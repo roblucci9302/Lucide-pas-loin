@@ -281,27 +281,122 @@ export class MessageAssistant extends LitElement {
     _renderMarkdown(content) {
         if (!content) return '';
 
-        // Simple markdown rendering (will be enhanced with marked.js later)
-        // For now, basic HTML escaping and newline conversion
-        let html = content
+        // Enhanced markdown rendering
+        let html = content;
+
+        // Escape HTML first
+        html = html
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/\n/g, '<br>');
+            .replace(/>/g, '&gt;');
 
-        // Basic markdown patterns
-        // Bold: **text**
-        html = html.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
-        // Italic: *text*
-        html = html.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
+        // Code blocks with language: ```language\ncode```
+        html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
+            const language = lang ? ` data-language="${lang}"` : '';
+            return `<pre${language}><code>${code.trim()}</code></pre>`;
+        });
+
         // Inline code: `code`
         html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
 
-        // Code blocks: ```code```
-        html = html.replace(/```([^`]+)```/g, '<pre><code>$1</code></pre>');
+        // Split into lines for block-level processing
+        const lines = html.split('\n');
+        const processed = [];
+        let inList = false;
+        let listType = null;
+
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i];
+
+            // Headers: # H1, ## H2, etc.
+            const headerMatch = line.match(/^(#{1,6})\s+(.+)$/);
+            if (headerMatch) {
+                const level = headerMatch[1].length;
+                const text = headerMatch[2];
+                processed.push(`<h${level}>${text}</h${level}>`);
+                continue;
+            }
+
+            // Unordered lists: - item or * item
+            const ulMatch = line.match(/^[\s]*[-*]\s+(.+)$/);
+            if (ulMatch) {
+                if (!inList || listType !== 'ul') {
+                    if (inList) processed.push(`</${listType}>`);
+                    processed.push('<ul>');
+                    inList = true;
+                    listType = 'ul';
+                }
+                processed.push(`<li>${ulMatch[1]}</li>`);
+                continue;
+            }
+
+            // Ordered lists: 1. item
+            const olMatch = line.match(/^[\s]*\d+\.\s+(.+)$/);
+            if (olMatch) {
+                if (!inList || listType !== 'ol') {
+                    if (inList) processed.push(`</${listType}>`);
+                    processed.push('<ol>');
+                    inList = true;
+                    listType = 'ol';
+                }
+                processed.push(`<li>${olMatch[1]}</li>`);
+                continue;
+            }
+
+            // Close list if we're not in a list item anymore
+            if (inList && !ulMatch && !olMatch) {
+                processed.push(`</${listType}>`);
+                inList = false;
+                listType = null;
+            }
+
+            // Blockquotes: > text
+            const quoteMatch = line.match(/^>\s+(.+)$/);
+            if (quoteMatch) {
+                processed.push(`<blockquote>${quoteMatch[1]}</blockquote>`);
+                continue;
+            }
+
+            // Horizontal rule: --- or ***
+            if (/^[-*]{3,}$/.test(line.trim())) {
+                processed.push('<hr>');
+                continue;
+            }
+
+            // Empty lines become paragraph breaks
+            if (line.trim() === '') {
+                processed.push('<br>');
+                continue;
+            }
+
+            // Regular lines
+            processed.push(line);
+        }
+
+        // Close any open list
+        if (inList) {
+            processed.push(`</${listType}>`);
+        }
+
+        html = processed.join('\n');
+
+        // Inline formatting (after block processing)
+        // Bold: **text** or __text__
+        html = html.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
+        html = html.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+
+        // Italic: *text* or _text_ (but not inside words)
+        html = html.replace(/(?<!\w)\*([^\*]+)\*(?!\w)/g, '<em>$1</em>');
+        html = html.replace(/(?<!\w)_([^_]+)_(?!\w)/g, '<em>$1</em>');
+
+        // Strikethrough: ~~text~~
+        html = html.replace(/~~([^~]+)~~/g, '<del>$1</del>');
 
         // Links: [text](url)
-        html = html.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+        html = html.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+
+        // Wrap paragraphs (text not in other blocks)
+        html = html.replace(/^(?!<[huplbdoa]|<br>)(.+)$/gm, '<p>$1</p>');
 
         return html;
     }
