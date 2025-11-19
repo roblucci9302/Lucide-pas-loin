@@ -73,8 +73,8 @@ export class AskView extends LitElement {
         .response-container pre {
             background: var(--color-black-40) !important;
             border-radius: var(--radius-md) !important;
-            padding: 12px !important;
-            margin: 8px 0 !important;
+            padding: var(--padding-sm) !important;
+            margin: var(--margin-xs) 0 !important;
             overflow-x: auto !important;
             border: 1px solid var(--color-white-10) !important;
             white-space: pre !important;
@@ -100,7 +100,7 @@ export class AskView extends LitElement {
 
         .response-container p code {
             background: var(--color-white-10) !important;
-            padding: 2px 4px !important;
+            padding: var(--space-0-5) var(--space-1) !important;
             border-radius: 4px !important;
             color: #ffd700 !important;
         }
@@ -171,7 +171,7 @@ export class AskView extends LitElement {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 16px;
+            padding: var(--padding-sm) var(--padding-md);
             background: transparent;
             border-bottom: 1px solid var(--color-white-10);
             flex-shrink: 0;
@@ -184,7 +184,7 @@ export class AskView extends LitElement {
         .header-left {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--gap-xs);
             flex-shrink: 0;
         }
 
@@ -221,7 +221,7 @@ export class AskView extends LitElement {
         .header-right {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--gap-xs);
             flex: 1;
             justify-content: flex-end;
         }
@@ -238,7 +238,7 @@ export class AskView extends LitElement {
 
         .header-controls {
             display: flex;
-            gap: 8px;
+            gap: var(--gap-xs);
             align-items: center;
             flex-shrink: 0;
         }
@@ -247,7 +247,7 @@ export class AskView extends LitElement {
             background: transparent;
             color: rgba(255, 255, 255, 0.9);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 4px;
+            padding: var(--space-1);
             border-radius: 4px;
             cursor: pointer;
             display: flex;
@@ -292,7 +292,7 @@ export class AskView extends LitElement {
             background: rgba(255, 255, 255, 0.07);
             color: white;
             border: none;
-            padding: 4px;
+            padding: var(--space-1);
             border-radius: 20px;
             outline: 1px rgba(255, 255, 255, 0.3) solid;
             outline-offset: -1px;
@@ -312,7 +312,7 @@ export class AskView extends LitElement {
 
         .response-container {
             flex: 1;
-            padding: 16px;
+            padding: var(--padding-md);
             padding-left: 48px;
             overflow-y: auto;
             font-size: 14px;
@@ -349,8 +349,8 @@ export class AskView extends LitElement {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            padding: 40px;
+            gap: var(--space-1-5);
+            padding: var(--space-10);
         }
 
         .loading-dot {
@@ -375,7 +375,7 @@ export class AskView extends LitElement {
 
         .response-line {
             position: relative;
-            padding: 2px 0;
+            padding: var(--space-0-5) 0;
             margin: 0;
             transition: background-color 0.15s ease;
         }
@@ -393,7 +393,7 @@ export class AskView extends LitElement {
             background: var(--color-white-10);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 4px;
-            padding: 2px;
+            padding: var(--space-0-5);
             cursor: pointer;
             opacity: 0;
             transition: opacity 0.15s ease, background-color 0.15s ease;
@@ -425,8 +425,8 @@ export class AskView extends LitElement {
         .text-input-container {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 12px 16px;
+            gap: var(--gap-xs);
+            padding: var(--padding-sm) var(--padding-md);
             background: rgba(0, 0, 0, 0.1);
             border-top: 1px solid var(--color-white-10);
             flex-shrink: 0;
@@ -449,7 +449,7 @@ export class AskView extends LitElement {
 
         #textInput {
             flex: 1;
-            padding: 10px 14px;
+            padding: var(--space-2-5) var(--space-3-5);
             background: rgba(0, 0, 0, 0.2);
             border-radius: 20px;
             outline: none;
@@ -475,18 +475,18 @@ export class AskView extends LitElement {
         .response-line h5,
         .response-line h6 {
             color: rgba(255, 255, 255, 0.95);
-            margin: 16px 0 8px 0;
+            margin: var(--space-4) 0 var(--margin-xs) 0;
             font-weight: 600;
         }
 
         .response-line p {
-            margin: 8px 0;
+            margin: var(--margin-xs) 0;
             color: rgba(255, 255, 255, 0.9);
         }
 
         .response-line ul,
         .response-line ol {
-            margin: 8px 0;
+            margin: var(--margin-xs) 0;
             padding-left: 20px;
         }
 

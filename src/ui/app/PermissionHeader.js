@@ -30,7 +30,7 @@ export class PermissionHeader extends TranslationMixin(LitElement) {
             -webkit-app-region: drag;
             width: 285px;
             /* height is now set dynamically */
-            padding: 18px 20px;
+            padding: var(--space-4-5) var(--space-5);
             background: var(--color-black-30);
             border-radius: var(--radius-lg);
             overflow: hidden;
@@ -59,8 +59,8 @@ export class PermissionHeader extends TranslationMixin(LitElement) {
         .close-button {
             -webkit-app-region: no-drag;
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: var(--space-2-5);
+            right: var(--space-2-5);
             width: 14px;
             height: 14px;
             background: var(--color-white-10);
@@ -115,7 +115,7 @@ export class PermissionHeader extends TranslationMixin(LitElement) {
             font-size: 11px;
             font-weight: 400;
             text-align: center;
-            margin-bottom: 12px;
+            margin-bottom: var(--margin-sm);
             line-height: 1.3;
         }
 
@@ -123,15 +123,15 @@ export class PermissionHeader extends TranslationMixin(LitElement) {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            margin-bottom: 12px;
+            gap: var(--gap-xs);
+            margin-bottom: var(--margin-sm);
             min-height: 20px;
         }
 
         .permission-item {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: var(--space-1-5);
             color: var(--color-white-80);
             font-size: 11px;
             font-weight: 400;
@@ -167,7 +167,7 @@ export class PermissionHeader extends TranslationMixin(LitElement) {
             transition: background var(--transition-fast) var(--easing-ease);
             position: relative;
             overflow: hidden;
-            margin-bottom: 6px;
+            margin-bottom: var(--space-1-5);
         }
 
         .action-button::after {
@@ -209,7 +209,7 @@ export class PermissionHeader extends TranslationMixin(LitElement) {
             transition: background var(--transition-fast) var(--easing-ease);
             position: relative;
             overflow: hidden;
-            margin-top: 4px;
+            margin-top: var(--space-1);
         }
 
         .continue-button::after {

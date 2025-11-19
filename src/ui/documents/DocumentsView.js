@@ -25,15 +25,15 @@ export class DocumentsView extends TranslationMixin(LitElement) {
             display: flex;
             flex-direction: column;
             height: 100%;
-            padding: 16px;
-            gap: 16px;
+            padding: var(--padding-md);
+            gap: var(--gap-md);
         }
 
         .header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding-bottom: 12px;
+            padding-bottom: var(--padding-sm);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
@@ -47,7 +47,7 @@ export class DocumentsView extends TranslationMixin(LitElement) {
             background: color-mix(in srgb, var(--color-primary-500) 20%, transparent);
             border: 1px solid color-mix(in srgb, var(--color-primary-500) 40%, transparent);
             color: white;
-            padding: 8px 16px;
+            padding: var(--padding-xs) var(--padding-md);
             border-radius: var(--radius-md);
             cursor: pointer;
             font-size: 13px;
@@ -59,12 +59,12 @@ export class DocumentsView extends TranslationMixin(LitElement) {
 
         .search-bar {
             display: flex;
-            gap: 8px;
+            gap: var(--gap-xs);
         }
 
         .search-input {
             flex: 1;
-            padding: 10px 14px;
+            padding: var(--space-2-5) var(--space-3-5);
             background: var(--color-white-5);
             border: 1px solid var(--color-white-10);
             border-radius: var(--radius-md);
@@ -77,14 +77,14 @@ export class DocumentsView extends TranslationMixin(LitElement) {
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: var(--gap-xs);
         }
 
         .document-card {
             background: var(--color-white-5);
             border: 1px solid var(--color-white-10);
             border-radius: var(--radius-md);
-            padding: 12px;
+            padding: var(--padding-sm);
             cursor: pointer;
             transition: all var(--transition-base) var(--easing-standard);
         }
@@ -98,7 +98,7 @@ export class DocumentsView extends TranslationMixin(LitElement) {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 6px;
+            margin-bottom: var(--space-1-5);
         }
 
         .doc-title {
@@ -114,14 +114,14 @@ export class DocumentsView extends TranslationMixin(LitElement) {
 
         .no-documents {
             text-align: center;
-            padding: 60px 20px;
+            padding: var(--space-15) var(--space-5);
             color: var(--color-white-50);
         }
 
         .stats {
             display: flex;
-            gap: 16px;
-            padding: 12px;
+            gap: var(--gap-md);
+            padding: var(--padding-sm);
             background: var(--color-white-3);
             border-radius: var(--radius-md);
         }
@@ -140,7 +140,7 @@ export class DocumentsView extends TranslationMixin(LitElement) {
         .stat-label {
             font-size: 11px;
             color: var(--color-white-50);
-            margin-top: 4px;
+            margin-top: var(--space-1);
         }
     `;
 

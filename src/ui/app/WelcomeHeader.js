@@ -16,22 +16,22 @@ export class WelcomeHeader extends LitElement {
             width: 100%;
             box-sizing: border-box;
             height: auto;
-            padding: 24px 16px;
+            padding: var(--padding-lg) var(--padding-md);
             background: rgba(0, 0, 0, 0.64);
             box-shadow: 0px 0px 0px 1.5px rgba(255, 255, 255, 0.64) inset;
             border-radius: 16px;
             flex-direction: column;
             justify-content: flex-start;
             align-items: flex-start;
-            gap: 32px;
+            gap: var(--gap-xl);
             display: inline-flex;
             -webkit-app-region: drag;
         }
         .close-button {
             -webkit-app-region: no-drag;
             position: absolute;
-            top: 16px;
-            right: 16px;
+            top: var(--space-4);
+            right: var(--space-4);
             width: 20px;
             height: 20px;
             background: rgba(255, 255, 255, 0.1);
@@ -56,7 +56,7 @@ export class WelcomeHeader extends LitElement {
             flex-direction: column;
             justify-content: flex-start;
             align-items: flex-start;
-            gap: 4px;
+            gap: var(--gap-xs);
             display: flex;
         }
         .title {
@@ -73,7 +73,7 @@ export class WelcomeHeader extends LitElement {
             width: 100%;
             justify-content: flex-start;
             align-items: flex-start;
-            gap: 8px;
+            gap: var(--space-2);
             display: inline-flex;
         }
         .divider {
@@ -88,7 +88,7 @@ export class WelcomeHeader extends LitElement {
             flex-direction: column;
             justify-content: flex-start;
             align-items: flex-start;
-            gap: 8px;
+            gap: var(--space-2);
             display: inline-flex;
             min-width: 0;
         }
@@ -109,14 +109,14 @@ export class WelcomeHeader extends LitElement {
         }
         .action-button {
             -webkit-app-region: no-drag;
-            padding: 8px 10px;
+            padding: var(--padding-xs) var(--space-2-5);
             background: rgba(132.6, 132.6, 132.6, 0.8);
             box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.16);
             border-radius: 16px;
             border: 1px solid rgba(255, 255, 255, 0.5);
             justify-content: center;
             align-items: center;
-            gap: 6px;
+            gap: var(--space-1-5);
             display: flex;
             cursor: pointer;
             transition: background-color 0.2s;
@@ -141,7 +141,7 @@ export class WelcomeHeader extends LitElement {
             border: solid white;
             border-width: 0 1.2px 1.2px 0;
             display: inline-block;
-            padding: 3px;
+            padding: var(--space-0-5);
             transform: rotate(-45deg);
             -webkit-transform: rotate(-45deg);
         }
