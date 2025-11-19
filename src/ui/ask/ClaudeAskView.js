@@ -6,6 +6,7 @@ import '../components/base/ClaudeButton.js';
 import '../components/base/ClaudeAvatar.js';
 import '../components/messages/MessageUser.js';
 import '../components/messages/MessageAssistant.js';
+import '../components/input/ClaudeInputArea.js';
 
 /**
  * ClaudeAskView - Ask interface with Claude.ai layout
@@ -26,6 +27,7 @@ export class ClaudeAskView extends LitElement {
         currentConversation: { type: Object },
         messages: { type: Array },
         inputValue: { type: String },
+        attachedFiles: { type: Array },
         isLoading: { type: Boolean },
         sidebarVisible: { type: Boolean },
         artifactsVisible: { type: Boolean },
@@ -58,92 +60,7 @@ export class ClaudeAskView extends LitElement {
             gap: var(--claude-message-gap, 24px);
         }
 
-        /* Input area (fixed at bottom) */
-        .input-area {
-            position: sticky;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--claude-bg-primary, #F5F5F0);
-            padding: 16px 0 24px 0;
-            border-top: 1px solid var(--claude-border-subtle, #e5e5e0);
-            z-index: var(--claude-z-input, 300);
-        }
-
-        .input-wrapper {
-            max-width: var(--claude-chat-max-width, 800px);
-            margin: 0 auto;
-            padding: 0 var(--claude-chat-padding, 24px);
-        }
-
-        .input-container {
-            display: flex;
-            gap: 12px;
-            align-items: flex-end;
-            background: var(--claude-input-bg, #FFFFFF);
-            border: 1px solid var(--claude-input-border, #e5e5e0);
-            border-radius: var(--claude-input-radius, 24px);
-            padding: 12px 16px;
-            transition: border-color var(--claude-transition-base, 200ms) ease;
-        }
-
-        .input-container:focus-within {
-            border-color: var(--claude-input-border-focus, #D97706);
-            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
-        }
-
-        claude-input {
-            flex: 1;
-        }
-
-        .send-button {
-            flex-shrink: 0;
-        }
-
-        .attach-button {
-            flex-shrink: 0;
-        }
-
-        .input-footer {
-            margin-top: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: var(--claude-font-size-xs, 12px);
-            color: var(--claude-text-tertiary, #9b9b9b);
-            padding: 0 16px;
-        }
-
-        /* Send button (circular) */
-        .send-btn {
-            width: 32px;
-            height: 32px;
-            min-width: 32px;
-            min-height: 32px;
-            border-radius: 50%;
-            background: var(--claude-send-btn-bg, #D97706);
-            color: white;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all var(--claude-transition-base, 200ms) ease;
-            font-size: 16px;
-        }
-
-        .send-btn:hover:not(:disabled) {
-            background: var(--claude-send-btn-bg-hover, #B45309);
-            transform: scale(1.05);
-        }
-
-        .send-btn:disabled {
-            background: var(--claude-send-btn-bg-disabled, #e5e5e0);
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-
-        /* Messages - styles handled by message components */
+        /* Input area - styles handled by ClaudeInputArea component */
 
         /* Empty state */
         .empty-state {
@@ -233,6 +150,7 @@ export class ClaudeAskView extends LitElement {
         this.currentConversation = null;
         this.messages = [];
         this.inputValue = '';
+        this.attachedFiles = [];
         this.isLoading = false;
         this.sidebarVisible = true;
         this.artifactsVisible = false;
@@ -267,27 +185,29 @@ export class ClaudeAskView extends LitElement {
         this.inputValue = e.detail.value;
     }
 
-    _handleSubmit() {
-        if (!this.inputValue.trim() || this.isLoading) return;
+    _handleInputSubmit(e) {
+        if ((!this.inputValue.trim() && this.attachedFiles.length === 0) || this.isLoading) return;
 
         const userMessage = {
             id: Date.now().toString(),
             role: 'user',
             content: this.inputValue,
+            files: this.attachedFiles.length > 0 ? this.attachedFiles : undefined,
             created_at: new Date().toISOString()
         };
 
         this.messages = [...this.messages, userMessage];
         this.inputValue = '';
+        this.attachedFiles = [];
         this.isLoading = true;
 
-        // TODO: Send to AI via IPC
+        // TODO: Send to AI via IPC (include files)
         // Mock response
         setTimeout(() => {
             const assistantMessage = {
                 id: (Date.now() + 1).toString(),
                 role: 'assistant',
-                content: 'Ceci est une réponse de démonstration. L\'intégration avec le service Ask sera ajoutée prochainement.',
+                content: `Ceci est une réponse de démonstration. ${userMessage.files ? `J'ai reçu ${userMessage.files.length} fichier(s).` : ''} L'intégration avec le service Ask sera ajoutée prochainement.`,
                 created_at: new Date().toISOString()
             };
             this.messages = [...this.messages, assistantMessage];
@@ -295,10 +215,14 @@ export class ClaudeAskView extends LitElement {
         }, 1500);
     }
 
-    _handleKeyDown(e) {
-        if (e.detail.originalEvent.key === 'Enter' && !e.detail.originalEvent.shiftKey) {
-            this._handleSubmit();
-        }
+    _handleFilesAttached(e) {
+        this.attachedFiles = e.detail.files;
+        console.log('[ClaudeAskView] Files attached:', this.attachedFiles);
+    }
+
+    _handleFileRemoved(e) {
+        this.attachedFiles = e.detail.files;
+        console.log('[ClaudeAskView] File removed, remaining:', this.attachedFiles);
     }
 
     _handleNewConversation() {
@@ -428,34 +352,16 @@ export class ClaudeAskView extends LitElement {
                             ${this._renderMessages()}
                         </div>
 
-                        <div class="input-area">
-                            <div class="input-wrapper">
-                                <div class="input-container">
-                                    <button class="attach-button" title="Joindre un fichier">
-                                        📎
-                                    </button>
-                                    <claude-input
-                                        placeholder="Parler avec Lucide..."
-                                        .value="${this.inputValue}"
-                                        @input-change="${this._handleInput}"
-                                        @keydown="${this._handleKeyDown}"
-                                        .maxHeight="${200}"
-                                    ></claude-input>
-                                    <button
-                                        class="send-btn"
-                                        ?disabled="${!this.inputValue.trim() || this.isLoading}"
-                                        @click="${this._handleSubmit}"
-                                        title="Envoyer (Enter)"
-                                    >
-                                        ↑
-                                    </button>
-                                </div>
-                                <div class="input-footer">
-                                    <span>Lucide peut faire des erreurs. Vérifiez les informations importantes.</span>
-                                    <span>${this.inputValue.length} caractères</span>
-                                </div>
-                            </div>
-                        </div>
+                        <claude-input-area
+                            .value="${this.inputValue}"
+                            .attachedFiles="${this.attachedFiles}"
+                            ?disabled="${this.isLoading}"
+                            placeholder="Parler avec Lucide..."
+                            @input-change="${this._handleInput}"
+                            @submit="${this._handleInputSubmit}"
+                            @files-attached="${this._handleFilesAttached}"
+                            @file-removed="${this._handleFileRemoved}"
+                        ></claude-input-area>
                     </div>
                 </div>
 
