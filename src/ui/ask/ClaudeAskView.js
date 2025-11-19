@@ -7,6 +7,7 @@ import '../components/base/ClaudeAvatar.js';
 import '../components/messages/MessageUser.js';
 import '../components/messages/MessageAssistant.js';
 import '../components/input/ClaudeInputArea.js';
+import '../components/artifacts/ArtifactsPanel.js';
 
 /**
  * ClaudeAskView - Ask interface with Claude.ai layout
@@ -32,6 +33,7 @@ export class ClaudeAskView extends LitElement {
         sidebarVisible: { type: Boolean },
         artifactsVisible: { type: Boolean },
         currentMode: { type: String },
+        currentArtifact: { type: Object },
     };
 
     static styles = css`
@@ -155,6 +157,7 @@ export class ClaudeAskView extends LitElement {
         this.sidebarVisible = true;
         this.artifactsVisible = false;
         this.currentMode = 'ask';
+        this.currentArtifact = null;
     }
 
     async connectedCallback() {
@@ -202,12 +205,50 @@ export class ClaudeAskView extends LitElement {
         this.isLoading = true;
 
         // TODO: Send to AI via IPC (include files)
-        // Mock response
+        // Mock response with artifact detection
         setTimeout(() => {
+            const shouldShowArtifact = /code|exemple|function|component|html|react/i.test(userMessage.content);
+
+            let assistantContent = `Ceci est une réponse de démonstration. ${userMessage.files ? `J'ai reçu ${userMessage.files.length} fichier(s).` : ''} L'intégration avec le service Ask sera ajoutée prochainement.`;
+
+            if (shouldShowArtifact) {
+                assistantContent += '\n\nVoici un exemple de code pour vous aider :';
+
+                // Create mock artifact
+                const artifact = {
+                    id: `artifact-${Date.now()}`,
+                    title: 'Exemple de code',
+                    type: 'code',
+                    language: 'javascript',
+                    content: `// Exemple de fonction JavaScript
+function greet(name) {
+    return \`Bonjour, \${name}!\`;
+}
+
+// Utilisation
+const message = greet("Lucide");
+console.log(message);
+
+// Fonction asynchrone
+async function fetchData(url) {
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Erreur:', error);
+        throw error;
+    }
+}`
+                };
+
+                this._showArtifact(artifact);
+            }
+
             const assistantMessage = {
                 id: (Date.now() + 1).toString(),
                 role: 'assistant',
-                content: `Ceci est une réponse de démonstration. ${userMessage.files ? `J'ai reçu ${userMessage.files.length} fichier(s).` : ''} L'intégration avec le service Ask sera ajoutée prochainement.`,
+                content: assistantContent,
                 created_at: new Date().toISOString()
             };
             this.messages = [...this.messages, assistantMessage];
@@ -294,6 +335,16 @@ export class ClaudeAskView extends LitElement {
         // TODO: Show share dialog
     }
 
+    _handleArtifactClose() {
+        this.artifactsVisible = false;
+        this.currentArtifact = null;
+    }
+
+    _showArtifact(artifact) {
+        this.currentArtifact = artifact;
+        this.artifactsVisible = true;
+    }
+
     _renderMessages() {
         if (this.messages.length === 0) {
             return html`
@@ -367,10 +418,10 @@ export class ClaudeAskView extends LitElement {
 
                 <!-- Artifacts slot (when needed) -->
                 <div slot="artifacts">
-                    <!-- TODO: Artifacts panel content -->
-                    <div style="padding: 24px; color: var(--claude-text-tertiary);">
-                        Artifacts panel (à venir)
-                    </div>
+                    <artifacts-panel
+                        .artifact="${this.currentArtifact}"
+                        @close="${this._handleArtifactClose}"
+                    ></artifacts-panel>
                 </div>
             </claude-layout>
         `;
