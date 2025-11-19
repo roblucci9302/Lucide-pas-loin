@@ -9,7 +9,9 @@ import '../components/messages/MessageAssistant.js';
 import '../components/input/ClaudeInputArea.js';
 import '../components/artifacts/ArtifactsPanel.js';
 import '../components/settings/SettingsPanel.js';
+import '../components/notifications/ToastContainer.js';
 import { claudeAskBridgeService } from '../services/claudeAskBridgeService.js';
+import { toastService } from '../services/toastService.js';
 
 /**
  * ClaudeAskView - Ask interface with Claude.ai layout
@@ -245,7 +247,7 @@ export class ClaudeAskView extends LitElement {
         this._unsubscribeError = claudeAskBridgeService.on('error', ({ error }) => {
             console.error('[ClaudeAskView] Error from bridge:', error);
             this.isLoading = false;
-            // TODO: Show error notification
+            toastService.error(`Erreur: ${error}`);
         });
     }
 
@@ -351,7 +353,7 @@ export class ClaudeAskView extends LitElement {
 
             if (!result.success) {
                 console.error('[ClaudeAskView] Failed to send message:', result.error);
-                // TODO: Show error notification
+                toastService.error(`Échec de l'envoi: ${result.error}`);
                 this.isLoading = false;
             }
 
@@ -359,8 +361,8 @@ export class ClaudeAskView extends LitElement {
             // which will handle the streaming updates
         } catch (error) {
             console.error('[ClaudeAskView] Error sending message:', error);
+            toastService.error(`Erreur lors de l'envoi: ${error.message}`);
             this.isLoading = false;
-            // TODO: Show error notification
         }
     }
 
@@ -433,7 +435,7 @@ export class ClaudeAskView extends LitElement {
 
     _handleMessageCopied(e) {
         console.log('[ClaudeAskView] Message copied:', e.detail.messageId);
-        // TODO: Show toast notification
+        toastService.success('Message copié dans le presse-papier');
     }
 
     _handleMessageFeedback(e) {
@@ -547,6 +549,9 @@ export class ClaudeAskView extends LitElement {
                 ?open="${this.settingsOpen}"
                 @close="${this._handleSettingsClose}"
             ></settings-panel>
+
+            <!-- Toast Container (for notifications) -->
+            <toast-container></toast-container>
         `;
     }
 }
