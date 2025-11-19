@@ -115,7 +115,7 @@ export class ProfileSuggestionBanner extends LitElement {
             color: #4ade80;
             background: rgba(74, 222, 128, 0.15);
             padding: 2px 8px;
-            border-radius: 6px;
+            border-radius: 8px;
         }
 
         .reason {

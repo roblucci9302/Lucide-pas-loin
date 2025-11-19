@@ -173,7 +173,7 @@ export class ApiKeyHeader extends TranslationMixin(LitElement) {
             width: 240px;
             padding: 10px 8px;
             background: rgba(61.2, 61.2, 61.2, 0.8);
-            border-radius: 6px;
+            border-radius: 8px;
             border: 1px solid rgba(255, 255, 255, 0.24);
             color: white;
             font-size: 11px;

@@ -65,7 +65,7 @@ export class HistoryView extends LitElement {
             padding: 8px 12px;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 6px;
+            border-radius: 8px;
             color: white;
             font-size: 12px;
             outline: none;
@@ -121,12 +121,12 @@ export class HistoryView extends LitElement {
 
         .sessions-list::-webkit-scrollbar-track {
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 3px;
+            border-radius: 4px;
         }
 
         .sessions-list::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.2);
-            border-radius: 3px;
+            border-radius: 4px;
         }
 
         .session-item {

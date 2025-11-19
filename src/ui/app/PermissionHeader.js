@@ -65,7 +65,7 @@ export class PermissionHeader extends TranslationMixin(LitElement) {
             height: 14px;
             background: rgba(255, 255, 255, 0.1);
             border: none;
-            border-radius: 3px;
+            border-radius: 4px;
             color: rgba(255, 255, 255, 0.7);
             cursor: pointer;
             display: flex;

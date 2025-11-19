@@ -207,7 +207,7 @@ export class MainHeader extends TranslationMixin(LitElement) {
             gap: 12px;
             display: flex;
             padding: 0 4px;
-            border-radius: 6px;
+            border-radius: 8px;
             transition: background 0.15s ease;
         }
 
@@ -371,10 +371,10 @@ export class MainHeader extends TranslationMixin(LitElement) {
 
     _getListenButtonText(status) {
         switch (status) {
-            case 'beforeSession': return 'Écouter';
-            case 'inSession'   : return 'Stop';
-            case 'afterSession': return 'Terminé';
-            default            : return 'Écouter';
+            case 'beforeSession': return this.t('header.listen');
+            case 'inSession'   : return this.t('header.stop');
+            case 'afterSession': return this.t('header.done');
+            default            : return this.t('header.listen');
         }
     }
 
@@ -626,12 +626,12 @@ export class MainHeader extends TranslationMixin(LitElement) {
 
     render() {
         const listenButtonText = this._getListenButtonText(this.listenSessionStatus);
-    
+
         const buttonClasses = {
-            active: listenButtonText === 'Stop',
-            done: listenButtonText === 'Done',
+            active: this.listenSessionStatus === 'inSession',
+            done: this.listenSessionStatus === 'afterSession',
         };
-        const showStopIcon = listenButtonText === 'Stop' || listenButtonText === 'Done';
+        const showStopIcon = this.listenSessionStatus === 'inSession' || this.listenSessionStatus === 'afterSession';
 
         return html`
             <div class="header" @mousedown=${this.handleMouseDown}>

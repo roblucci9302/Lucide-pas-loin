@@ -73,7 +73,7 @@ export class ListenView extends LitElement {
 .insights-container p code {
     background: rgba(255, 255, 255, 0.1) !important;
     padding: 2px 4px !important;
-    border-radius: 3px !important;
+    border-radius: 4px !important;
     color: #ffd700 !important;
 }
 
@@ -244,7 +244,7 @@ export class ListenView extends LitElement {
             outline: none;
             box-shadow: none;
             padding: 4px;
-            border-radius: 3px;
+            border-radius: 4px;
             cursor: pointer;
             display: flex;
             align-items: center;

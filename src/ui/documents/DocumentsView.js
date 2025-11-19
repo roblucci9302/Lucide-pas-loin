@@ -48,7 +48,7 @@ export class DocumentsView extends TranslationMixin(LitElement) {
             border: 1px solid rgba(100, 150, 255, 0.4);
             color: white;
             padding: 8px 16px;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 13px;
         }

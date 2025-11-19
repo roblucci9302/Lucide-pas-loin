@@ -41,7 +41,7 @@ export class SummaryView extends LitElement {
         .insights-container p code {
             background: rgba(255, 255, 255, 0.1) !important;
             padding: 2px 4px !important;
-            border-radius: 3px !important;
+            border-radius: 4px !important;
             color: #ffd700 !important;
         }
 

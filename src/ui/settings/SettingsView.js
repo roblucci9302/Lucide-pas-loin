@@ -38,12 +38,12 @@ export class SettingsView extends LitElement {
 
         .settings-container::-webkit-scrollbar-track {
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 3px;
+            border-radius: 4px;
         }
 
         .settings-container::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.2);
-            border-radius: 3px;
+            border-radius: 4px;
         }
 
         .settings-container::-webkit-scrollbar-thumb:hover {
@@ -147,7 +147,7 @@ export class SettingsView extends LitElement {
 
         .cmd-key, .shortcut-key {
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
+            border-radius: 4px;
             width: 16px;
             height: 16px;
             display: flex;
@@ -292,7 +292,7 @@ export class SettingsView extends LitElement {
             align-items: center;
             padding: 4px 6px;
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 3px;
+            border-radius: 4px;
             cursor: pointer;
             transition: all 0.15s ease;
             font-size: 11px;
@@ -407,7 +407,7 @@ export class SettingsView extends LitElement {
         .model-item { 
             padding: 5px 8px; 
             font-size: 11px; 
-            border-radius: 3px; 
+            border-radius: 4px; 
             cursor: pointer; 
             transition: background-color 0.15s; 
             display: flex; 

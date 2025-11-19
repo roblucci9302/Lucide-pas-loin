@@ -28,7 +28,7 @@ export class ShortcutSettingsView extends TranslationMixin(LitElement) {
             position:relative; overflow:hidden; padding:12px; }
 
         .close-button{position:absolute;top:10px;right:10px;inline-size:14px;block-size:14px;
-            background:rgba(255,255,255,.1);border:none;border-radius:3px;
+            background:rgba(255,255,255,.1);border:none;border-radius:4px;
             color:rgba(255,255,255,.7);display:grid;place-items:center;
             font-size:14px;line-height:0;cursor:pointer;transition:.15s;z-index:10;}
         .close-button:hover{background:rgba(255,255,255,.2);color:rgba(255,255,255,.9);}
