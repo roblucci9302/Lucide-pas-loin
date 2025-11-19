@@ -9,6 +9,7 @@ const agentProfileService = require('../../features/common/services/agentProfile
 const conversationHistoryService = require('../../features/common/services/conversationHistoryService');
 const exportService = require('../../features/common/services/exportService');
 const askService = require('../../features/ask/askService');
+const browserService = require('../../features/browser/browserService');
 const listenService = require('../../features/listen/listenService');
 
 module.exports = {
@@ -179,6 +180,38 @@ module.exports = {
                 return { success: true };
             } catch (error) {
                 console.error('[ConversationBridge] ask:setBrowserMode failed', error.message);
+                return { success: false, error: error.message };
+            }
+        });
+
+        // Browser Feature
+        ipcMain.handle('browser:show', async (event, url) => {
+            console.log('[ConversationBridge] browser:show called', { url });
+            try {
+                const result = await browserService.showBrowser(url);
+                return result;
+            } catch (error) {
+                console.error('[ConversationBridge] browser:show failed', error.message);
+                return { success: false, error: error.message };
+            }
+        });
+        ipcMain.handle('browser:navigateTo', async (event, url) => {
+            console.log('[ConversationBridge] browser:navigateTo called', { url });
+            try {
+                const result = await browserService.navigateTo(url);
+                return result;
+            } catch (error) {
+                console.error('[ConversationBridge] browser:navigateTo failed', error.message);
+                return { success: false, error: error.message };
+            }
+        });
+        ipcMain.handle('browser:close', async () => {
+            console.log('[ConversationBridge] browser:close called');
+            try {
+                const result = await browserService.closeBrowser();
+                return result;
+            } catch (error) {
+                console.error('[ConversationBridge] browser:close failed', error.message);
                 return { success: false, error: error.message };
             }
         });
