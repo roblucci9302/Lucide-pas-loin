@@ -59,7 +59,7 @@ export class SettingsView extends LitElement {
             bottom: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.15);
+            background: var(--color-black-15);
             box-shadow: var(--shadow-lg);
             border-radius: var(--radius-lg);
             filter: blur(10px);
@@ -78,7 +78,7 @@ export class SettingsView extends LitElement {
             justify-content: space-between;
             align-items: flex-start;
             padding-bottom: 6px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid var(--color-white-10);
             position: relative;
             z-index: 1;
         }
@@ -98,7 +98,7 @@ export class SettingsView extends LitElement {
 
         .account-info {
             font-size: 11px;
-            color: rgba(255, 255, 255, 0.7);
+            color: var(--color-white-70);
             margin: 0;
         }
 
@@ -146,7 +146,7 @@ export class SettingsView extends LitElement {
         }
 
         .cmd-key, .shortcut-key {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--color-white-10);
             border-radius: 4px;
             width: 16px;
             height: 16px;
@@ -155,7 +155,7 @@ export class SettingsView extends LitElement {
             justify-content: center;
             font-size: 11px;
             font-weight: 500;
-            color: rgba(255, 255, 255, 0.9);
+            color: var(--color-white-90);
         }
 
         /* Buttons Section */
@@ -164,14 +164,14 @@ export class SettingsView extends LitElement {
             flex-direction: column;
             gap: 4px;
             padding-top: 6px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid var(--color-white-10);
             position: relative;
             z-index: 1;
             flex: 1;
         }
 
         .settings-button {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--color-white-10);
             border: 1px solid var(--color-white-20);
             border-radius: 4px;
             color: white;
@@ -187,7 +187,7 @@ export class SettingsView extends LitElement {
         }
 
         .settings-button:hover {
-            background: rgba(255, 255, 255, 0.15);
+            background: var(--color-white-15);
             border-color: var(--scrollbar-thumb-hover);
         }
 
@@ -204,14 +204,14 @@ export class SettingsView extends LitElement {
         }
 
         .settings-button.danger {
-            background: rgba(255, 59, 48, 0.1);
-            border-color: rgba(255, 59, 48, 0.3);
-            color: rgba(255, 59, 48, 0.9);
+            background: color-mix(in srgb, var(--color-error-500) 10%, transparent);
+            border-color: color-mix(in srgb, var(--color-error-500) 30%, transparent);
+            color: color-mix(in srgb, var(--color-error-500) 90%, transparent);
         }
 
         .settings-button.danger:hover {
-            background: rgba(255, 59, 48, 0.15);
-            border-color: rgba(255, 59, 48, 0.4);
+            background: color-mix(in srgb, var(--color-error-500) 15%, transparent);
+            border-color: color-mix(in srgb, var(--color-error-500) 40%, transparent);
         }
 
         .move-buttons, .bottom-buttons {
@@ -221,13 +221,13 @@ export class SettingsView extends LitElement {
 
         .api-key-section {
             padding: 6px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid var(--color-white-10);
         }
 
         .api-key-section input {
             width: 100%;
-            background: rgba(0,0,0,0.2);
-            border: 1px solid rgba(255,255,255,0.2);
+            background: var(--color-black-20);
+            border: 1px solid var(--color-white-20);
             color: white;
             border-radius: 4px;
             padding: 4px;
@@ -237,13 +237,13 @@ export class SettingsView extends LitElement {
         }
 
         .api-key-section input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
+            color: var(--color-white-40);
         }
 
         /* Preset Management Section */
         .preset-section {
             padding: 6px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid var(--color-white-10);
         }
 
         .preset-header {
@@ -261,13 +261,13 @@ export class SettingsView extends LitElement {
 
         .preset-count {
             font-size: 9px;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--color-white-50);
             margin-left: 4px;
         }
 
         .preset-toggle {
             font-size: 10px;
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--color-white-60);
             cursor: pointer;
             padding: 2px 4px;
             border-radius: 2px;
@@ -275,7 +275,7 @@ export class SettingsView extends LitElement {
         }
 
         .preset-toggle:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--color-white-10);
         }
 
         .preset-list {
@@ -300,8 +300,8 @@ export class SettingsView extends LitElement {
         }
 
         .preset-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.1);
+            background: var(--color-white-10);
+            border-color: var(--color-white-10);
         }
 
         .preset-item.selected {
@@ -333,7 +333,7 @@ export class SettingsView extends LitElement {
         .no-presets-message {
             padding: 12px 8px;
             text-align: center;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--color-white-50);
             font-size: 10px;
             line-height: 1.4;
         }
@@ -353,7 +353,7 @@ export class SettingsView extends LitElement {
             align-items: center;
             justify-content: center;
             padding: 20px;
-            color: rgba(255, 255, 255, 0.7);
+            color: var(--color-white-70);
             font-size: 11px;
         }
 
@@ -373,7 +373,7 @@ export class SettingsView extends LitElement {
 
         .api-key-section, .model-selection-section {
             padding: 8px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid var(--color-white-10);
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -394,7 +394,7 @@ export class SettingsView extends LitElement {
             font-weight: 600;
         }
         .provider-key-group input {
-            width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.2);
+            width: 100%; background: var(--color-black-20); border: 1px solid var(--color-white-20);
             color: white; border-radius: 4px; padding: 5px 8px; font-size: 11px; box-sizing: border-box;
         }
         .key-buttons { display: flex; gap: 4px; }
@@ -439,7 +439,7 @@ export class SettingsView extends LitElement {
         
         /* Dropdown styles */
         select.model-dropdown {
-            background: rgba(0,0,0,0.2);
+            background: var(--color-black-20);
             color: white;
             cursor: pointer;
         }
@@ -1408,7 +1408,7 @@ export class SettingsView extends LitElement {
                 ${modelSelectionHTML}
 
                 <!-- Agent Profile Selection Section -->
-                <div class="agent-profile-section" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                <div class="agent-profile-section" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--color-white-10);">
                     <div class="section-header" style="font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.7); margin-bottom: 8px;">
                         Mode de Lucy
                     </div>
@@ -1419,7 +1419,7 @@ export class SettingsView extends LitElement {
                                  style="
                                      padding: 10px 12px;
                                      background: ${this.activeProfile === profile.id ? 'rgba(100, 150, 255, 0.2)' : 'var(--scrollbar-track)'};
-                                     border: 1px solid ${this.activeProfile === profile.id ? 'rgba(100, 150, 255, 0.4)' : 'rgba(255, 255, 255, 0.1)'};
+                                     border: 1px solid ${this.activeProfile === profile.id ? 'rgba(100, 150, 255, 0.4)' : 'var(--color-white-10)'};
                                      border-radius: 8px;
                                      cursor: pointer;
                                      transition: all 0.2s;
@@ -1453,7 +1453,7 @@ export class SettingsView extends LitElement {
                     </div>
                 </div>
 
-                <div class="buttons-section" style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 6px; margin-top: 12px;">
+                <div class="buttons-section" style="border-top: 1px solid var(--color-white-10); padding-top: 6px; margin-top: 12px;">
                     <button class="settings-button full-width" @click=${this.openShortcutEditor}>
                         Modifier les raccourcis
                     </button>

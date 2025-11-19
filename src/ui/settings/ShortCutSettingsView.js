@@ -17,58 +17,58 @@ const displayNameMap = {
 
 export class ShortcutSettingsView extends TranslationMixin(LitElement) {
     static styles = css`
-        * { font-family:'Helvetica Neue',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+        * { font-family:var(--font-family-primary);
             cursor:default; user-select:none; box-sizing:border-box; }
 
         :host { display:flex; width:100%; height:100%; color:white; }
 
         .container { display:flex; flex-direction:column; height:100%;
-            background:rgba(20,20,20,.9); border-radius:12px;
-            outline:.5px rgba(255,255,255,.2) solid; outline-offset:-1px;
+            background:color-mix(in srgb, var(--color-gray-900) 90%, transparent); border-radius:var(--radius-lg);
+            outline:.5px var(--color-white-20) solid; outline-offset:-1px;
             position:relative; overflow:hidden; padding:12px; }
 
         .close-button{position:absolute;top:10px;right:10px;inline-size:14px;block-size:14px;
-            background:rgba(255,255,255,.1);border:none;border-radius:4px;
-            color:rgba(255,255,255,.7);display:grid;place-items:center;
-            font-size:14px;line-height:0;cursor:pointer;transition:.15s;z-index:10;}
-        .close-button:hover{background:rgba(255,255,255,.2);color:rgba(255,255,255,.9);}
+            background:var(--color-white-10);border:none;border-radius:var(--radius-sm);
+            color:var(--color-white-70);display:grid;place-items:center;
+            font-size:14px;line-height:0;cursor:pointer;transition:var(--transition-fast);z-index:10;}
+        .close-button:hover{background:var(--color-white-20);color:var(--color-white-90);}
 
         .title{font-size:14px;font-weight:500;margin:0 0 8px;padding-bottom:8px;
-            border-bottom:1px solid rgba(255,255,255,.1);text-align:center;}
+            border-bottom:1px solid var(--color-white-10);text-align:center;}
 
         .scroll-area{flex:1 1 auto;overflow-y:auto;margin:0 -4px;padding:4px;}
 
         .shortcut-entry{display:flex;align-items:center;width:100%;gap:8px;
             margin-bottom:8px;font-size:12px;padding:4px;}
-        .shortcut-name{flex:1 1 auto;color:rgba(255,255,255,.9);font-weight:300;
+        .shortcut-name{flex:1 1 auto;color:var(--color-white-90);font-weight:300;
             white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
-        .action-btn{background:none;border:none;color:rgba(0,122,255,.8);
-            font-size:11px;padding:0 4px;cursor:pointer;transition:.15s;}
-        .action-btn:hover{color:#0a84ff;text-decoration:underline;}
+        .action-btn{background:none;border:none;color:color-mix(in srgb, var(--color-primary-500) 80%, transparent);
+            font-size:11px;padding:0 4px;cursor:pointer;transition:var(--transition-fast);}
+        .action-btn:hover{color:var(--color-primary-400);text-decoration:underline;}
 
-        .shortcut-input{inline-size:120px;background:rgba(0,0,0,.2);
-            border:1px solid rgba(255,255,255,.2);border-radius:4px;
-            padding:4px 6px;font:11px 'SF Mono','Menlo',monospace;
+        .shortcut-input{inline-size:120px;background:var(--color-black-20);
+            border:1px solid var(--color-white-20);border-radius:var(--radius-sm);
+            padding:4px 6px;font:11px var(--font-family-mono);
             color:white;text-align:right;cursor:text;margin-left:auto;}
         .shortcut-input:focus,.shortcut-input.capturing{
-            outline:none;border-color:rgba(0,122,255,.6);
-            box-shadow:0 0 0 1px rgba(0,122,255,.3);}
+            outline:none;border-color:color-mix(in srgb, var(--color-primary-500) 60%, transparent);
+            box-shadow:0 0 0 1px color-mix(in srgb, var(--color-primary-500) 30%, transparent);}
 
         .feedback{font-size:10px;margin-top:2px;min-height:12px;}
-        .feedback.error{color:#ef4444;}
-        .feedback.success{color:#22c55e;}
+        .feedback.error{color:var(--color-error-500);}
+        .feedback.success{color:var(--color-success-500);}
 
-        .actions{display:flex;gap:4px;padding-top:8px;border-top:1px solid rgba(255,255,255,.1);}
-        .settings-button{flex:1;background:rgba(255,255,255,.1);
-            border:1px solid rgba(255,255,255,.2);border-radius:4px;
-            color:white;padding:5px 10px;font-size:11px;cursor:pointer;transition:.15s;}
-        .settings-button:hover{background:rgba(255,255,255,.15);}
-        .settings-button.primary{background:rgba(0,122,255,.25);border-color:rgba(0,122,255,.6);}
-        .settings-button.primary:hover{background:rgba(0,122,255,.35);}
-        .settings-button.danger{background:rgba(255,59,48,.1);border-color:rgba(255,59,48,.3);
-            color:rgba(255,59,48,.9);}
-        .settings-button.danger:hover{background:rgba(255,59,48,.15);
+        .actions{display:flex;gap:4px;padding-top:8px;border-top:1px solid var(--color-white-10);}
+        .settings-button{flex:1;background:var(--color-white-10);
+            border:1px solid var(--color-white-20);border-radius:var(--radius-sm);
+            color:white;padding:5px 10px;font-size:11px;cursor:pointer;transition:var(--transition-fast);}
+        .settings-button:hover{background:var(--color-white-15);}
+        .settings-button.primary{background:color-mix(in srgb, var(--color-primary-500) 25%, transparent);border-color:color-mix(in srgb, var(--color-primary-500) 60%, transparent);}
+        .settings-button.primary:hover{background:color-mix(in srgb, var(--color-primary-500) 35%, transparent);}
+        .settings-button.danger{background:color-mix(in srgb, var(--color-error-500) 10%, transparent);border-color:color-mix(in srgb, var(--color-error-500) 30%, transparent);
+            color:color-mix(in srgb, var(--color-error-500) 90%, transparent);}
+        .settings-button.danger:hover{background:color-mix(in srgb, var(--color-error-500) 15%, transparent);
         }
 
         /* ────────────────[ GLASS BYPASS ]─────────────── */

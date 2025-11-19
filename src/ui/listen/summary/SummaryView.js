@@ -11,19 +11,19 @@ export class SummaryView extends LitElement {
 
         /* highlight.js 스타일 추가 */
         .insights-container pre {
-            background: rgba(0, 0, 0, 0.4) !important;
-            border-radius: 8px !important;
+            background: var(--color-black-40) !important;
+            border-radius: var(--radius-md) !important;
             padding: 12px !important;
             margin: 8px 0 !important;
             overflow-x: auto !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid var(--color-white-10) !important;
             white-space: pre !important;
             word-wrap: normal !important;
             word-break: normal !important;
         }
 
         .insights-container code {
-            font-family: 'Monaco', 'Menlo', 'Consolas', monospace !important;
+            font-family: var(--font-family-mono) !important;
             font-size: 11px !important;
             background: transparent !important;
             white-space: pre !important;
@@ -39,9 +39,9 @@ export class SummaryView extends LitElement {
         }
 
         .insights-container p code {
-            background: rgba(255, 255, 255, 0.1) !important;
+            background: var(--color-white-10) !important;
             padding: 2px 4px !important;
-            border-radius: 4px !important;
+            border-radius: var(--radius-sm) !important;
             color: #ffd700 !important;
         }
 
@@ -89,25 +89,25 @@ export class SummaryView extends LitElement {
         /* Visibility handled by parent component */
 
         .insights-container::-webkit-scrollbar {
-            width: 8px;
+            width: var(--scrollbar-width);
         }
         .insights-container::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 4px;
+            background: var(--color-black-10);
+            border-radius: var(--radius-sm);
         }
         .insights-container::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 4px;
+            background: var(--color-white-30);
+            border-radius: var(--radius-sm);
         }
         .insights-container::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.5);
+            background: var(--color-white-50);
         }
 
         insights-title {
-            color: rgba(255, 255, 255, 0.8);
+            color: var(--color-white-80);
             font-size: 15px;
             font-weight: 500;
-            font-family: 'Helvetica Neue', sans-serif;
+            font-family: var(--font-family-primary);
             margin: 12px 0 8px 0;
             display: block;
         }
@@ -118,7 +118,7 @@ export class SummaryView extends LitElement {
             font-weight: 600;
             margin: 12px 0 8px 0;
             padding: 4px 8px;
-            border-radius: 4px;
+            border-radius: var(--radius-sm);
             background: transparent;
             cursor: default;
         }
@@ -137,15 +137,15 @@ export class SummaryView extends LitElement {
             line-height: 1.4;
             margin: 4px 0;
             padding: 6px 8px;
-            border-radius: 4px;
+            border-radius: var(--radius-sm);
             background: transparent;
-            transition: background-color 0.15s ease;
+            transition: background-color var(--transition-fast) var(--easing-ease);
             cursor: pointer;
             word-wrap: break-word;
         }
 
         .outline-item:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--color-white-10);
         }
 
         .request-item {
@@ -154,19 +154,19 @@ export class SummaryView extends LitElement {
             line-height: 1.2;
             margin: 4px 0;
             padding: 6px 8px;
-            border-radius: 4px;
+            border-radius: var(--radius-sm);
             background: transparent;
             cursor: default;
             word-wrap: break-word;
-            transition: background-color 0.15s ease;
+            transition: background-color var(--transition-fast) var(--easing-ease);
         }
 
         .request-item.clickable {
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: all var(--transition-fast) var(--easing-ease);
         }
         .request-item.clickable:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--color-white-10);
             transform: translateX(2px);
         }
 
@@ -177,15 +177,15 @@ export class SummaryView extends LitElement {
             line-height: 1.4;
             margin: 4px 0;
             padding: 6px 8px;
-            border-radius: 4px;
+            border-radius: var(--radius-sm);
             background: transparent;
             cursor: pointer;
             word-wrap: break-word;
-            transition: all 0.15s ease;
+            transition: all var(--transition-fast) var(--easing-ease);
         }
 
         .markdown-content:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--color-white-10);
             transform: translateX(2px);
         }
 

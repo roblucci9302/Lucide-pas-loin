@@ -25,23 +25,23 @@ export class SttView extends LitElement {
         /* Visibility handled by parent component */
 
         .transcription-container::-webkit-scrollbar {
-            width: 8px;
+            width: var(--scrollbar-width);
         }
         .transcription-container::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 4px;
+            background: var(--color-black-10);
+            border-radius: var(--radius-sm);
         }
         .transcription-container::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 4px;
+            background: var(--color-white-30);
+            border-radius: var(--radius-sm);
         }
         .transcription-container::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.5);
+            background: var(--color-white-50);
         }
 
         .stt-message {
             padding: 8px 12px;
-            border-radius: 12px;
+            border-radius: var(--radius-lg);
             max-width: 80%;
             word-wrap: break-word;
             word-break: break-word;
@@ -52,18 +52,18 @@ export class SttView extends LitElement {
         }
 
         .stt-message.them {
-            background: rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.9);
+            background: var(--color-white-10);
+            color: var(--color-white-90);
             align-self: flex-start;
-            border-bottom-left-radius: 4px;
+            border-bottom-left-radius: var(--radius-sm);
             margin-right: auto;
         }
 
         .stt-message.me {
-            background: rgba(0, 122, 255, 0.8);
+            background: color-mix(in srgb, var(--color-primary-500) 80%, transparent);
             color: white;
             align-self: flex-end;
-            border-bottom-right-radius: 4px;
+            border-bottom-right-radius: var(--radius-sm);
             margin-left: auto;
         }
 
@@ -72,7 +72,7 @@ export class SttView extends LitElement {
             align-items: center;
             justify-content: center;
             height: 100px;
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--color-white-60);
             font-size: 12px;
             font-style: italic;
         }
