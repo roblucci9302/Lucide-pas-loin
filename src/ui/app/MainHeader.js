@@ -45,7 +45,7 @@ export class MainHeader extends TranslationMixin(LitElement) {
             width: auto;
             min-width: 405px;
             height: 47px;
-            padding: 2px 12px;
+            padding: var(--space-0-5) var(--padding-sm);
             background: transparent;
             overflow: visible;
             border-radius: var(--radius-full);
@@ -86,13 +86,13 @@ export class MainHeader extends TranslationMixin(LitElement) {
         .listen-button {
             -webkit-app-region: no-drag;
             height: 30px;
-            padding: 0 10px;
+            padding: 0 var(--space-2-5);
             background: transparent;
             border-radius: var(--radius-full);
             justify-content: center;
             min-width: 80px;
             align-items: center;
-            gap: 6px;
+            gap: var(--space-1-5);
             display: flex;
             border: none;
             cursor: pointer;
@@ -166,7 +166,7 @@ export class MainHeader extends TranslationMixin(LitElement) {
         .loading-dots {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: var(--space-1);
         }
 
         .loading-dots span {
@@ -185,10 +185,10 @@ export class MainHeader extends TranslationMixin(LitElement) {
 
         .middle-actions {
             display: flex;
-            gap: 4px;
+            gap: var(--gap-xs);
             flex: 1;
             justify-content: center;
-            margin: 0 6px;
+            margin: 0 var(--space-1-5);
         }
 
         .header-actions {
