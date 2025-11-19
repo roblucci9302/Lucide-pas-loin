@@ -1,5 +1,6 @@
 import { html, css, LitElement } from '../../assets/lit-core-2.7.4.min.js';
 import '../base/ClaudeButton.js';
+import '../code/CodeBlock.js';
 
 /**
  * ArtifactsPanel - Contextual panel for code/preview (Claude.ai style)
@@ -212,27 +213,14 @@ export class ArtifactsPanel extends LitElement {
         /* Code view */
         .code-container {
             height: 100%;
-            overflow: auto;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
-        .code-block {
-            padding: 20px;
-            height: 100%;
-        }
-
-        .code-block pre {
-            margin: 0;
-            padding: 0;
-            background: transparent;
-            height: 100%;
-        }
-
-        .code-block code {
-            font-family: var(--claude-font-family-mono, 'Monaco', monospace);
-            font-size: 14px;
-            line-height: 1.5;
-            color: var(--claude-text-primary, #1a1a1a);
-            display: block;
+        .code-container code-block {
+            flex: 1;
+            overflow: hidden;
         }
 
         /* Preview view */
@@ -341,21 +329,6 @@ export class ArtifactsPanel extends LitElement {
             background: var(--claude-scrollbar-thumb-hover, #a3a3a0);
         }
 
-        /* Language badge */
-        .language-badge {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: var(--claude-bg-tertiary, #FAFAF8);
-            border: 1px solid var(--claude-border-subtle, #e5e5e0);
-            color: var(--claude-text-secondary, #6b6b6b);
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: var(--claude-font-size-xs, 12px);
-            font-weight: 500;
-            text-transform: uppercase;
-        }
-
         /* Mobile responsiveness */
         @media (max-width: 768px) {
             .panel-header {
@@ -407,6 +380,54 @@ export class ArtifactsPanel extends LitElement {
         }));
     }
 
+    _handleDownload() {
+        if (!this.artifact?.content) return;
+
+        const filename = this._getDownloadFilename();
+        const blob = new Blob([this.artifact.content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    _getDownloadFilename() {
+        const title = this.artifact.title || 'artifact';
+        const extension = this._getFileExtension(this.artifact.language || this.artifact.type);
+        return `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.${extension}`;
+    }
+
+    _getFileExtension(languageOrType) {
+        const extensions = {
+            javascript: 'js',
+            typescript: 'ts',
+            python: 'py',
+            java: 'java',
+            cpp: 'cpp',
+            csharp: 'cs',
+            html: 'html',
+            css: 'css',
+            scss: 'scss',
+            json: 'json',
+            xml: 'xml',
+            yaml: 'yaml',
+            markdown: 'md',
+            bash: 'sh',
+            sql: 'sql',
+            php: 'php',
+            ruby: 'rb',
+            go: 'go',
+            rust: 'rs',
+            swift: 'swift',
+            kotlin: 'kt',
+        };
+        return extensions[languageOrType?.toLowerCase()] || 'txt';
+    }
+
     _handleTabChange(tab) {
         this.currentTab = tab;
     }
@@ -448,14 +469,12 @@ export class ArtifactsPanel extends LitElement {
 
         return html`
             <div class="code-container">
-                <div class="code-block">
-                    ${this.artifact.language ? html`
-                        <div class="language-badge">
-                            ${this._getLanguageName(this.artifact.language)}
-                        </div>
-                    ` : ''}
-                    <pre><code>${this.artifact.content}</code></pre>
-                </div>
+                <code-block
+                    .code="${this.artifact.content}"
+                    .language="${this.artifact.language || this.artifact.type || ''}"
+                    ?showLineNumbers="${true}"
+                    maxHeight="none"
+                ></code-block>
             </div>
         `;
     }
@@ -585,6 +604,16 @@ export class ArtifactsPanel extends LitElement {
                         ${this.copiedState ? html`
                             <span class="copied-feedback">✓ Copié !</span>
                         ` : ''}
+                    </button>
+
+                    <!-- Download button -->
+                    <button
+                        class="action-button"
+                        @click="${this._handleDownload}"
+                        aria-label="Télécharger"
+                    >
+                        💾
+                        <span class="tooltip">Télécharger</span>
                     </button>
 
                     <!-- Fullscreen button -->

@@ -972,6 +972,7 @@ export class ClaudeAskView extends LitElement {
                 @action-thumbs-down="${(e) => this._handleActionThumbsDown(e, message)}"
                 @action-regenerate="${(e) => this._handleActionRegenerate(e, message)}"
                 @action-share="${(e) => this._handleActionShare(e, message)}"
+                @view-artifact="${(e) => this._showArtifact(e.detail.artifact)}"
             ></message-assistant>
         `;
     }

@@ -2,6 +2,7 @@ import { html, css, LitElement, unsafeHTML } from '../../assets/lit-core-2.7.4.m
 import '../base/ClaudeAvatar.js';
 import './MessageActionBar.js';
 import './CodeBlock.js';
+import { artifactDetectionService } from '../../services/artifactDetectionService.js';
 
 /**
  * MessageAssistant - Assistant message component with Claude.ai styling
@@ -32,6 +33,7 @@ export class MessageAssistant extends LitElement {
         messageId: { type: String },
         showLineNumbers: { type: Boolean }, // For code blocks
         _contentSections: { type: Array, state: true },
+        _detectedArtifacts: { type: Array, state: true },
     };
 
     static styles = css`
@@ -201,6 +203,34 @@ export class MessageAssistant extends LitElement {
             51%, 100% { opacity: 0; }
         }
 
+        /* Artifact button */
+        .artifact-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            margin-top: 12px;
+            background: var(--claude-accent-orange-subtle, #FEF3C7);
+            border: 1px solid var(--claude-accent-orange, #D97706);
+            border-radius: 8px;
+            color: var(--claude-accent-orange-dark, #B45309);
+            font-size: var(--claude-font-size-sm, 13px);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--claude-transition-fast, 150ms) ease;
+        }
+
+        .artifact-button:hover {
+            background: var(--claude-accent-orange, #D97706);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(217, 119, 6, 0.2);
+        }
+
+        .artifact-button:active {
+            transform: translateY(0);
+        }
+
         /* Action bar */
         .action-bar-wrapper {
             opacity: 0;
@@ -266,11 +296,13 @@ export class MessageAssistant extends LitElement {
         this.messageId = '';
         this.showLineNumbers = false;
         this._contentSections = [];
+        this._detectedArtifacts = [];
     }
 
     updated(changedProperties) {
         if (changedProperties.has('content')) {
             this._contentSections = this._parseContentIntoSections(this.content);
+            this._detectedArtifacts = artifactDetectionService.detectArtifacts(this.content);
         }
     }
 
@@ -505,6 +537,18 @@ export class MessageAssistant extends LitElement {
         }));
     }
 
+    _handleViewArtifact() {
+        if (this._detectedArtifacts.length === 0) return;
+
+        // Dispatch event with the primary (first) artifact
+        const primaryArtifact = this._detectedArtifacts[0];
+        this.dispatchEvent(new CustomEvent('view-artifact', {
+            detail: { artifact: primaryArtifact },
+            bubbles: true,
+            composed: true
+        }));
+    }
+
     render() {
         return html`
             <div class="message-wrapper">
@@ -538,6 +582,16 @@ export class MessageAssistant extends LitElement {
                         })}
                         ${this.isStreaming ? html`<span class="streaming-cursor"></span>` : ''}
                     </div>
+
+                    ${!this.isStreaming && this._detectedArtifacts.length > 0 ? html`
+                        <button class="artifact-button" @click="${this._handleViewArtifact}">
+                            <span>💻</span>
+                            <span>Voir dans Artifacts</span>
+                            ${this._detectedArtifacts.length > 1 ? html`
+                                <span>(${this._detectedArtifacts.length})</span>
+                            ` : ''}
+                        </button>
+                    ` : ''}
 
                     ${!this.isStreaming ? html`
                         <div class="action-bar-wrapper">
