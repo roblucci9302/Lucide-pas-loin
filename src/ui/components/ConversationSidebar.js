@@ -29,6 +29,7 @@ export class ConversationSidebar extends LitElement {
         currentProfile: { type: String },
         userName: { type: String },
         userAvatar: { type: String },
+        searchQuery: { type: String, state: true },
     };
 
     static styles = css`
@@ -82,6 +83,68 @@ export class ConversationSidebar extends LitElement {
 
         .new-conversation-btn {
             width: 100%;
+        }
+
+        /* Search Section */
+        .search-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 12px 10px 36px;
+            border: 1px solid var(--claude-border-light, #e5e5e0);
+            border-radius: 8px;
+            background: var(--claude-input-bg, #FFFFFF);
+            color: var(--claude-text-primary, #1a1a1a);
+            font-size: var(--claude-font-size-sm, 13px);
+            font-family: inherit;
+            transition: all var(--claude-transition-fast, 150ms) ease;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: var(--claude-text-tertiary, #9b9b9b);
+        }
+
+        .search-input:focus {
+            border-color: var(--claude-accent-orange, #D97706);
+            background: var(--claude-input-focus-bg, #FFFFFF);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            color: var(--claude-text-tertiary, #9b9b9b);
+            pointer-events: none;
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: var(--claude-text-tertiary, #9b9b9b);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all var(--claude-transition-fast, 150ms) ease;
+        }
+
+        .search-clear:hover {
+            background: var(--claude-hover-overlay, rgba(0, 0, 0, 0.04));
+            color: var(--claude-text-secondary, #6b6b6b);
         }
 
         /* Modes Section */
@@ -190,6 +253,14 @@ export class ConversationSidebar extends LitElement {
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        .conversation-title mark {
+            background: var(--claude-highlight-bg, #FEF3C7);
+            color: var(--claude-accent-orange-dark, #B45309);
+            font-weight: 600;
+            padding: 0 2px;
+            border-radius: 2px;
         }
 
         .conversation-time {
@@ -347,6 +418,7 @@ export class ConversationSidebar extends LitElement {
         this.currentProfile = 'lucide_assistant';
         this.userName = 'Utilisateur';
         this.userAvatar = '';
+        this.searchQuery = '';
     }
 
     _handleNewConversation() {
@@ -390,6 +462,40 @@ export class ConversationSidebar extends LitElement {
         }));
     }
 
+    _handleSearchInput(e) {
+        this.searchQuery = e.target.value;
+    }
+
+    _handleSearchClear() {
+        this.searchQuery = '';
+        // Focus back on search input
+        const searchInput = this.shadowRoot.querySelector('.search-input');
+        if (searchInput) {
+            searchInput.focus();
+        }
+    }
+
+    _filterConversations(conversations) {
+        if (!this.searchQuery || this.searchQuery.trim() === '') {
+            return conversations;
+        }
+
+        const query = this.searchQuery.toLowerCase().trim();
+        return conversations.filter(conv => {
+            const title = (conv.title || 'Nouvelle conversation').toLowerCase();
+            return title.includes(query);
+        });
+    }
+
+    _highlightText(text, query) {
+        if (!query || query.trim() === '') {
+            return text;
+        }
+
+        const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+        return text.replace(regex, '<mark>$1</mark>');
+    }
+
     _formatTime(timestamp) {
         if (!timestamp) return '';
 
@@ -424,7 +530,10 @@ export class ConversationSidebar extends LitElement {
         const weekAgo = new Date(today);
         weekAgo.setDate(weekAgo.getDate() - 7);
 
-        this.conversations.forEach(conv => {
+        // Apply search filter first
+        const filteredConversations = this._filterConversations(this.conversations);
+
+        filteredConversations.forEach(conv => {
             const convDate = new Date(conv.updated_at || conv.created_at);
 
             if (convDate >= today) {
@@ -447,25 +556,30 @@ export class ConversationSidebar extends LitElement {
         return html`
             <div class="conversation-group">
                 <div class="group-title">${title}</div>
-                ${conversations.map(conv => html`
-                    <div
-                        class="conversation-item ${conv.id === this.currentConversationId ? 'active' : ''}"
-                        @click="${() => this._handleConversationSelect(conv)}"
-                    >
-                        <div class="conversation-content">
-                            <div class="conversation-title">${conv.title || 'Nouvelle conversation'}</div>
-                            <div class="conversation-time">${this._formatTime(conv.updated_at)}</div>
+                ${conversations.map(conv => {
+                    const conversationTitle = conv.title || 'Nouvelle conversation';
+                    const highlightedTitle = this._highlightText(conversationTitle, this.searchQuery);
+
+                    return html`
+                        <div
+                            class="conversation-item ${conv.id === this.currentConversationId ? 'active' : ''}"
+                            @click="${() => this._handleConversationSelect(conv)}"
+                        >
+                            <div class="conversation-content">
+                                <div class="conversation-title" .innerHTML="${highlightedTitle}"></div>
+                                <div class="conversation-time">${this._formatTime(conv.updated_at)}</div>
+                            </div>
+                            <div class="conversation-actions">
+                                <button class="action-btn" @click="${(e) => { e.stopPropagation(); /* TODO: rename */ }}" title="Renommer">
+                                    ✏️
+                                </button>
+                                <button class="action-btn" @click="${(e) => { e.stopPropagation(); /* TODO: delete */ }}" title="Supprimer">
+                                    🗑️
+                                </button>
+                            </div>
                         </div>
-                        <div class="conversation-actions">
-                            <button class="action-btn" @click="${(e) => { e.stopPropagation(); /* TODO: rename */ }}" title="Renommer">
-                                ✏️
-                            </button>
-                            <button class="action-btn" @click="${(e) => { e.stopPropagation(); /* TODO: delete */ }}" title="Supprimer">
-                                🗑️
-                            </button>
-                        </div>
-                    </div>
-                `)}
+                    `;
+                })}
             </div>
         `;
     }
@@ -496,6 +610,27 @@ export class ConversationSidebar extends LitElement {
                     >
                         Nouvelle conversation
                     </claude-button>
+
+                    <!-- Search -->
+                    <div class="search-container">
+                        <span class="search-icon">🔍</span>
+                        <input
+                            type="text"
+                            class="search-input"
+                            placeholder="Rechercher des conversations..."
+                            .value="${this.searchQuery}"
+                            @input="${this._handleSearchInput}"
+                        />
+                        ${this.searchQuery ? html`
+                            <button
+                                class="search-clear"
+                                @click="${this._handleSearchClear}"
+                                title="Effacer la recherche"
+                            >
+                                ✕
+                            </button>
+                        ` : ''}
+                    </div>
                 </div>
 
                 <!-- Modes -->
@@ -521,13 +656,25 @@ export class ConversationSidebar extends LitElement {
                             Aucune conversation pour le moment.<br>
                             Commencez en cliquant sur "Nouvelle conversation".
                         </div>
-                    ` : html`
-                        <div class="section-title">Conversations</div>
-                        ${this._renderConversationGroup('Aujourd\'hui', groups.today)}
-                        ${this._renderConversationGroup('Hier', groups.yesterday)}
-                        ${this._renderConversationGroup('Cette semaine', groups.thisWeek)}
-                        ${this._renderConversationGroup('Plus ancien', groups.older)}
-                    `}
+                    ` : (() => {
+                        const filteredCount = this._filterConversations(this.conversations).length;
+                        if (filteredCount === 0 && this.searchQuery) {
+                            return html`
+                                <div class="empty-state">
+                                    🔍<br><br>
+                                    Aucune conversation trouvée pour<br>
+                                    "<strong>${this.searchQuery}</strong>"
+                                </div>
+                            `;
+                        }
+                        return html`
+                            <div class="section-title">Conversations</div>
+                            ${this._renderConversationGroup('Aujourd\'hui', groups.today)}
+                            ${this._renderConversationGroup('Hier', groups.yesterday)}
+                            ${this._renderConversationGroup('Cette semaine', groups.thisWeek)}
+                            ${this._renderConversationGroup('Plus ancien', groups.older)}
+                        `;
+                    })()}
                 </div>
 
                 <!-- Profiles -->
