@@ -475,6 +475,13 @@ export class ConversationSidebar extends LitElement {
         }));
     }
 
+    _handleSearchOpen() {
+        this.dispatchEvent(new CustomEvent('search-open', {
+            bubbles: true,
+            composed: true
+        }));
+    }
+
     _handleSearchInput(e) {
         this.searchQuery = e.target.value;
     }
@@ -779,6 +786,10 @@ export class ConversationSidebar extends LitElement {
                     <div class="footer-item" @click="${this._handleStatistics}">
                         <span class="footer-icon">📊</span>
                         <span class="footer-label">Statistiques</span>
+                    </div>
+                    <div class="footer-item" @click="${this._handleSearchOpen}">
+                        <span class="footer-icon">🔍</span>
+                        <span class="footer-label">Recherche</span>
                     </div>
                     <div class="footer-item" @click="${this._handleSettings}">
                         <span class="footer-icon">⚙️</span>

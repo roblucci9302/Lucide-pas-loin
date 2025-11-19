@@ -16,6 +16,7 @@ import '../components/dialogs/ExportDialog.js';
 import '../components/command/CommandPalette.js';
 import '../components/tags/TagManager.js';
 import '../components/statistics/StatisticsModal.js';
+import '../components/search/AdvancedSearchPanel.js';
 import { claudeAskBridgeService } from '../services/claudeAskBridgeService.js';
 import { toastService } from '../services/toastService.js';
 import { exportService } from '../services/exportService.js';
@@ -57,6 +58,7 @@ export class ClaudeAskView extends LitElement {
         commandPaletteOpen: { type: Boolean, state: true },
         tagManagerOpen: { type: Boolean, state: true },
         statisticsOpen: { type: Boolean, state: true },
+        searchOpen: { type: Boolean, state: true },
     };
 
     static styles = css`
@@ -190,6 +192,7 @@ export class ClaudeAskView extends LitElement {
         this.commandPaletteOpen = false;
         this.tagManagerOpen = false;
         this.statisticsOpen = false;
+        this.searchOpen = false;
         this._unsubscribeStateUpdate = null;
         this._unsubscribeError = null;
         this._keydownHandler = this._handleKeyDown.bind(this);
@@ -539,6 +542,31 @@ export class ClaudeAskView extends LitElement {
 
     _handleStatisticsClose() {
         this.statisticsOpen = false;
+    }
+
+    _handleSearchOpen() {
+        this.searchOpen = true;
+    }
+
+    _handleSearchClose() {
+        this.searchOpen = false;
+    }
+
+    _handleSearchResultSelected(e) {
+        const { conversation, message, messageIndex } = e.detail;
+
+        // Switch to the conversation
+        if (conversation.id !== this.currentConversation?.id) {
+            this._handleConversationSelect({ detail: { conversation } });
+        }
+
+        // Scroll to message
+        setTimeout(() => {
+            // TODO: Scroll to specific message in the list
+            // For now, just close the search
+            this.searchOpen = false;
+            toastService.success(`Message trouvé dans "${conversation.title || 'Nouvelle conversation'}"`);
+        }, 100);
     }
 
     _handleConversationRename(e) {
@@ -1011,6 +1039,7 @@ export class ClaudeAskView extends LitElement {
                         @conversation-manage-tags="${this._handleManageTags}"
                         @mode-changed="${this._handleModeChange}"
                         @statistics-open="${this._handleStatisticsOpen}"
+                        @search-open="${this._handleSearchOpen}"
                         @settings-open="${this._handleSettingsOpen}"
                     ></conversation-sidebar>
                 </div>
@@ -1103,6 +1132,14 @@ export class ClaudeAskView extends LitElement {
                 @close="${this._handleTagManagerClose}"
                 @tags-changed="${this._handleTagsChanged}"
             ></tag-manager>
+
+            <!-- Advanced Search Panel -->
+            <advanced-search-panel
+                ?open="${this.searchOpen}"
+                .conversations="${this.conversations}"
+                @close="${this._handleSearchClose}"
+                @result-selected="${this._handleSearchResultSelected}"
+            ></advanced-search-panel>
 
             <!-- Toast Container (for notifications) -->
             <toast-container></toast-container>
