@@ -16,6 +16,21 @@
     --profile-accent: #818cf8;
     --profile-accent-light: #a5b4fc;
 
+    /* Functional colors for Memory components and data sources */
+    --color-conversation: #3b82f6;  /* Blue - Conversations */
+    --color-screenshot: #8b5cf6;    /* Violet - Screenshots */
+    --color-audio: #ec4899;         /* Pink - Audio */
+    --color-external: #10b981;      /* Green - External data */
+
+    /* Entity type colors for Knowledge Graph */
+    --color-project: #3b82f6;       /* Blue */
+    --color-person: #ec4899;        /* Pink */
+    --color-company: #10b981;       /* Green */
+    --color-topic: #8b5cf6;         /* Violet */
+    --color-technology: #f59e0b;    /* Orange */
+    --color-date: #06b6d4;          /* Cyan */
+    --color-location: #ef4444;      /* Red */
+
     /* Transition configuration */
     --theme-transition-duration: 300ms;
     --theme-transition-timing: cubic-bezier(0.4, 0.0, 0.2, 1); /* Material Design easing */
@@ -261,6 +276,25 @@
 .focus-profile:focus-visible {
     outline: 2px solid var(--profile-accent);
     outline-offset: 2px;
+}
+
+/* Global focus states for accessibility */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+a:focus-visible {
+    outline: 2px solid var(--profile-accent);
+    outline-offset: 2px;
+}
+
+/* Remove default focus outline (but keep for :focus-visible) */
+button:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible),
+select:focus:not(:focus-visible),
+a:focus:not(:focus-visible) {
+    outline: none;
 }
 
 /* ========================================

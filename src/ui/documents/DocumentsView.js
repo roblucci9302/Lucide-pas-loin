@@ -8,7 +8,7 @@ import { TranslationMixin } from '../i18n/useTranslation.js';
 export class DocumentsView extends TranslationMixin(LitElement) {
     static styles = css`
         * {
-            font-family: 'Helvetica Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: var(--font-family-primary);
             user-select: none;
         }
 
@@ -16,8 +16,8 @@ export class DocumentsView extends TranslationMixin(LitElement) {
             display: block;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 12px;
+            background: var(--glass-bg);
+            border-radius: var(--radius-lg);
             overflow: hidden;
         }
 
@@ -44,17 +44,17 @@ export class DocumentsView extends TranslationMixin(LitElement) {
         }
 
         .upload-btn {
-            background: rgba(100, 150, 255, 0.2);
-            border: 1px solid rgba(100, 150, 255, 0.4);
+            background: color-mix(in srgb, var(--color-primary-500) 20%, transparent);
+            border: 1px solid color-mix(in srgb, var(--color-primary-500) 40%, transparent);
             color: white;
             padding: 8px 16px;
-            border-radius: 6px;
+            border-radius: var(--radius-md);
             cursor: pointer;
             font-size: 13px;
         }
 
         .upload-btn:hover {
-            background: rgba(100, 150, 255, 0.3);
+            background: color-mix(in srgb, var(--color-primary-500) 30%, transparent);
         }
 
         .search-bar {
@@ -65,9 +65,9 @@ export class DocumentsView extends TranslationMixin(LitElement) {
         .search-input {
             flex: 1;
             padding: 10px 14px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
+            background: var(--color-white-5);
+            border: 1px solid var(--color-white-10);
+            border-radius: var(--radius-md);
             color: white;
             font-size: 13px;
         }
@@ -81,16 +81,16 @@ export class DocumentsView extends TranslationMixin(LitElement) {
         }
 
         .document-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
+            background: var(--color-white-5);
+            border: 1px solid var(--color-white-10);
+            border-radius: var(--radius-md);
             padding: 12px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all var(--transition-base) var(--easing-standard);
         }
 
         .document-card:hover {
-            background: rgba(255, 255, 255, 0.08);
+            background: var(--color-white-8);
             transform: translateX(4px);
         }
 
@@ -109,21 +109,21 @@ export class DocumentsView extends TranslationMixin(LitElement) {
 
         .doc-meta {
             font-size: 11px;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--color-white-50);
         }
 
         .no-documents {
             text-align: center;
             padding: 60px 20px;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--color-white-50);
         }
 
         .stats {
             display: flex;
             gap: 16px;
             padding: 12px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 8px;
+            background: var(--color-white-3);
+            border-radius: var(--radius-md);
         }
 
         .stat-item {
@@ -139,7 +139,7 @@ export class DocumentsView extends TranslationMixin(LitElement) {
 
         .stat-label {
             font-size: 11px;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--color-white-50);
             margin-top: 4px;
         }
     `;

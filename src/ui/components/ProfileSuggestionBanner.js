@@ -50,33 +50,11 @@ export class ProfileSuggestionBanner extends LitElement {
             align-items: center;
             gap: 16px;
 
-            animation: slideDown 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            animation: slideIn var(--animation-base) var(--easing-smooth-out);
         }
 
         .banner.hiding {
-            animation: slideUp 0.2s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 1;
-                transform: translateY(0);
-            }
-            to {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
+            animation: fadeOut var(--animation-fast) var(--easing-smooth-out) forwards;
         }
 
         .icon {
@@ -115,7 +93,7 @@ export class ProfileSuggestionBanner extends LitElement {
             color: #4ade80;
             background: rgba(74, 222, 128, 0.15);
             padding: 2px 8px;
-            border-radius: 6px;
+            border-radius: 8px;
         }
 
         .reason {

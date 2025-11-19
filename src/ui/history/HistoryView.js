@@ -3,7 +3,7 @@ import { html, css, LitElement } from '../assets/lit-core-2.7.4.min.js';
 export class HistoryView extends LitElement {
     static styles = css`
         * {
-            font-family: 'Helvetica Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: var(--font-family-primary);
             cursor: default;
             user-select: none;
         }
@@ -19,9 +19,9 @@ export class HistoryView extends LitElement {
             display: flex;
             flex-direction: column;
             height: 100%;
-            background: rgba(20, 20, 20, 0.8);
-            border-radius: 12px;
-            outline: 0.5px rgba(255, 255, 255, 0.2) solid;
+            background: var(--color-gray-800);
+            border-radius: var(--radius-lg);
+            outline: 0.5px var(--color-white-20) solid;
             outline-offset: -1px;
             box-sizing: border-box;
             overflow: hidden;
@@ -32,15 +32,15 @@ export class HistoryView extends LitElement {
             position: absolute;
             inset: 0;
             background: rgba(0, 0, 0, 0.15);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            border-radius: var(--radius-lg);
             filter: blur(10px);
             z-index: -1;
         }
 
         .header {
             padding: 16px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid var(--color-white-10);
         }
 
         .header h2 {
@@ -52,31 +52,31 @@ export class HistoryView extends LitElement {
 
         .stats {
             font-size: 11px;
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--color-white-60);
         }
 
         .search-box {
             padding: 12px 16px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid var(--color-white-10);
         }
 
         .search-input {
             width: 100%;
             padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 6px;
+            background: var(--color-white-10);
+            border: 1px solid var(--color-white-20);
+            border-radius: 8px;
             color: white;
             font-size: 12px;
             outline: none;
         }
 
         .search-input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
+            color: var(--color-white-40);
         }
 
         .search-input:focus {
-            background: rgba(255, 255, 255, 0.15);
+            background: var(--color-white-15);
             border-color: rgba(100, 150, 255, 0.5);
         }
 
@@ -85,16 +85,16 @@ export class HistoryView extends LitElement {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid var(--color-white-10);
         }
 
         .filter-btn {
             padding: 4px 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
+            background: var(--color-white-5);
+            border: 1px solid var(--color-white-20);
+            border-radius: var(--radius-lg);
             font-size: 10px;
-            color: rgba(255, 255, 255, 0.7);
+            color: var(--color-white-70);
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -106,7 +106,7 @@ export class HistoryView extends LitElement {
         }
 
         .filter-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--color-white-10);
         }
 
         .sessions-list {
@@ -120,28 +120,28 @@ export class HistoryView extends LitElement {
         }
 
         .sessions-list::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 3px;
+            background: var(--color-white-5);
+            border-radius: 4px;
         }
 
         .sessions-list::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 3px;
+            background: var(--color-white-20);
+            border-radius: 4px;
         }
 
         .session-item {
             padding: 12px;
             margin-bottom: 6px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--color-white-5);
+            border: 1px solid var(--color-white-10);
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s;
         }
 
         .session-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
+            background: var(--color-white-10);
+            border-color: var(--color-white-20);
         }
 
         .session-item.active {
@@ -164,7 +164,7 @@ export class HistoryView extends LitElement {
             align-items: center;
             gap: 8px;
             font-size: 10px;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--color-white-50);
             margin-bottom: 4px;
         }
 
@@ -173,7 +173,7 @@ export class HistoryView extends LitElement {
             align-items: center;
             gap: 3px;
             padding: 2px 6px;
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--color-white-10);
             border-radius: 8px;
             font-size: 9px;
         }
@@ -200,7 +200,7 @@ export class HistoryView extends LitElement {
             align-items: center;
             justify-content: center;
             height: 100%;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--color-white-50);
             font-size: 12px;
             text-align: center;
             padding: 32px;
@@ -215,7 +215,7 @@ export class HistoryView extends LitElement {
         .loading {
             text-align: center;
             padding: 32px;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--color-white-50);
             font-size: 12px;
         }
 

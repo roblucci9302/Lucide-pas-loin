@@ -10,16 +10,17 @@ export class ListenView extends LitElement {
             width: 400px;
             transform: translate3d(0, 0, 0);
             backface-visibility: hidden;
-            transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.2s ease-out;
+            transition: transform var(--transition-base) var(--easing-smooth-out),
+                        opacity var(--transition-base) var(--easing-ease-out);
             will-change: transform, opacity;
         }
 
         :host(.hiding) {
-            animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+            animation: slideUp var(--animation-base) var(--easing-smooth-in) forwards;
         }
 
         :host(.showing) {
-            animation: slideDown 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation: slideDown 350ms var(--easing-elastic) forwards;
         }
 
         :host(.hidden) {
@@ -30,7 +31,7 @@ export class ListenView extends LitElement {
 
 
         * {
-            font-family: 'Helvetica Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: var(--font-family-primary);
             cursor: default;
             user-select: none;
         }
@@ -43,19 +44,19 @@ export class ListenView extends LitElement {
 
 /* highlight.js 스타일 추가 */
 .insights-container pre {
-    background: rgba(0, 0, 0, 0.4) !important;
-    border-radius: 8px !important;
-    padding: 12px !important;
-    margin: 8px 0 !important;
+    background: var(--color-black-40) !important;
+    border-radius: var(--radius-md) !important;
+    padding: var(--padding-sm) !important;
+    margin: var(--margin-xs) 0 !important;
     overflow-x: auto !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid var(--color-white-10) !important;
     white-space: pre !important;
     word-wrap: normal !important;
     word-break: normal !important;
 }
 
 .insights-container code {
-    font-family: 'Monaco', 'Menlo', 'Consolas', monospace !important;
+    font-family: var(--font-family-mono) !important;
     font-size: 11px !important;
     background: transparent !important;
     white-space: pre !important;
@@ -71,9 +72,9 @@ export class ListenView extends LitElement {
 }
 
 .insights-container p code {
-    background: rgba(255, 255, 255, 0.1) !important;
-    padding: 2px 4px !important;
-    border-radius: 3px !important;
+    background: var(--color-white-10) !important;
+    padding: var(--space-0-5) var(--space-1) !important;
+    border-radius: 4px !important;
     color: #ffd700 !important;
 }
 
@@ -137,7 +138,7 @@ export class ListenView extends LitElement {
             right: 0;
             bottom: 0;
             border-radius: 12px;
-            padding: 1px;
+            padding: var(--space-0-5);
             background: linear-gradient(169deg, rgba(255, 255, 255, 0.17) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.17) 100%);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: destination-out;
@@ -164,14 +165,14 @@ export class ListenView extends LitElement {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 6px 16px;
+            padding: var(--space-1-5) var(--padding-md);
             min-height: 32px;
             position: relative;
             z-index: 1;
             width: 100%;
             box-sizing: border-box;
             flex-shrink: 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid var(--color-white-10);
         }
 
         .bar-left-text {
@@ -198,25 +199,25 @@ export class ListenView extends LitElement {
 
         .bar-controls {
             display: flex;
-            gap: 4px;
+            gap: var(--gap-xs);
             align-items: center;
             flex-shrink: 0;
             width: 120px;
             justify-content: flex-end;
             box-sizing: border-box;
-            padding: 4px;
+            padding: var(--space-1);
         }
 
         .toggle-button {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: var(--space-1);
             background: transparent;
             color: rgba(255, 255, 255, 0.9);
             border: none;
             outline: none;
             box-shadow: none;
-            padding: 4px 8px;
+            padding: var(--space-1) var(--padding-xs);
             border-radius: 5px;
             font-size: 11px;
             font-weight: 500;
@@ -228,7 +229,7 @@ export class ListenView extends LitElement {
         }
 
         .toggle-button:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--color-white-10);
         }
 
         .toggle-button svg {
@@ -244,7 +245,7 @@ export class ListenView extends LitElement {
             outline: none;
             box-shadow: none;
             padding: 4px;
-            border-radius: 3px;
+            border-radius: 4px;
             cursor: pointer;
             display: flex;
             align-items: center;

@@ -20,7 +20,7 @@ export class ResponseView extends LitElement {
             width: 100%;
             height: 100%;
             overflow-y: auto;
-            background: rgba(15, 15, 25, 0.95);
+            background: color-mix(in srgb, var(--color-gray-900) 95%, transparent);
             backdrop-filter: blur(20px);
         }
 
@@ -36,7 +36,7 @@ export class ResponseView extends LitElement {
             gap: 8px;
             margin-bottom: 12px;
             padding-bottom: 8px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid var(--color-white-10);
         }
 
         .response-icon {
@@ -46,12 +46,12 @@ export class ResponseView extends LitElement {
         .response-title {
             font-size: 14px;
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
+            color: var(--color-white-90);
         }
 
         .response-subtitle {
             font-size: 11px;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--color-white-50);
             margin-top: 2px;
         }
 
@@ -63,11 +63,11 @@ export class ResponseView extends LitElement {
 
         .suggestion-card {
             padding: 12px 14px;
-            background: rgba(100, 150, 255, 0.08);
-            border: 1px solid rgba(100, 150, 255, 0.2);
-            border-radius: 10px;
+            background: color-mix(in srgb, var(--color-primary-500) 8%, transparent);
+            border: 1px solid color-mix(in srgb, var(--color-primary-500) 20%, transparent);
+            border-radius: var(--radius-md);
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all var(--transition-base) var(--easing-ease);
             position: relative;
             overflow: hidden;
         }
@@ -79,14 +79,14 @@ export class ResponseView extends LitElement {
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, rgba(100, 150, 255, 0.1) 0%, rgba(150, 100, 255, 0.05) 100%);
+            background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary-500) 10%, transparent) 0%, color-mix(in srgb, var(--profile-accent) 5%, transparent) 100%);
             opacity: 0;
-            transition: opacity 0.2s ease;
+            transition: opacity var(--transition-base) var(--easing-ease);
         }
 
         .suggestion-card:hover {
-            background: rgba(100, 150, 255, 0.12);
-            border-color: rgba(100, 150, 255, 0.4);
+            background: color-mix(in srgb, var(--color-primary-500) 12%, transparent);
+            border-color: color-mix(in srgb, var(--color-primary-500) 40%, transparent);
             transform: translateY(-2px);
         }
 
@@ -102,9 +102,9 @@ export class ResponseView extends LitElement {
             display: inline-block;
             width: 20px;
             height: 20px;
-            background: rgba(100, 150, 255, 0.2);
-            color: rgba(150, 200, 255, 0.9);
-            border-radius: 50%;
+            background: color-mix(in srgb, var(--color-primary-500) 20%, transparent);
+            color: color-mix(in srgb, var(--profile-accent-light) 90%, transparent);
+            border-radius: var(--radius-full);
             font-size: 11px;
             font-weight: 600;
             line-height: 20px;
@@ -116,7 +116,7 @@ export class ResponseView extends LitElement {
         .suggestion-text {
             font-size: 13px;
             line-height: 1.5;
-            color: rgba(255, 255, 255, 0.85);
+            color: var(--color-white-85);
             position: relative;
             user-select: text;
         }
@@ -133,28 +133,24 @@ export class ResponseView extends LitElement {
         .loading-spinner {
             width: 32px;
             height: 32px;
-            border: 3px solid rgba(100, 150, 255, 0.2);
-            border-top-color: rgba(100, 150, 255, 0.8);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+            border: 3px solid color-mix(in srgb, var(--color-primary-500) 20%, transparent);
+            border-top-color: color-mix(in srgb, var(--color-primary-500) 80%, transparent);
+            border-radius: var(--radius-full);
+            animation: spin var(--animation-slower) linear infinite;
         }
 
         .loading-text {
             margin-top: 12px;
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--color-white-60);
         }
 
         .error-state {
             padding: 16px;
-            background: rgba(255, 100, 100, 0.1);
-            border: 1px solid rgba(255, 100, 100, 0.3);
-            border-radius: 8px;
-            color: rgba(255, 150, 150, 0.9);
+            background: color-mix(in srgb, var(--color-error-500) 10%, transparent);
+            border: 1px solid color-mix(in srgb, var(--color-error-500) 30%, transparent);
+            border-radius: var(--radius-md);
+            color: color-mix(in srgb, var(--color-error-400) 90%, transparent);
             font-size: 12px;
             line-height: 1.5;
         }
@@ -177,7 +173,7 @@ export class ResponseView extends LitElement {
 
         .empty-text {
             font-size: 13px;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--color-white-50);
             line-height: 1.5;
         }
 
@@ -186,23 +182,16 @@ export class ResponseView extends LitElement {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0.9);
-            background: rgba(50, 200, 100, 0.95);
+            background: color-mix(in srgb, var(--color-success-500) 95%, transparent);
             color: white;
             padding: 12px 20px;
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             font-size: 13px;
             font-weight: 500;
             opacity: 0;
             pointer-events: none;
-            animation: copyFeedback 1.5s ease;
+            animation: copyFeedback 1.5s var(--easing-ease);
             z-index: 1000;
-        }
-
-        @keyframes copyFeedback {
-            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
-            20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-            80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
         }
     `;
 

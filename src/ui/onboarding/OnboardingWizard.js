@@ -35,7 +35,7 @@ export class OnboardingWizard extends LitElement {
             justify-content: center;
             height: 100%;
             background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-            padding: 40px;
+            padding: var(--space-10);
             box-sizing: border-box;
         }
 
@@ -44,29 +44,18 @@ export class OnboardingWizard extends LitElement {
             border-radius: 20px;
             outline: 1px rgba(255, 255, 255, 0.2) solid;
             outline-offset: -1px;
-            padding: 48px;
+            padding: var(--padding-xl) var(--padding-xl) var(--space-12);
             max-width: 600px;
             width: 100%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            animation: slideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            animation: slideIn var(--animation-slow) var(--easing-elastic);
         }
 
         .step-indicators {
             display: flex;
             justify-content: center;
-            gap: 12px;
-            margin-bottom: 40px;
+            gap: var(--gap-sm);
+            margin-bottom: var(--space-10);
         }
 
         .step-dot {
@@ -97,7 +86,7 @@ export class OnboardingWizard extends LitElement {
             font-size: 32px;
             font-weight: 700;
             color: white;
-            margin: 0 0 12px 0;
+            margin: 0 0 var(--margin-sm) 0;
             text-align: center;
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
             -webkit-background-clip: text;
@@ -116,19 +105,14 @@ export class OnboardingWizard extends LitElement {
         .welcome-icon {
             font-size: 80px;
             text-align: center;
-            margin: 40px 0;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            margin: var(--space-10) 0;
+            animation: heartbeat 2s var(--easing-ease-in-out) infinite;
         }
 
         .profiles-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
+            gap: var(--gap-md);
             margin-bottom: 24px;
         }
 
@@ -253,18 +237,7 @@ export class OnboardingWizard extends LitElement {
         .completion-icon {
             font-size: 80px;
             margin-bottom: 24px;
-            animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-
-        @keyframes bounceIn {
-            from {
-                opacity: 0;
-                transform: scale(0.3);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+            animation: bounceIn 600ms var(--easing-bounce);
         }
 
         .completion-text {
@@ -336,12 +309,8 @@ export class OnboardingWizard extends LitElement {
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-top-color: white;
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            animation: spin var(--animation-slower) linear infinite;
             margin-right: 8px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
         }
     `;
 

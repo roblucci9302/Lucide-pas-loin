@@ -29,13 +29,7 @@ export class ApiKeyHeader extends TranslationMixin(LitElement) {
     static styles = css`
         :host {
             display: block;
-            font-family:
-                'Inter',
-                -apple-system,
-                BlinkMacSystemFont,
-                'Segoe UI',
-                Roboto,
-                sans-serif;
+            font-family: var(--font-family-primary);
         }
         * {
             box-sizing: border-box;
@@ -43,14 +37,14 @@ export class ApiKeyHeader extends TranslationMixin(LitElement) {
         .container {
             width: 100%;
             height: 100%;
-            padding: 24px 16px;
-            background: rgba(0, 0, 0, 0.64);
-            box-shadow: 0px 0px 0px 1.5px rgba(255, 255, 255, 0.64) inset;
-            border-radius: 16px;
+            padding: var(--padding-lg) var(--padding-md);
+            background: var(--glass-bg);
+            box-shadow: 0px 0px 0px 1.5px var(--color-white-64) inset;
+            border-radius: var(--radius-lg);
             flex-direction: column;
             justify-content: flex-start;
             align-items: flex-start;
-            gap: 24px;
+            gap: var(--gap-lg);
             display: flex;
             -webkit-app-region: drag;
         }
@@ -60,7 +54,7 @@ export class ApiKeyHeader extends TranslationMixin(LitElement) {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: var(--margin-xs);
         }
         .close-button {
             -webkit-app-region: no-drag;
@@ -69,55 +63,55 @@ export class ApiKeyHeader extends TranslationMixin(LitElement) {
             right: 16px;
             width: 20px;
             height: 20px;
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--color-white-10);
             border: none;
-            border-radius: 5px;
-            color: rgba(255, 255, 255, 0.7);
+            border-radius: var(--radius-sm);
+            color: var(--color-white-70);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.15s ease;
+            transition: all var(--transition-fast) var(--easing-ease);
             z-index: 10;
             font-size: 16px;
             line-height: 1;
             padding: 0;
         }
         .close-button:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: rgba(255, 255, 255, 0.9);
+            background: var(--color-white-20);
+            color: var(--color-white-90);
         }
         .back-button {
             -webkit-app-region: no-drag;
-            padding: 8px;
+            padding: var(--padding-xs);
             left: 0px;
             top: -7px;
             position: absolute;
-            background: rgba(132.6, 132.6, 132.6, 0.8);
-            border-radius: 16px;
-            border: 0.5px solid rgba(255, 255, 255, 0.5);
+            background: color-mix(in srgb, var(--color-gray-500) 80%, transparent);
+            border-radius: var(--radius-lg);
+            border: 0.5px solid var(--color-white-50);
             justify-content: center;
             align-items: center;
-            gap: 4px;
+            gap: var(--gap-xs);
             display: flex;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: background-color var(--transition-base) var(--easing-ease);
         }
         .back-button:hover {
-            background: rgba(150, 150, 150, 0.9);
+            background: color-mix(in srgb, var(--color-gray-400) 90%, transparent);
         }
         .arrow-icon-left {
             border: solid #dcdcdc;
             border-width: 0 1.2px 1.2px 0;
             display: inline-block;
-            padding: 3px;
+            padding: var(--space-3);
             transform: rotate(135deg);
         }
         .back-button-text {
             color: white;
             font-size: 12px;
             font-weight: 500;
-            padding-right: 4px;
+            padding-right: var(--space-1);
         }
         .title {
             color: white;
@@ -128,7 +122,7 @@ export class ApiKeyHeader extends TranslationMixin(LitElement) {
             width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: var(--space-2-5);
         }
         .row {
             width: 100%;
@@ -145,36 +139,36 @@ export class ApiKeyHeader extends TranslationMixin(LitElement) {
             display: flex;
             width: 240px;
             overflow: hidden;
-            border-radius: 12px;
-            border: 0.5px solid rgba(255, 255, 255, 0.5);
+            border-radius: var(--radius-lg);
+            border: 0.5px solid var(--color-white-50);
         }
         .provider-button {
             -webkit-app-region: no-drag;
-            padding: 4px 8px;
-            background: rgba(20.4, 20.4, 20.4, 0.32);
+            padding: var(--space-1) var(--padding-xs);
+            background: var(--color-black-32);
             color: #dcdcdc;
             font-size: 11px;
             font-weight: 450;
             letter-spacing: 0.11px;
             border: none;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: background-color var(--transition-base) var(--easing-ease);
             flex: 1;
         }
         .provider-button:hover {
-            background: rgba(80, 80, 80, 0.48);
+            background: color-mix(in srgb, var(--color-gray-600) 48%, transparent);
         }
         .provider-button[data-status='active'] {
-            background: rgba(142.8, 142.8, 142.8, 0.48);
+            background: color-mix(in srgb, var(--color-gray-500) 48%, transparent);
             color: white;
         }
         .api-input {
             -webkit-app-region: no-drag;
             width: 240px;
-            padding: 10px 8px;
-            background: rgba(61.2, 61.2, 61.2, 0.8);
-            border-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.24);
+            padding: var(--space-2-5) var(--padding-xs);
+            background: color-mix(in srgb, var(--color-gray-700) 80%, transparent);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--color-white-24);
             color: white;
             font-size: 11px;
             text-overflow: ellipsis;
@@ -184,8 +178,8 @@ export class ApiKeyHeader extends TranslationMixin(LitElement) {
         .ollama-action-button {
             -webkit-app-region: no-drag;
             width: 240px;
-            padding: 10px 8px;
-            border-radius: 16px;
+            padding: var(--space-2-5) var(--padding-xs);
+            border-radius: var(--radius-lg);
             border: none;
             color: white;
             font-size: 12px;
@@ -193,7 +187,7 @@ export class ApiKeyHeader extends TranslationMixin(LitElement) {
             font-family: inherit;
             cursor: pointer;
             text-align: center;
-            transition: background-color 0.2s ease;
+            transition: background-color var(--transition-base) var(--easing-ease);
         }
         .ollama-action-button.install {
             background: rgba(0, 122, 255, 0.2);
@@ -226,23 +220,23 @@ export class ApiKeyHeader extends TranslationMixin(LitElement) {
             -webkit-app-region: no-drag;
             width: 240px;
             padding: 8px;
-            background: rgba(132.6, 132.6, 132.6, 0.8);
-            box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.16);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            background: color-mix(in srgb, var(--color-gray-500) 80%, transparent);
+            box-shadow: 0px 2px 2px var(--color-black-16);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-white-50);
             color: white;
             font-size: 12px;
             font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: background-color var(--transition-base) var(--easing-ease);
         }
         .confirm-button:hover {
-            background: rgba(150, 150, 150, 0.9);
+            background: color-mix(in srgb, var(--color-gray-400) 90%, transparent);
         }
         .confirm-button:disabled {
-            background: rgba(255, 255, 255, 0.12);
+            background: var(--color-white-12);
             color: #bebebe;
-            border: 0.5px solid rgba(255, 255, 255, 0.24);
+            border: 0.5px solid var(--color-white-24);
             box-shadow: none;
             cursor: not-allowed;
         }
@@ -269,7 +263,7 @@ export class ApiKeyHeader extends TranslationMixin(LitElement) {
             font-size: 11px;
             font-weight: 500;
             padding: 4px;
-            border-radius: 4px;
+            border-radius: var(--radius-sm);
         }
         .error-message {
             color: rgba(239, 68, 68, 0.9);
@@ -278,31 +272,10 @@ export class ApiKeyHeader extends TranslationMixin(LitElement) {
             color: rgba(74, 222, 128, 0.9);
         }
         .message-fade-out {
-            animation: fadeOut 3s ease-in-out forwards;
-        }
-        @keyframes fadeOut {
-            0% {
-                opacity: 1;
-            }
-            66% {
-                opacity: 1;
-            }
-            100% {
-                opacity: 0;
-            }
+            animation: fadeOut 3s var(--easing-ease-in-out) forwards;
         }
         .sliding-out {
-            animation: slideOut 0.3s ease-out forwards;
-        }
-        @keyframes slideOut {
-            from {
-                transform: translateY(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateY(-100%);
-                opacity: 0;
-            }
+            animation: slideOut var(--animation-base) var(--easing-ease-out) forwards;
         }
         .api-input.invalid {
             outline: 1px solid #ff7070;
