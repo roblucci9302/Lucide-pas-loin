@@ -30,7 +30,7 @@ export class ListenView extends LitElement {
 
 
         * {
-            font-family: 'Helvetica Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: var(--font-family-primary);
             cursor: default;
             user-select: none;
         }
@@ -43,19 +43,19 @@ export class ListenView extends LitElement {
 
 /* highlight.js 스타일 추가 */
 .insights-container pre {
-    background: rgba(0, 0, 0, 0.4) !important;
-    border-radius: 8px !important;
+    background: var(--color-black-40) !important;
+    border-radius: var(--radius-md) !important;
     padding: 12px !important;
     margin: 8px 0 !important;
     overflow-x: auto !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid var(--color-white-10) !important;
     white-space: pre !important;
     word-wrap: normal !important;
     word-break: normal !important;
 }
 
 .insights-container code {
-    font-family: 'Monaco', 'Menlo', 'Consolas', monospace !important;
+    font-family: var(--font-family-mono) !important;
     font-size: 11px !important;
     background: transparent !important;
     white-space: pre !important;
@@ -71,7 +71,7 @@ export class ListenView extends LitElement {
 }
 
 .insights-container p code {
-    background: rgba(255, 255, 255, 0.1) !important;
+    background: var(--color-white-10) !important;
     padding: 2px 4px !important;
     border-radius: 4px !important;
     color: #ffd700 !important;
@@ -171,7 +171,7 @@ export class ListenView extends LitElement {
             width: 100%;
             box-sizing: border-box;
             flex-shrink: 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid var(--color-white-10);
         }
 
         .bar-left-text {
@@ -228,7 +228,7 @@ export class ListenView extends LitElement {
         }
 
         .toggle-button:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--color-white-10);
         }
 
         .toggle-button svg {

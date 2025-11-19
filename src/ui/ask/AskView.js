@@ -109,7 +109,7 @@ export class AskView extends LitElement {
         }
 
         * {
-            font-family: 'Helvetica Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: var(--font-family-primary);
             cursor: default;
             user-select: none;
         }
@@ -121,19 +121,19 @@ export class AskView extends LitElement {
         }
 
         .response-container pre {
-            background: rgba(0, 0, 0, 0.4) !important;
-            border-radius: 8px !important;
+            background: var(--color-black-40) !important;
+            border-radius: var(--radius-md) !important;
             padding: 12px !important;
             margin: 8px 0 !important;
             overflow-x: auto !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid var(--color-white-10) !important;
             white-space: pre !important;
             word-wrap: normal !important;
             word-break: normal !important;
         }
 
         .response-container code {
-            font-family: 'Monaco', 'Menlo', 'Consolas', monospace !important;
+            font-family: var(--font-family-mono) !important;
             font-size: 11px !important;
             background: transparent !important;
             white-space: pre !important;
@@ -149,7 +149,7 @@ export class AskView extends LitElement {
         }
 
         .response-container p code {
-            background: rgba(255, 255, 255, 0.1) !important;
+            background: var(--color-white-10) !important;
             padding: 2px 4px !important;
             border-radius: 4px !important;
             color: #ffd700 !important;
@@ -223,7 +223,7 @@ export class AskView extends LitElement {
             align-items: center;
             padding: 12px 16px;
             background: transparent;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid var(--color-white-10);
             flex-shrink: 0;
         }
 
@@ -371,7 +371,7 @@ export class AskView extends LitElement {
         }
 
         .close-button:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--color-white-10);
             color: rgba(255, 255, 255, 1);
         }
 
@@ -468,7 +468,7 @@ export class AskView extends LitElement {
             left: -32px;
             top: 50%;
             transform: translateY(-50%);
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--color-white-10);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 4px;
             padding: 2px;
@@ -506,7 +506,7 @@ export class AskView extends LitElement {
             gap: 8px;
             padding: 12px 16px;
             background: rgba(0, 0, 0, 0.1);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid var(--color-white-10);
             flex-shrink: 0;
             transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
             transform-origin: bottom;
@@ -574,7 +574,7 @@ export class AskView extends LitElement {
         }
 
         .response-line code {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--color-white-10);
             color: rgba(255, 255, 255, 0.95);
             padding: 2px 6px;
             border-radius: 4px;
@@ -586,10 +586,10 @@ export class AskView extends LitElement {
             background: rgba(255, 255, 255, 0.05);
             color: rgba(255, 255, 255, 0.95);
             padding: 12px;
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             overflow-x: auto;
             margin: 12px 0;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--color-white-10);
         }
 
         .response-line pre code {
@@ -664,7 +664,7 @@ export class AskView extends LitElement {
             background: transparent;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             margin-left: 8px;
             font-size: 13px;
             font-family: 'Helvetica Neue', sans-serif;
@@ -713,7 +713,7 @@ export class AskView extends LitElement {
             font-size: 12px;
             font-family: 'Helvetica Neue', sans-serif;
             font-weight: 500;
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: var(--color-white-10);
             border-radius: 13%;
             width: 18px;
             height: 18px;
@@ -740,15 +740,15 @@ export class AskView extends LitElement {
             background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid var(--color-white-10);
             height: 44px;
             flex-shrink: 0;
         }
 
         .nav-button {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--color-white-10);
             border: none;
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             width: 32px;
             height: 32px;
             display: flex;
@@ -779,7 +779,7 @@ export class AskView extends LitElement {
         .url-display {
             flex: 1;
             background: rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             padding: 6px 12px;
             font-size: 12px;
             color: rgba(255, 255, 255, 0.7);
@@ -792,7 +792,7 @@ export class AskView extends LitElement {
             flex: 1;
             background: rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             padding: 6px 12px;
             font-size: 12px;
             color: rgba(255, 255, 255, 0.9);
@@ -808,7 +808,7 @@ export class AskView extends LitElement {
         }
 
         .url-input:focus {
-            background: rgba(0, 0, 0, 0.4);
+            background: var(--color-black-40);
             border-color: rgba(100, 150, 255, 0.6);
             box-shadow: 0 0 0 2px rgba(100, 150, 255, 0.2);
         }
@@ -923,7 +923,7 @@ export class AskView extends LitElement {
             border: 1px solid rgba(100, 150, 255, 0.4);
             color: rgba(255, 255, 255, 0.9);
             padding: 8px 20px;
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             font-size: 13px;
             font-weight: 500;
             cursor: pointer;
@@ -976,7 +976,7 @@ export class AskView extends LitElement {
             right: 12px;
             background: rgba(30, 30, 40, 0.98);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             padding: 8px 12px;
             display: flex;
             align-items: center;
@@ -989,7 +989,7 @@ export class AskView extends LitElement {
         .find-input {
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             padding: 4px 8px;
             font-size: 12px;
             color: rgba(255, 255, 255, 0.9);
@@ -1011,7 +1011,7 @@ export class AskView extends LitElement {
         }
 
         .find-nav-button {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--color-white-10);
             border: none;
             border-radius: 4px;
             width: 24px;
@@ -1100,7 +1100,7 @@ export class AskView extends LitElement {
         .favicon-placeholder {
             width: 16px;
             height: 16px;
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--color-white-10);
             border-radius: 2px;
             display: flex;
             align-items: center;
@@ -1136,7 +1136,7 @@ export class AskView extends LitElement {
             width: 40px;
             height: 40px;
             background: rgba(100, 150, 255, 0.2);
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1172,7 +1172,7 @@ export class AskView extends LitElement {
         .download-progress {
             width: 100%;
             height: 4px;
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--color-white-10);
             border-radius: 2px;
             overflow: hidden;
             margin: 12px 0;
@@ -1194,7 +1194,7 @@ export class AskView extends LitElement {
         .download-btn {
             flex: 1;
             padding: 8px 16px;
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             font-size: 12px;
             font-weight: 500;
             cursor: pointer;
@@ -1220,7 +1220,7 @@ export class AskView extends LitElement {
         }
 
         .download-btn.secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--color-white-10);
             border-color: rgba(255, 255, 255, 0.3);
         }
 

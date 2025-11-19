@@ -20,7 +20,7 @@ export class PermissionHeader extends TranslationMixin(LitElement) {
         }
 
         * {
-            font-family: 'Helvetica Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: var(--font-family-primary);
             cursor: default;
             user-select: none;
             box-sizing: border-box;
@@ -31,8 +31,8 @@ export class PermissionHeader extends TranslationMixin(LitElement) {
             width: 285px;
             /* height is now set dynamically */
             padding: 18px 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 16px;
+            background: var(--color-black-30);
+            border-radius: var(--radius-lg);
             overflow: hidden;
             position: relative;
             display: flex;
@@ -47,7 +47,7 @@ export class PermissionHeader extends TranslationMixin(LitElement) {
             left: 0;
             right: 0;
             bottom: 0;
-            border-radius: 16px;
+            border-radius: var(--radius-lg);
             padding: 1px;
             background: linear-gradient(169deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.5) 100%);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -63,15 +63,15 @@ export class PermissionHeader extends TranslationMixin(LitElement) {
             right: 10px;
             width: 14px;
             height: 14px;
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--color-white-10);
             border: none;
-            border-radius: 4px;
-            color: rgba(255, 255, 255, 0.7);
+            border-radius: var(--radius-sm);
+            color: var(--color-white-70);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.15s ease;
+            transition: all var(--transition-fast) var(--easing-ease);
             z-index: 10;
             font-size: 14px;
             line-height: 1;
@@ -79,8 +79,8 @@ export class PermissionHeader extends TranslationMixin(LitElement) {
         }
 
         .close-button:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: rgba(255, 255, 255, 0.9);
+            background: var(--color-white-20);
+            color: var(--color-white-90);
         }
 
         .close-button:active {
@@ -111,7 +111,7 @@ export class PermissionHeader extends TranslationMixin(LitElement) {
         }
 
         .subtitle {
-            color: rgba(255, 255, 255, 0.7);
+            color: var(--color-white-70);
             font-size: 11px;
             font-weight: 400;
             text-align: center;
@@ -132,7 +132,7 @@ export class PermissionHeader extends TranslationMixin(LitElement) {
             display: flex;
             align-items: center;
             gap: 6px;
-            color: rgba(255, 255, 255, 0.8);
+            color: var(--color-white-80);
             font-size: 11px;
             font-weight: 400;
         }
@@ -157,14 +157,14 @@ export class PermissionHeader extends TranslationMixin(LitElement) {
             -webkit-app-region: no-drag;
             width: 100%;
             height: 34px;
-            background: rgba(255, 255, 255, 0.2);
+            background: var(--color-white-20);
             border: none;
-            border-radius: 10px;
+            border-radius: var(--radius-md);
             color: white;
             font-size: 12px;
             font-weight: 500;
             cursor: pointer;
-            transition: background 0.15s ease;
+            transition: background var(--transition-fast) var(--easing-ease);
             position: relative;
             overflow: hidden;
             margin-bottom: 6px;
@@ -177,7 +177,7 @@ export class PermissionHeader extends TranslationMixin(LitElement) {
             left: 0;
             right: 0;
             bottom: 0;
-            border-radius: 10px;
+            border-radius: var(--radius-md);
             padding: 1px;
             background: linear-gradient(169deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.5) 100%);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -187,7 +187,7 @@ export class PermissionHeader extends TranslationMixin(LitElement) {
         }
 
         .action-button:hover:not(:disabled) {
-            background: rgba(255, 255, 255, 0.3);
+            background: var(--color-white-30);
         }
 
         .action-button:disabled {
@@ -199,14 +199,14 @@ export class PermissionHeader extends TranslationMixin(LitElement) {
             -webkit-app-region: no-drag;
             width: 100%;
             height: 34px;
-            background: rgba(34, 197, 94, 0.8);
+            background: color-mix(in srgb, var(--color-success-500) 80%, transparent);
             border: none;
-            border-radius: 10px;
+            border-radius: var(--radius-md);
             color: white;
             font-size: 12px;
             font-weight: 500;
             cursor: pointer;
-            transition: background 0.15s ease;
+            transition: background var(--transition-fast) var(--easing-ease);
             position: relative;
             overflow: hidden;
             margin-top: 4px;
@@ -219,7 +219,7 @@ export class PermissionHeader extends TranslationMixin(LitElement) {
             left: 0;
             right: 0;
             bottom: 0;
-            border-radius: 10px;
+            border-radius: var(--radius-md);
             padding: 1px;
             background: linear-gradient(169deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.5) 100%);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -229,11 +229,11 @@ export class PermissionHeader extends TranslationMixin(LitElement) {
         }
 
         .continue-button:hover:not(:disabled) {
-            background: rgba(34, 197, 94, 0.9);
+            background: color-mix(in srgb, var(--color-success-500) 90%, transparent);
         }
 
         .continue-button:disabled {
-            background: rgba(255, 255, 255, 0.2);
+            background: var(--color-white-20);
             cursor: not-allowed;
         }
         
