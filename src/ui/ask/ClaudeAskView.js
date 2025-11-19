@@ -14,6 +14,7 @@ import '../components/dialogs/RenameConversationDialog.js';
 import '../components/dialogs/ConfirmDialog.js';
 import '../components/dialogs/ExportDialog.js';
 import '../components/command/CommandPalette.js';
+import '../components/tags/TagManager.js';
 import { claudeAskBridgeService } from '../services/claudeAskBridgeService.js';
 import { toastService } from '../services/toastService.js';
 import { exportService } from '../services/exportService.js';
@@ -52,6 +53,7 @@ export class ClaudeAskView extends LitElement {
         selectedConversation: { type: Object, state: true },
         showCodeLineNumbers: { type: Boolean, state: true },
         commandPaletteOpen: { type: Boolean, state: true },
+        tagManagerOpen: { type: Boolean, state: true },
     };
 
     static styles = css`
@@ -183,6 +185,7 @@ export class ClaudeAskView extends LitElement {
         this.selectedConversation = null;
         this.streamingMessageId = null;
         this.commandPaletteOpen = false;
+        this.tagManagerOpen = false;
         this._unsubscribeStateUpdate = null;
         this._unsubscribeError = null;
         this._keydownHandler = this._handleKeyDown.bind(this);
@@ -575,6 +578,33 @@ export class ClaudeAskView extends LitElement {
     }
 
     /**
+     * Handle manage tags click
+     * @private
+     */
+    _handleManageTags(e) {
+        this.selectedConversation = e.detail.conversation;
+        this.tagManagerOpen = true;
+    }
+
+    /**
+     * Handle tag manager close
+     * @private
+     */
+    _handleTagManagerClose() {
+        this.tagManagerOpen = false;
+        this.selectedConversation = null;
+    }
+
+    /**
+     * Handle tags changed
+     * @private
+     */
+    _handleTagsChanged(e) {
+        // Reload conversations to reflect tag changes
+        this._loadConversations();
+    }
+
+    /**
      * Handle command palette close
      * @private
      */
@@ -704,6 +734,7 @@ export class ClaudeAskView extends LitElement {
                         @conversation-export="${this._handleConversationExport}"
                         @conversation-rename="${this._handleConversationRename}"
                         @conversation-delete="${this._handleConversationDelete}"
+                        @conversation-manage-tags="${this._handleManageTags}"
                         @mode-changed="${this._handleModeChange}"
                         @settings-open="${this._handleSettingsOpen}"
                     ></conversation-sidebar>
@@ -780,6 +811,14 @@ export class ClaudeAskView extends LitElement {
                 @close="${this._handleCommandPaletteClose}"
                 @execute="${this._handleCommandExecute}"
             ></command-palette>
+
+            <!-- Tag Manager -->
+            <tag-manager
+                ?open="${this.tagManagerOpen}"
+                .conversation="${this.selectedConversation}"
+                @close="${this._handleTagManagerClose}"
+                @tags-changed="${this._handleTagsChanged}"
+            ></tag-manager>
 
             <!-- Toast Container (for notifications) -->
             <toast-container></toast-container>

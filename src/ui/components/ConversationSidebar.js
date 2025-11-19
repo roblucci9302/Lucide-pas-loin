@@ -1,6 +1,8 @@
 import { html, css, LitElement } from '../assets/lit-core-2.7.4.min.js';
 import './base/ClaudeButton.js';
 import './base/ClaudeAvatar.js';
+import './tags/TagFilter.js';
+import { tagService } from '../services/tagService.js';
 
 /**
  * ConversationSidebar - Sidebar with conversations, modes, and profiles
@@ -30,6 +32,8 @@ export class ConversationSidebar extends LitElement {
         userName: { type: String },
         userAvatar: { type: String },
         searchQuery: { type: String, state: true },
+        _selectedTagIds: { type: Array, state: true },
+        _tagFilterMode: { type: String, state: true },
     };
 
     static styles = css`
@@ -419,6 +423,8 @@ export class ConversationSidebar extends LitElement {
         this.userName = 'Utilisateur';
         this.userAvatar = '';
         this.searchQuery = '';
+        this._selectedTagIds = [];
+        this._tagFilterMode = 'any';
     }
 
     _handleNewConversation() {
@@ -502,16 +508,43 @@ export class ConversationSidebar extends LitElement {
         }));
     }
 
+    _handleManageTagsClick(e, conversation) {
+        e.stopPropagation();
+        this.dispatchEvent(new CustomEvent('conversation-manage-tags', {
+            detail: { conversation },
+            bubbles: true,
+            composed: true
+        }));
+    }
+
+    _handleTagFilterChange(e) {
+        const { selectedTags, filterMode } = e.detail;
+        this._selectedTagIds = selectedTags;
+        this._tagFilterMode = filterMode;
+    }
+
     _filterConversations(conversations) {
-        if (!this.searchQuery || this.searchQuery.trim() === '') {
-            return conversations;
+        let filtered = conversations;
+
+        // Apply search filter
+        if (this.searchQuery && this.searchQuery.trim() !== '') {
+            const query = this.searchQuery.toLowerCase().trim();
+            filtered = filtered.filter(conv => {
+                const title = (conv.title || 'Nouvelle conversation').toLowerCase();
+                return title.includes(query);
+            });
         }
 
-        const query = this.searchQuery.toLowerCase().trim();
-        return conversations.filter(conv => {
-            const title = (conv.title || 'Nouvelle conversation').toLowerCase();
-            return title.includes(query);
-        });
+        // Apply tag filter
+        if (this._selectedTagIds && this._selectedTagIds.length > 0) {
+            filtered = tagService.filterConversationsByTags(
+                filtered,
+                this._selectedTagIds,
+                this._tagFilterMode
+            );
+        }
+
+        return filtered;
     }
 
     _highlightText(text, query) {
@@ -597,6 +630,9 @@ export class ConversationSidebar extends LitElement {
                                 <div class="conversation-time">${this._formatTime(conv.updated_at)}</div>
                             </div>
                             <div class="conversation-actions">
+                                <button class="action-btn" @click="${(e) => this._handleManageTagsClick(e, conv)}" title="Tags">
+                                    🏷️
+                                </button>
                                 <button class="action-btn" @click="${(e) => this._handleExportClick(e, conv)}" title="Exporter">
                                     📥
                                 </button>
@@ -678,6 +714,12 @@ export class ConversationSidebar extends LitElement {
                 </div>
 
                 <div class="divider"></div>
+
+                <!-- Tag Filter -->
+                <tag-filter
+                    .selectedTags="${this._selectedTagIds}"
+                    @filter-changed="${this._handleTagFilterChange}"
+                ></tag-filter>
 
                 <!-- Conversations -->
                 <div class="conversations">
