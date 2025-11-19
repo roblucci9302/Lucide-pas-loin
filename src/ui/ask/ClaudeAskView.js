@@ -12,8 +12,10 @@ import '../components/settings/SettingsPanel.js';
 import '../components/notifications/ToastContainer.js';
 import '../components/dialogs/RenameConversationDialog.js';
 import '../components/dialogs/ConfirmDialog.js';
+import '../components/dialogs/ExportDialog.js';
 import { claudeAskBridgeService } from '../services/claudeAskBridgeService.js';
 import { toastService } from '../services/toastService.js';
+import { exportService } from '../services/exportService.js';
 
 /**
  * ClaudeAskView - Ask interface with Claude.ai layout
@@ -43,6 +45,7 @@ export class ClaudeAskView extends LitElement {
         settingsOpen: { type: Boolean, state: true },
         renameDialogOpen: { type: Boolean, state: true },
         deleteDialogOpen: { type: Boolean, state: true },
+        exportDialogOpen: { type: Boolean, state: true },
         selectedConversation: { type: Object, state: true },
     };
 
@@ -171,6 +174,7 @@ export class ClaudeAskView extends LitElement {
         this.settingsOpen = false;
         this.renameDialogOpen = false;
         this.deleteDialogOpen = false;
+        this.exportDialogOpen = false;
         this.selectedConversation = null;
         this.streamingMessageId = null;
         this._unsubscribeStateUpdate = null;
@@ -504,6 +508,41 @@ export class ClaudeAskView extends LitElement {
         this.selectedConversation = null;
     }
 
+    _handleConversationExport(e) {
+        this.selectedConversation = e.detail.conversation;
+        this.exportDialogOpen = true;
+    }
+
+    async _handleExportConfirm(e) {
+        const {
+            format,
+            includeMetadata,
+            includeTimestamps,
+            conversation,
+            messages,
+        } = e.detail;
+
+        try {
+            await exportService.export(format, conversation, messages, {
+                includeMetadata,
+                includeTimestamps,
+            });
+
+            toastService.success(`Conversation exportée en ${format.toUpperCase()} avec succès`);
+        } catch (error) {
+            console.error('[ClaudeAskView] Error exporting conversation:', error);
+            toastService.error(`Erreur lors de l'export: ${error.message}`);
+        } finally {
+            this.exportDialogOpen = false;
+            this.selectedConversation = null;
+        }
+    }
+
+    _handleExportCancel() {
+        this.exportDialogOpen = false;
+        this.selectedConversation = null;
+    }
+
     _renderMessage(message) {
         if (message.role === 'user') {
             return html`
@@ -608,6 +647,7 @@ export class ClaudeAskView extends LitElement {
                         .currentConversationId="${this.currentConversation?.id}"
                         @new-conversation="${this._handleNewConversation}"
                         @conversation-selected="${this._handleConversationSelect}"
+                        @conversation-export="${this._handleConversationExport}"
                         @conversation-rename="${this._handleConversationRename}"
                         @conversation-delete="${this._handleConversationDelete}"
                         @mode-changed="${this._handleModeChange}"
@@ -670,6 +710,15 @@ export class ClaudeAskView extends LitElement {
                 @confirm="${this._handleDeleteConfirm}"
                 @cancel="${this._handleDeleteCancel}"
             ></confirm-dialog>
+
+            <!-- Export Conversation Dialog -->
+            <export-dialog
+                ?open="${this.exportDialogOpen}"
+                .conversation="${this.selectedConversation}"
+                .messages="${this.messages}"
+                @export="${this._handleExportConfirm}"
+                @cancel="${this._handleExportCancel}"
+            ></export-dialog>
 
             <!-- Toast Container (for notifications) -->
             <toast-container></toast-container>

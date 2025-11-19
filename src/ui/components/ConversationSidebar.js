@@ -475,6 +475,15 @@ export class ConversationSidebar extends LitElement {
         }
     }
 
+    _handleExportClick(e, conversation) {
+        e.stopPropagation();
+        this.dispatchEvent(new CustomEvent('conversation-export', {
+            detail: { conversation },
+            bubbles: true,
+            composed: true
+        }));
+    }
+
     _handleRenameClick(e, conversation) {
         e.stopPropagation();
         this.dispatchEvent(new CustomEvent('conversation-rename', {
@@ -588,6 +597,9 @@ export class ConversationSidebar extends LitElement {
                                 <div class="conversation-time">${this._formatTime(conv.updated_at)}</div>
                             </div>
                             <div class="conversation-actions">
+                                <button class="action-btn" @click="${(e) => this._handleExportClick(e, conv)}" title="Exporter">
+                                    📥
+                                </button>
                                 <button class="action-btn" @click="${(e) => this._handleRenameClick(e, conv)}" title="Renommer">
                                     ✏️
                                 </button>
