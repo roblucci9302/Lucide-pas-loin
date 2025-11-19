@@ -34,7 +34,7 @@ export class MainHeader extends TranslationMixin(LitElement) {
 
 
         * {
-            font-family: 'Helvetica Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: var(--font-family-primary);
             cursor: default;
             user-select: none;
         }
@@ -47,7 +47,7 @@ export class MainHeader extends TranslationMixin(LitElement) {
             padding: 2px 12px;
             background: transparent;
             overflow: visible;
-            border-radius: 9000px;
+            border-radius: var(--radius-full);
             /* backdrop-filter: blur(1px); */
             justify-content: space-between;
             align-items: center;
@@ -62,8 +62,8 @@ export class MainHeader extends TranslationMixin(LitElement) {
             top: 0; left: 0; right: 0; bottom: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 9000px;
+            background: var(--glass-bg);
+            border-radius: var(--radius-full);
             z-index: -1;
         }
 
@@ -71,7 +71,7 @@ export class MainHeader extends TranslationMixin(LitElement) {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            border-radius: 9000px;
+            border-radius: var(--radius-full);
             padding: 1px;
             background: linear-gradient(169deg, rgba(255, 255, 255, 0.17) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.17) 100%); 
             -webkit-mask:
@@ -87,7 +87,7 @@ export class MainHeader extends TranslationMixin(LitElement) {
             height: 30px;
             padding: 0 10px;
             background: transparent;
-            border-radius: 9000px;
+            border-radius: var(--radius-full);
             justify-content: center;
             min-width: 80px;
             align-items: center;
@@ -112,7 +112,7 @@ export class MainHeader extends TranslationMixin(LitElement) {
         }
 
         .listen-button.done {
-            background-color: rgba(255, 255, 255, 0.6);
+            background-color: var(--color-white-60);
             transition: background-color 0.15s ease;
         }
 
@@ -130,24 +130,24 @@ export class MainHeader extends TranslationMixin(LitElement) {
         }
 
         .listen-button:hover::before {
-            background: rgba(255, 255, 255, 0.18);
+            background: var(--color-white-20);
         }
 
         .listen-button::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(255, 255, 255, 0.14);
-            border-radius: 9000px;
+            background: var(--color-white-15);
+            border-radius: var(--radius-full);
             z-index: -1;
-            transition: background 0.15s ease;
+            transition: background var(--transition-fast) var(--easing-ease);
         }
 
         .listen-button::after {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            border-radius: 9000px;
+            border-radius: var(--radius-full);
             padding: 1px;
             background: linear-gradient(169deg, rgba(255, 255, 255, 0.17) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.17) 100%);
             -webkit-mask:
@@ -207,12 +207,12 @@ export class MainHeader extends TranslationMixin(LitElement) {
             gap: 12px;
             display: flex;
             padding: 0 4px;
-            border-radius: 8px;
-            transition: background 0.15s ease;
+            border-radius: var(--radius-md);
+            transition: background var(--transition-fast) var(--easing-ease);
         }
 
         .header-actions:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--color-white-10);
         }
 
         .ask-action {
@@ -231,7 +231,7 @@ export class MainHeader extends TranslationMixin(LitElement) {
         .action-text-content {
             color: white;
             font-size: 12px;
-            font-family: 'Helvetica Neue', sans-serif;
+            font-family: var(--font-family-primary);
             font-weight: 500; /* Medium */
             word-wrap: break-word;
         }
@@ -259,9 +259,9 @@ export class MainHeader extends TranslationMixin(LitElement) {
         .icon-box {
             color: white;
             font-size: 12px;
-            font-family: 'Helvetica Neue', sans-serif;
+            font-family: var(--font-family-primary);
             font-weight: 500;
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: var(--color-white-10);
             border-radius: 13%;
             width: 18px;
             height: 18px;
@@ -277,7 +277,7 @@ export class MainHeader extends TranslationMixin(LitElement) {
             flex-shrink: 0;
             border-radius: 50%;
             background: transparent;
-            transition: background 0.15s ease;
+            transition: background var(--transition-fast) var(--easing-ease);
             color: white;
             border: none;
             cursor: pointer;
@@ -287,7 +287,7 @@ export class MainHeader extends TranslationMixin(LitElement) {
         }
 
         .settings-button:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--color-white-10);
         }
 
         .settings-icon {

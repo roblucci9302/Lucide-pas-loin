@@ -4,7 +4,7 @@ import { html, css, LitElement } from '../assets/lit-core-2.7.4.min.js';
 export class SettingsView extends LitElement {
     static styles = css`
         * {
-            font-family: 'Helvetica Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: var(--font-family-primary);
             cursor: default;
             user-select: none;
         }
@@ -21,9 +21,9 @@ export class SettingsView extends LitElement {
             flex-direction: column;
             height: 100%;
             width: 100%;
-            background: rgba(20, 20, 20, 0.8);
-            border-radius: 12px;
-            outline: 0.5px rgba(255, 255, 255, 0.2) solid;
+            background: var(--color-gray-800);
+            border-radius: var(--radius-lg);
+            outline: 0.5px var(--color-white-20) solid;
             outline-offset: -1px;
             box-sizing: border-box;
             position: relative;
@@ -33,21 +33,21 @@ export class SettingsView extends LitElement {
         }
 
         .settings-container::-webkit-scrollbar {
-            width: 6px;
+            width: var(--scrollbar-width);
         }
 
         .settings-container::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--scrollbar-track);
             border-radius: 4px;
         }
 
         .settings-container::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
+            background: var(--color-white-20);
             border-radius: 4px;
         }
 
         .settings-container::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: var(--scrollbar-thumb-hover);
         }
 
         .settings-container::before {
@@ -60,8 +60,8 @@ export class SettingsView extends LitElement {
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.15);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            border-radius: var(--radius-lg);
             filter: blur(10px);
             z-index: -1;
         }
@@ -172,7 +172,7 @@ export class SettingsView extends LitElement {
 
         .settings-button {
             background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--color-white-20);
             border-radius: 4px;
             color: white;
             padding: 5px 10px;
@@ -188,7 +188,7 @@ export class SettingsView extends LitElement {
 
         .settings-button:hover {
             background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.3);
+            border-color: var(--scrollbar-thumb-hover);
         }
 
         .settings-button:active {
@@ -291,7 +291,7 @@ export class SettingsView extends LitElement {
             justify-content: space-between;
             align-items: center;
             padding: 4px 6px;
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--scrollbar-track);
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.15s ease;
@@ -360,7 +360,7 @@ export class SettingsView extends LitElement {
         .loading-spinner {
             width: 12px;
             height: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--color-white-20);
             border-top: 1px solid rgba(255, 255, 255, 0.8);
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -1418,7 +1418,7 @@ export class SettingsView extends LitElement {
                                  @click=${() => this.handleProfileSelect(profile.id)}
                                  style="
                                      padding: 10px 12px;
-                                     background: ${this.activeProfile === profile.id ? 'rgba(100, 150, 255, 0.2)' : 'rgba(255, 255, 255, 0.05)'};
+                                     background: ${this.activeProfile === profile.id ? 'rgba(100, 150, 255, 0.2)' : 'var(--scrollbar-track)'};
                                      border: 1px solid ${this.activeProfile === profile.id ? 'rgba(100, 150, 255, 0.4)' : 'rgba(255, 255, 255, 0.1)'};
                                      border-radius: 8px;
                                      cursor: pointer;
@@ -1431,7 +1431,7 @@ export class SettingsView extends LitElement {
                                  }}
                                  @mouseout=${(e) => {
                                      if (this.activeProfile !== profile.id) {
-                                         e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                                         e.currentTarget.style.background = 'var(--scrollbar-track)';
                                      }
                                  }}>
                                 <div style="display: flex; align-items: center; gap: 8px;">
