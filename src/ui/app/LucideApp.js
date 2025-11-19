@@ -2,6 +2,7 @@ import { html, css, LitElement } from '../assets/lit-core-2.7.4.min.js';
 import { SettingsView } from '../settings/SettingsView.js';
 import { ListenView } from '../listen/ListenView.js';
 import { AskView } from '../ask/AskView.js';
+import { BrowserView } from '../browser/BrowserView.js';
 import { ShortcutSettingsView } from '../settings/ShortCutSettingsView.js';
 import { i18n } from '../i18n/index.js';
 
@@ -24,7 +25,7 @@ export class LucideApp extends LitElement {
             height: 100%;
         }
 
-        ask-view, settings-view, history-view, help-view, setup-view {
+        ask-view, browser-view, settings-view, history-view, help-view, setup-view {
             display: block;
             width: 100%;
             height: 100%;
@@ -148,6 +149,8 @@ export class LucideApp extends LitElement {
                 ></listen-view>`;
             case 'ask':
                 return html`<ask-view></ask-view>`;
+            case 'browser':
+                return html`<browser-view></browser-view>`;
             case 'settings':
                 return html`<settings-view
                     .selectedProfile=${this.selectedProfile}
