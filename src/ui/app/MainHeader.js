@@ -11,19 +11,20 @@ export class MainHeader extends TranslationMixin(LitElement) {
     static styles = css`
         :host {
             display: flex;
-            transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.2s ease-out;
+            transition: transform var(--transition-base) var(--easing-smooth-out),
+                        opacity var(--transition-base) var(--easing-ease-out);
         }
 
         :host(.hiding) {
-            animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+            animation: slideUp var(--animation-base) var(--easing-smooth-in) forwards;
         }
 
         :host(.showing) {
-            animation: slideDown 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation: slideDown 350ms var(--easing-elastic) forwards;
         }
 
         :host(.sliding-in) {
-            animation: fadeIn 0.2s ease-out forwards;
+            animation: fadeIn var(--animation-fast) var(--easing-ease-out) forwards;
         }
 
         :host(.hidden) {
@@ -173,21 +174,13 @@ export class MainHeader extends TranslationMixin(LitElement) {
             height: 6px;
             background-color: white;
             border-radius: 50%;
-            animation: pulse 1.4s infinite ease-in-out both;
+            animation: pulse 1.4s var(--easing-ease-in-out) infinite both;
         }
         .loading-dots span:nth-of-type(1) {
             animation-delay: -0.32s;
         }
         .loading-dots span:nth-of-type(2) {
             animation-delay: -0.16s;
-        }
-        @keyframes pulse {
-            0%, 80%, 100% {
-                opacity: 0.2;
-            }
-            40% {
-                opacity: 1.0;
-            }
         }
 
         .middle-actions {

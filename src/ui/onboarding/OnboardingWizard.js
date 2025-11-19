@@ -48,18 +48,7 @@ export class OnboardingWizard extends LitElement {
             max-width: 600px;
             width: 100%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            animation: slideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            animation: slideIn var(--animation-slow) var(--easing-elastic);
         }
 
         .step-indicators {
@@ -117,12 +106,7 @@ export class OnboardingWizard extends LitElement {
             font-size: 80px;
             text-align: center;
             margin: 40px 0;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            animation: heartbeat 2s var(--easing-ease-in-out) infinite;
         }
 
         .profiles-grid {
@@ -253,18 +237,7 @@ export class OnboardingWizard extends LitElement {
         .completion-icon {
             font-size: 80px;
             margin-bottom: 24px;
-            animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-
-        @keyframes bounceIn {
-            from {
-                opacity: 0;
-                transform: scale(0.3);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+            animation: bounceIn 600ms var(--easing-bounce);
         }
 
         .completion-text {
@@ -336,12 +309,8 @@ export class OnboardingWizard extends LitElement {
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-top-color: white;
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            animation: spin var(--animation-slower) linear infinite;
             margin-right: 8px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
         }
     `;
 

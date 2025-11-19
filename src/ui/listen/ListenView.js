@@ -10,16 +10,17 @@ export class ListenView extends LitElement {
             width: 400px;
             transform: translate3d(0, 0, 0);
             backface-visibility: hidden;
-            transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.2s ease-out;
+            transition: transform var(--transition-base) var(--easing-smooth-out),
+                        opacity var(--transition-base) var(--easing-ease-out);
             will-change: transform, opacity;
         }
 
         :host(.hiding) {
-            animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+            animation: slideUp var(--animation-base) var(--easing-smooth-in) forwards;
         }
 
         :host(.showing) {
-            animation: slideDown 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation: slideDown 350ms var(--easing-elastic) forwards;
         }
 
         :host(.hidden) {

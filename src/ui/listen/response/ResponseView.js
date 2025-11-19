@@ -136,11 +136,7 @@ export class ResponseView extends LitElement {
             border: 3px solid color-mix(in srgb, var(--color-primary-500) 20%, transparent);
             border-top-color: color-mix(in srgb, var(--color-primary-500) 80%, transparent);
             border-radius: var(--radius-full);
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+            animation: spin var(--animation-slower) linear infinite;
         }
 
         .loading-text {
@@ -194,15 +190,8 @@ export class ResponseView extends LitElement {
             font-weight: 500;
             opacity: 0;
             pointer-events: none;
-            animation: copyFeedback 1.5s ease;
+            animation: copyFeedback 1.5s var(--easing-ease);
             z-index: 1000;
-        }
-
-        @keyframes copyFeedback {
-            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
-            20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-            80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
         }
     `;
 

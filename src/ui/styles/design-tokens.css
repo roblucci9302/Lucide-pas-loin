@@ -383,3 +383,452 @@
         --border-color-normal: var(--color-white-40);
     }
 }
+
+/* ========================================
+   ANIMATIONS & KEYFRAMES
+   ======================================== */
+
+/* Animation Durations */
+:root {
+    --animation-fast: 200ms;
+    --animation-base: 300ms;
+    --animation-slow: 500ms;
+    --animation-slower: 800ms;
+}
+
+/* Advanced Easing Functions */
+:root {
+    --easing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --easing-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --easing-smooth-in: cubic-bezier(0.4, 0, 0.6, 1);
+    --easing-smooth-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* === ENTRANCE ANIMATIONS === */
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-150%) scale(0.85);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes bounceIn {
+    from {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* === EXIT ANIMATIONS === */
+
+@keyframes slideUp {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-150%) scale(0.85);
+    }
+}
+
+@keyframes slideOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-100%);
+    }
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    66% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+/* === LOADING ANIMATIONS === */
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes pulse {
+    0%, 80%, 100% {
+        opacity: 0.2;
+        transform: scale(1);
+    }
+    40% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% center;
+    }
+    100% {
+        background-position: 200% center;
+    }
+}
+
+/* === ATTENTION ANIMATIONS === */
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-8px);
+    }
+    75% {
+        transform: translateX(8px);
+    }
+}
+
+@keyframes heartbeat {
+    0%, 100% {
+        transform: scale(1);
+    }
+    25% {
+        transform: scale(1.1);
+    }
+    50% {
+        transform: scale(1);
+    }
+}
+
+/* === FEEDBACK ANIMATIONS === */
+
+@keyframes copyFeedback {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
+    20% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    80% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+/* === UTILITY ANIMATIONS === */
+
+@keyframes glow {
+    0%, 100% {
+        box-shadow: 0 0 10px var(--color-primary-500);
+    }
+    50% {
+        box-shadow: 0 0 20px var(--color-primary-400);
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+/* === ANIMATION UTILITY CLASSES === */
+
+.animate-fade-in {
+    animation: fadeIn var(--animation-fast) var(--easing-ease) forwards;
+}
+
+.animate-fade-out {
+    animation: fadeOut var(--animation-base) var(--easing-ease) forwards;
+}
+
+.animate-slide-in {
+    animation: slideIn var(--animation-slow) var(--easing-elastic) forwards;
+}
+
+.animate-slide-down {
+    animation: slideDown 350ms var(--easing-elastic) forwards;
+}
+
+.animate-slide-up {
+    animation: slideUp var(--animation-base) var(--easing-smooth-in) forwards;
+}
+
+.animate-bounce-in {
+    animation: bounceIn 600ms var(--easing-bounce) forwards;
+}
+
+.animate-spin {
+    animation: spin var(--animation-slower) linear infinite;
+}
+
+.animate-pulse {
+    animation: pulse 1.4s var(--easing-ease-in-out) infinite;
+}
+
+.animate-shimmer {
+    animation: shimmer 2s linear infinite;
+}
+
+.animate-bounce {
+    animation: bounce 600ms var(--easing-ease) infinite;
+}
+
+.animate-shake {
+    animation: shake 400ms var(--easing-ease);
+}
+
+.animate-glow {
+    animation: glow 2s var(--easing-ease) infinite;
+}
+
+.animate-float {
+    animation: float 3s var(--easing-ease-in-out) infinite;
+}
+
+/* ========================================
+   HOVER & ACTIVE STATE ENHANCEMENTS
+   ======================================== */
+
+/* Interactive Element Base */
+.interactive {
+    transition: all var(--transition-base) var(--easing-ease);
+    cursor: pointer;
+}
+
+.interactive:hover {
+    transform: translateY(-2px);
+}
+
+.interactive:active {
+    transform: translateY(0);
+    transition-duration: var(--transition-fast);
+}
+
+/* Button Enhancements */
+.btn-hover-lift {
+    transition: transform var(--transition-base) var(--easing-ease),
+                box-shadow var(--transition-base) var(--easing-ease);
+}
+
+.btn-hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.btn-hover-lift:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-hover-scale {
+    transition: transform var(--transition-fast) var(--easing-ease);
+}
+
+.btn-hover-scale:hover {
+    transform: scale(1.05);
+}
+
+.btn-hover-scale:active {
+    transform: scale(0.98);
+}
+
+.btn-hover-glow {
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow var(--transition-base) var(--easing-ease);
+}
+
+.btn-hover-glow:hover {
+    box-shadow: 0 0 20px var(--color-primary-400);
+}
+
+/* Ripple Effect */
+.ripple-effect {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple-effect::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+    pointer-events: none;
+    transition: transform 0.6s var(--easing-ease-out);
+}
+
+.ripple-effect:active::after {
+    transform: translate(-50%, -50%) scale(2);
+}
+
+/* Focus States */
+.focus-ring {
+    outline: none;
+    transition: box-shadow var(--transition-fast) var(--easing-ease);
+}
+
+.focus-ring:focus-visible {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-500) 40%, transparent);
+}
+
+/* Card Hover Effects */
+.card-hover {
+    transition: transform var(--transition-base) var(--easing-ease),
+                box-shadow var(--transition-base) var(--easing-ease),
+                border-color var(--transition-base) var(--easing-ease);
+}
+
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Smooth Background Transitions */
+.bg-transition {
+    transition: background var(--transition-base) var(--easing-ease);
+}
+
+/* Icon Transitions */
+.icon-hover {
+    transition: transform var(--transition-fast) var(--easing-ease),
+                color var(--transition-fast) var(--easing-ease);
+}
+
+.icon-hover:hover {
+    transform: rotate(5deg) scale(1.1);
+}
+
+/* Loading State Overlay */
+.loading-overlay {
+    position: relative;
+    pointer-events: none;
+}
+
+.loading-overlay::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.1) 50%,
+        transparent 100%);
+    animation: shimmer 2s linear infinite;
+    background-size: 200% 100%;
+}
+
+/* Disabled State */
+.disabled-state {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Success/Error Feedback */
+.feedback-success {
+    animation: pulse 0.4s var(--easing-ease);
+    background: color-mix(in srgb, var(--color-success-500) 20%, transparent);
+}
+
+.feedback-error {
+    animation: shake 0.4s var(--easing-ease);
+    background: color-mix(in srgb, var(--color-error-500) 20%, transparent);
+}
+
+/* Progressive Enhancement for Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .interactive,
+    .btn-hover-lift,
+    .btn-hover-scale,
+    .btn-hover-glow,
+    .ripple-effect,
+    .focus-ring,
+    .card-hover,
+    .bg-transition,
+    .icon-hover {
+        transition: none;
+        animation: none;
+    }
+
+    .interactive:hover,
+    .btn-hover-lift:hover,
+    .btn-hover-scale:hover,
+    .card-hover:hover,
+    .icon-hover:hover {
+        transform: none;
+    }
+}

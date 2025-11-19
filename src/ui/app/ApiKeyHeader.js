@@ -272,31 +272,10 @@ export class ApiKeyHeader extends TranslationMixin(LitElement) {
             color: rgba(74, 222, 128, 0.9);
         }
         .message-fade-out {
-            animation: fadeOut 3s ease-in-out forwards;
-        }
-        @keyframes fadeOut {
-            0% {
-                opacity: 1;
-            }
-            66% {
-                opacity: 1;
-            }
-            100% {
-                opacity: 0;
-            }
+            animation: fadeOut 3s var(--easing-ease-in-out) forwards;
         }
         .sliding-out {
-            animation: slideOut 0.3s ease-out forwards;
-        }
-        @keyframes slideOut {
-            from {
-                transform: translateY(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateY(-100%);
-                opacity: 0;
-            }
+            animation: slideOut var(--animation-base) var(--easing-ease-out) forwards;
         }
         .api-input.invalid {
             outline: 1px solid #ff7070;
