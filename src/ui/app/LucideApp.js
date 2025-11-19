@@ -2,6 +2,7 @@ import { html, css, LitElement } from '../assets/lit-core-2.7.4.min.js';
 import { SettingsView } from '../settings/SettingsView.js';
 import { ListenView } from '../listen/ListenView.js';
 import { AskView } from '../ask/AskView.js';
+import { ClaudeAskView } from '../ask/ClaudeAskView.js';
 import { BrowserView } from '../browser/BrowserView.js';
 import { ShortcutSettingsView } from '../settings/ShortCutSettingsView.js';
 import { i18n } from '../i18n/index.js';
@@ -166,6 +167,14 @@ export class LucideApp extends LitElement {
 
 
     render() {
+        // Use Claude UI mode for ask view if enabled
+        if (this.currentView === 'ask' && this.uiMode === 'claude') {
+            return html`<claude-ask-view
+                @view-change-requested=${e => (this.currentView = e.detail.view)}
+            ></claude-ask-view>`;
+        }
+
+        // Classic rendering for all other views or when in classic mode
         switch (this.currentView) {
             case 'listen':
                 return html`<listen-view
