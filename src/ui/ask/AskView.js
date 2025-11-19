@@ -39,73 +39,23 @@ export class AskView extends LitElement {
             color: white;
             transform: translate3d(0, 0, 0);
             backface-visibility: hidden;
-            transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.2s ease-out;
+            transition: transform var(--transition-base) var(--easing-smooth-out),
+                        opacity var(--transition-base) var(--easing-ease-out);
             will-change: transform, opacity;
         }
 
         :host(.hiding) {
-            animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+            animation: slideUpEnhanced var(--animation-base) var(--easing-smooth-in) forwards;
         }
 
         :host(.showing) {
-            animation: slideDown 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation: slideDownEnhanced 350ms var(--easing-elastic) forwards;
         }
 
         :host(.hidden) {
             opacity: 0;
             transform: translateY(-150%) scale(0.85);
             pointer-events: none;
-        }
-
-        @keyframes slideUp {
-            0% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-                filter: blur(0px);
-            }
-            30% {
-                opacity: 0.7;
-                transform: translateY(-20%) scale(0.98);
-                filter: blur(0.5px);
-            }
-            70% {
-                opacity: 0.3;
-                transform: translateY(-80%) scale(0.92);
-                filter: blur(1.5px);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(-150%) scale(0.85);
-                filter: blur(2px);
-            }
-        }
-
-        @keyframes slideDown {
-            0% {
-                opacity: 0;
-                transform: translateY(-150%) scale(0.85);
-                filter: blur(2px);
-            }
-            30% {
-                opacity: 0.5;
-                transform: translateY(-50%) scale(0.92);
-                filter: blur(1px);
-            }
-            65% {
-                opacity: 0.9;
-                transform: translateY(-5%) scale(0.99);
-                filter: blur(0.2px);
-            }
-            85% {
-                opacity: 0.98;
-                transform: translateY(2%) scale(1.005);
-                filter: blur(0px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-                filter: blur(0px);
-            }
         }
 
         * {
@@ -265,22 +215,7 @@ export class AskView extends LitElement {
         }
 
         .response-label.animating {
-            animation: fadeInOut 0.3s ease-in-out;
-        }
-
-        @keyframes fadeInOut {
-            0% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-            50% {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            animation: fadeInOut var(--animation-base) var(--easing-ease-in-out);
         }
 
         .header-right {
@@ -436,19 +371,6 @@ export class AskView extends LitElement {
 
         .loading-dot:nth-child(3) {
             animation-delay: 0.4s;
-        }
-
-        @keyframes pulse {
-            0%,
-            80%,
-            100% {
-                opacity: 0.3;
-                transform: scale(0.8);
-            }
-            40% {
-                opacity: 1;
-                transform: scale(1.2);
-            }
         }
 
         .response-line {
@@ -845,12 +767,7 @@ export class AskView extends LitElement {
             border: 3px solid rgba(255, 255, 255, 0.2);
             border-top-color: rgba(100, 150, 255, 0.8);
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            animation: spin var(--animation-slower) linear infinite;
         }
 
         .loading-text {
