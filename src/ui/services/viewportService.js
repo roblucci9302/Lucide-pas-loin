@@ -9,19 +9,53 @@
  */
 
 class ViewportService {
-    constructor() {
-        this.breakpoints = {
+    constructor(customBreakpoints = {}) {
+        // Default breakpoints (can be overridden)
+        const defaultBreakpoints = {
             mobile: 768,
             tablet: 1024,
             desktop: 1280,
         };
 
+        // Merge custom breakpoints with defaults
+        this.breakpoints = {
+            ...defaultBreakpoints,
+            ...customBreakpoints,
+        };
+
         this.listeners = new Set();
+        this.mediaQueryListeners = []; // Store media query listeners for cleanup
         this.currentBreakpoint = this._getCurrentBreakpoint();
         this.isTouchDevice = this._detectTouch();
         this.orientation = this._getOrientation();
 
         this._init();
+    }
+
+    /**
+     * Update breakpoints dynamically
+     * @param {Object} newBreakpoints - New breakpoint values
+     */
+    setBreakpoints(newBreakpoints) {
+        this.breakpoints = {
+            ...this.breakpoints,
+            ...newBreakpoints,
+        };
+
+        // Re-setup media query listeners with new breakpoints
+        this._setupMediaQueryListeners();
+
+        // Update current breakpoint
+        const oldBreakpoint = this.currentBreakpoint;
+        this.currentBreakpoint = this._getCurrentBreakpoint();
+
+        if (oldBreakpoint !== this.currentBreakpoint) {
+            this._notifyListeners({
+                breakpoint: this.currentBreakpoint,
+                width: window.innerWidth,
+                height: window.innerHeight,
+            });
+        }
     }
 
     /**
@@ -44,31 +78,43 @@ class ViewportService {
      * @private
      */
     _setupMediaQueryListeners() {
+        // Clean up existing listeners
+        this.mediaQueryListeners.forEach(({ query, handler }) => {
+            query.removeEventListener('change', handler);
+        });
+        this.mediaQueryListeners = [];
+
         // Mobile breakpoint
         const mobileQuery = window.matchMedia(`(max-width: ${this.breakpoints.mobile - 1}px)`);
-        mobileQuery.addEventListener('change', (e) => {
+        const mobileHandler = (e) => {
             if (e.matches) {
                 this._updateBreakpoint('mobile');
             }
-        });
+        };
+        mobileQuery.addEventListener('change', mobileHandler);
+        this.mediaQueryListeners.push({ query: mobileQuery, handler: mobileHandler });
 
         // Tablet breakpoint
         const tabletQuery = window.matchMedia(
             `(min-width: ${this.breakpoints.mobile}px) and (max-width: ${this.breakpoints.tablet - 1}px)`
         );
-        tabletQuery.addEventListener('change', (e) => {
+        const tabletHandler = (e) => {
             if (e.matches) {
                 this._updateBreakpoint('tablet');
             }
-        });
+        };
+        tabletQuery.addEventListener('change', tabletHandler);
+        this.mediaQueryListeners.push({ query: tabletQuery, handler: tabletHandler });
 
         // Desktop breakpoint
         const desktopQuery = window.matchMedia(`(min-width: ${this.breakpoints.desktop}px)`);
-        desktopQuery.addEventListener('change', (e) => {
+        const desktopHandler = (e) => {
             if (e.matches) {
                 this._updateBreakpoint('desktop');
             }
-        });
+        };
+        desktopQuery.addEventListener('change', desktopHandler);
+        this.mediaQueryListeners.push({ query: desktopQuery, handler: desktopHandler });
     }
 
     /**

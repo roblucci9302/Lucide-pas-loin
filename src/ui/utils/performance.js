@@ -153,25 +153,32 @@ export function calculateVisibleRange(config) {
 }
 
 /**
- * Memoize function results
+ * Memoize function results with configurable cache limit
  * @param {Function} func - Function to memoize
+ * @param {Object} options - Configuration options
+ * @param {number} options.maxSize - Maximum cache size (default: 100)
  * @returns {Function} Memoized function
  */
-export function memoize(func) {
+export function memoize(func, options = {}) {
+    const { maxSize = 100 } = options;
     const cache = new Map();
 
     return function memoized(...args) {
         const key = JSON.stringify(args);
 
         if (cache.has(key)) {
-            return cache.get(key);
+            // Move to end (LRU strategy)
+            const value = cache.get(key);
+            cache.delete(key);
+            cache.set(key, value);
+            return value;
         }
 
         const result = func(...args);
         cache.set(key, result);
 
-        // Limit cache size to prevent memory leaks
-        if (cache.size > 100) {
+        // Limit cache size using FIFO eviction to prevent memory leaks
+        if (cache.size > maxSize) {
             const firstKey = cache.keys().next().value;
             cache.delete(firstKey);
         }

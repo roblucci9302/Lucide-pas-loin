@@ -37,9 +37,18 @@ export class ErrorBoundary extends LitElement {
         }
 
         .error-icon {
-            font-size: 64px;
+            width: 64px;
+            height: 64px;
             margin-bottom: 24px;
-            opacity: 0.5;
+            border-radius: 50%;
+            background: var(--claude-error-subtle, #FEE2E2);
+            color: var(--claude-error, #DC2626);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: bold;
+            font-family: var(--claude-font-family-sans, system-ui);
         }
 
         .error-title {
@@ -229,7 +238,7 @@ export class ErrorBoundary extends LitElement {
         if (this.hasError) {
             return html`
                 <div class="error-container">
-                    <div class="error-icon">⚠️</div>
+                    <div class="error-icon">!</div>
                     <h2 class="error-title">Une erreur est survenue</h2>
                     <p class="error-message">
                         Nous sommes désolés, quelque chose s'est mal passé.
@@ -241,7 +250,7 @@ export class ErrorBoundary extends LitElement {
                             class="error-button error-button-primary"
                             @click="${this._handleRetry}"
                         >
-                            🔄 Réessayer
+                            ↻ Réessayer
                         </button>
                         <button
                             class="error-button error-button-secondary"

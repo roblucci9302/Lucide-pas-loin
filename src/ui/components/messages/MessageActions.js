@@ -26,6 +26,7 @@ export class MessageActions extends LitElement {
         reaction: { type: String }, // 'up' | 'down' | null
         isEditing: { type: Boolean },
         showMenu: { type: Boolean, state: true },
+        _deleteConfirm: { type: Boolean, state: true }, // Confirmation state for delete
     };
 
     static styles = css`
@@ -77,6 +78,20 @@ export class MessageActions extends LitElement {
 
         .action-button.primary:hover {
             background: var(--claude-accent-orange-subtle, #FEF3C7);
+        }
+
+        .action-button.danger {
+            color: var(--claude-error, #DC2626);
+            background: var(--claude-error-subtle, #FEE2E2);
+            font-size: var(--claude-font-size-xs, 11px);
+            font-weight: 600;
+            width: auto;
+            padding: 0 8px;
+        }
+
+        .action-button.danger:hover {
+            background: var(--claude-error, #DC2626);
+            color: white;
         }
 
         /* Reaction Buttons */
@@ -171,6 +186,8 @@ export class MessageActions extends LitElement {
         this.isEditing = false;
         this.showMenu = false;
         this._showCopyFeedback = false;
+        this._deleteConfirm = false;
+        this._deleteTimeout = null;
     }
 
     _handleCopy() {
@@ -203,8 +220,26 @@ export class MessageActions extends LitElement {
     }
 
     _handleDelete() {
-        if (confirm('Supprimer ce message ?')) {
+        if (!this._deleteConfirm) {
+            // First click: ask for confirmation
+            this._deleteConfirm = true;
+
+            // Reset confirmation after 3 seconds
+            if (this._deleteTimeout) {
+                clearTimeout(this._deleteTimeout);
+            }
+            this._deleteTimeout = setTimeout(() => {
+                this._deleteConfirm = false;
+                this._deleteTimeout = null;
+            }, 3000);
+        } else {
+            // Second click: actually delete
             this._dispatchAction('delete');
+            this._deleteConfirm = false;
+            if (this._deleteTimeout) {
+                clearTimeout(this._deleteTimeout);
+                this._deleteTimeout = null;
+            }
         }
     }
 
@@ -285,11 +320,11 @@ export class MessageActions extends LitElement {
 
                 <!-- Delete Button -->
                 <button
-                    class="action-button"
+                    class="action-button ${this._deleteConfirm ? 'danger' : ''}"
                     @click=${this._handleDelete}
-                    title="Supprimer"
+                    title="${this._deleteConfirm ? 'Cliquez pour confirmer' : 'Supprimer'}"
                 >
-                    🗑️
+                    ${this._deleteConfirm ? 'Confirmer ?' : '🗑️'}
                 </button>
             </div>
         `;

@@ -447,7 +447,7 @@ export class CodeBlock extends LitElement {
                     @click=${this._handleCopy}
                     title="Copier le code"
                 >
-                    ${this._copiedState ? '✓ Copié' : '📋 Copier'}
+                    ${this._copiedState ? '✓ Copié' : 'Copier'}
                 </button>
             </div>
 
