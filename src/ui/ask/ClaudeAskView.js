@@ -694,6 +694,207 @@ export class ClaudeAskView extends LitElement {
     }
 
     /**
+     * Handle message action events
+     * @private
+     */
+    _handleMessageAction(e) {
+        const { action, messageId, role, content, reaction } = e.detail;
+
+        switch (action) {
+            case 'copy':
+                this._handleMessageCopy(content);
+                break;
+            case 'edit-save':
+                this._handleMessageEdit(messageId, content);
+                break;
+            case 'delete':
+                this._handleMessageDelete(messageId);
+                break;
+            case 'reaction':
+                this._handleMessageReaction(messageId, reaction);
+                break;
+            default:
+                console.warn('[ClaudeAskView] Unknown message action:', action);
+        }
+    }
+
+    /**
+     * Copy message content to clipboard
+     * @private
+     */
+    async _handleMessageCopy(content) {
+        try {
+            await navigator.clipboard.writeText(content);
+            toastService.success('Message copié dans le presse-papiers');
+        } catch (error) {
+            console.error('[ClaudeAskView] Error copying message:', error);
+            toastService.error('Erreur lors de la copie');
+        }
+    }
+
+    /**
+     * Edit user message
+     * @private
+     */
+    async _handleMessageEdit(messageId, newContent) {
+        try {
+            // Update message in local state
+            this.messages = this.messages.map(msg =>
+                msg.id === messageId ? { ...msg, content: newContent } : msg
+            );
+
+            // TODO: Update in backend/conversation
+            // await claudeAskBridgeService.updateMessage(this.currentConversation.id, messageId, newContent);
+
+            toastService.success('Message modifié');
+        } catch (error) {
+            console.error('[ClaudeAskView] Error editing message:', error);
+            toastService.error('Erreur lors de la modification');
+        }
+    }
+
+    /**
+     * Delete message
+     * @private
+     */
+    async _handleMessageDelete(messageId) {
+        try {
+            // Remove message from local state
+            this.messages = this.messages.filter(msg => msg.id !== messageId);
+
+            // TODO: Delete from backend/conversation
+            // await claudeAskBridgeService.deleteMessage(this.currentConversation.id, messageId);
+
+            toastService.success('Message supprimé');
+        } catch (error) {
+            console.error('[ClaudeAskView] Error deleting message:', error);
+            toastService.error('Erreur lors de la suppression');
+        }
+    }
+
+    /**
+     * Handle message reaction (thumbs up/down)
+     * @private
+     */
+    async _handleMessageReaction(messageId, reaction) {
+        try {
+            // Update message reaction in local state
+            this.messages = this.messages.map(msg =>
+                msg.id === messageId ? { ...msg, reaction } : msg
+            );
+
+            // TODO: Save reaction to backend
+            // await claudeAskBridgeService.setMessageReaction(this.currentConversation.id, messageId, reaction);
+
+            if (reaction) {
+                toastService.success(reaction === 'up' ? 'Réponse marquée comme utile' : 'Réponse marquée comme non utile');
+            }
+        } catch (error) {
+            console.error('[ClaudeAskView] Error setting reaction:', error);
+            toastService.error('Erreur lors de l\'enregistrement de la réaction');
+        }
+    }
+
+    /**
+     * Handle action-copy from MessageActionBar
+     * @private
+     */
+    async _handleActionCopy(e, message) {
+        await this._handleMessageCopy(message.content);
+    }
+
+    /**
+     * Handle action-thumbs-up from MessageActionBar
+     * @private
+     */
+    async _handleActionThumbsUp(e, message) {
+        await this._handleMessageReaction(message.id, 'up');
+    }
+
+    /**
+     * Handle action-thumbs-down from MessageActionBar
+     * @private
+     */
+    async _handleActionThumbsDown(e, message) {
+        await this._handleMessageReaction(message.id, 'down');
+    }
+
+    /**
+     * Handle action-regenerate from MessageActionBar
+     * @private
+     */
+    async _handleActionRegenerate(e, message) {
+        try {
+            if (!this.currentConversation || this.isLoading) return;
+
+            // Find the user message before this assistant message
+            const messageIndex = this.messages.findIndex(msg => msg.id === message.id);
+            if (messageIndex <= 0) {
+                toastService.error('Impossible de régénérer cette réponse');
+                return;
+            }
+
+            // Get the previous user message
+            let userMessage = null;
+            for (let i = messageIndex - 1; i >= 0; i--) {
+                if (this.messages[i].role === 'user') {
+                    userMessage = this.messages[i];
+                    break;
+                }
+            }
+
+            if (!userMessage) {
+                toastService.error('Message utilisateur introuvable');
+                return;
+            }
+
+            // Remove messages after the user message (including current assistant message)
+            this.messages = this.messages.slice(0, this.messages.indexOf(userMessage) + 1);
+
+            // Re-send the user message
+            this.isLoading = true;
+            const result = await claudeAskBridgeService.sendMessage(
+                this.currentConversation.id,
+                userMessage.content
+            );
+
+            toastService.success('Réponse régénérée');
+        } catch (error) {
+            console.error('[ClaudeAskView] Error regenerating message:', error);
+            this.isLoading = false;
+            toastService.error(`Erreur lors de la régénération: ${error.message}`);
+        }
+    }
+
+    /**
+     * Handle action-share from MessageActionBar
+     * @private
+     */
+    async _handleActionShare(e, message) {
+        try {
+            // Create a shareable text
+            const shareText = `Lucide - ${this.currentConversation?.title || 'Conversation'}\n\n${message.content}`;
+
+            if (navigator.share) {
+                await navigator.share({
+                    title: 'Lucide - Partage de message',
+                    text: shareText,
+                });
+                toastService.success('Message partagé');
+            } else {
+                // Fallback: copy to clipboard
+                await navigator.clipboard.writeText(shareText);
+                toastService.success('Lien copié dans le presse-papiers');
+            }
+        } catch (error) {
+            console.error('[ClaudeAskView] Error sharing message:', error);
+            if (error.name !== 'AbortError') {
+                toastService.error('Erreur lors du partage');
+            }
+        }
+    }
+
+    /**
      * Handle command palette close
      * @private
      */
@@ -719,10 +920,13 @@ export class ClaudeAskView extends LitElement {
         if (message.role === 'user') {
             return html`
                 <message-user
+                    .messageId="${message.id}"
                     .content="${message.content}"
                     .timestamp="${message.created_at}"
                     .userName=${"Vous"}
                     ?showAvatar="${false}"
+                    ?showActions="${true}"
+                    @message-action="${this._handleMessageAction}"
                 ></message-user>
             `;
         }
@@ -733,34 +937,15 @@ export class ClaudeAskView extends LitElement {
                 .timestamp="${message.created_at}"
                 .assistantName=${"Lucide"}
                 .messageId="${message.id}"
-                ?isStreaming="${false}"
+                ?isStreaming="${message.isStreaming || false}"
                 ?showLineNumbers="${this.showCodeLineNumbers}"
-                @message-copied="${this._handleMessageCopied}"
-                @message-feedback="${this._handleMessageFeedback}"
-                @message-regenerate="${this._handleMessageRegenerate}"
-                @message-share="${this._handleMessageShare}"
+                @action-copy="${(e) => this._handleActionCopy(e, message)}"
+                @action-thumbs-up="${(e) => this._handleActionThumbsUp(e, message)}"
+                @action-thumbs-down="${(e) => this._handleActionThumbsDown(e, message)}"
+                @action-regenerate="${(e) => this._handleActionRegenerate(e, message)}"
+                @action-share="${(e) => this._handleActionShare(e, message)}"
             ></message-assistant>
         `;
-    }
-
-    _handleMessageCopied(e) {
-        console.log('[ClaudeAskView] Message copied:', e.detail.messageId);
-        toastService.success('Message copié dans le presse-papier');
-    }
-
-    _handleMessageFeedback(e) {
-        console.log('[ClaudeAskView] Message feedback:', e.detail);
-        // TODO: Send feedback to backend
-    }
-
-    _handleMessageRegenerate(e) {
-        console.log('[ClaudeAskView] Regenerate message:', e.detail.messageId);
-        // TODO: Regenerate response
-    }
-
-    _handleMessageShare(e) {
-        console.log('[ClaudeAskView] Share message:', e.detail.messageId);
-        // TODO: Show share dialog
     }
 
     _handleArtifactClose() {

@@ -1,5 +1,6 @@
 import { html, css, LitElement } from '../../assets/lit-core-2.7.4.min.js';
 import '../base/ClaudeAvatar.js';
+import './MessageActions.js';
 
 /**
  * MessageUser - User message component with Claude.ai styling
@@ -20,11 +21,15 @@ import '../base/ClaudeAvatar.js';
  */
 export class MessageUser extends LitElement {
     static properties = {
+        messageId: { type: String },
         content: { type: String },
         timestamp: { type: String },
         userName: { type: String },
         userAvatar: { type: String },
         showAvatar: { type: Boolean },
+        showActions: { type: Boolean },
+        isEditing: { type: Boolean, state: true },
+        editValue: { type: String, state: true },
     };
 
     static styles = css`
@@ -61,6 +66,69 @@ export class MessageUser extends LitElement {
 
         .message-content:hover {
             background: #ebebeb;
+        }
+
+        /* Edit Mode */
+        .edit-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .edit-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px;
+            font-family: inherit;
+            font-size: var(--claude-font-size-base, 16px);
+            line-height: var(--claude-line-height-normal, 1.6);
+            border: 2px solid var(--claude-accent-orange, #D97706);
+            border-radius: var(--claude-message-radius, 16px);
+            background: var(--claude-bg-secondary, #FFFFFF);
+            color: var(--claude-text-primary, #1a1a1a);
+            resize: vertical;
+            outline: none;
+        }
+
+        .edit-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .edit-button {
+            padding: 6px 16px;
+            font-size: var(--claude-font-size-sm, 13px);
+            font-weight: 500;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all var(--claude-transition-fast, 150ms) ease;
+        }
+
+        .edit-button.save {
+            background: var(--claude-accent-orange, #D97706);
+            color: white;
+        }
+
+        .edit-button.save:hover {
+            background: var(--claude-accent-orange-dark, #B45309);
+        }
+
+        .edit-button.cancel {
+            background: var(--claude-bg-tertiary, #FAFAF8);
+            color: var(--claude-text-secondary, #6b6b6b);
+        }
+
+        .edit-button.cancel:hover {
+            background: var(--claude-border-subtle, #e5e5e0);
+        }
+
+        /* Actions */
+        .message-actions {
+            display: flex;
+            justify-content: flex-end;
+            padding: 4px;
         }
 
         .message-meta {
@@ -120,11 +188,52 @@ export class MessageUser extends LitElement {
 
     constructor() {
         super();
+        this.messageId = '';
         this.content = '';
         this.timestamp = '';
         this.userName = 'You';
         this.userAvatar = '';
         this.showAvatar = false;
+        this.showActions = true;
+        this.isEditing = false;
+        this.editValue = '';
+    }
+
+    _handleMessageAction(e) {
+        const { action, messageId } = e.detail;
+
+        if (action === 'edit') {
+            this.isEditing = true;
+            this.editValue = this.content;
+        } else {
+            // Forward other actions to parent
+            this.dispatchEvent(new CustomEvent('message-action', {
+                detail: e.detail,
+                bubbles: true,
+                composed: true,
+            }));
+        }
+    }
+
+    _handleSaveEdit() {
+        if (!this.editValue.trim()) return;
+
+        this.dispatchEvent(new CustomEvent('message-action', {
+            detail: {
+                action: 'edit-save',
+                messageId: this.messageId,
+                content: this.editValue,
+            },
+            bubbles: true,
+            composed: true,
+        }));
+
+        this.isEditing = false;
+    }
+
+    _handleCancelEdit() {
+        this.isEditing = false;
+        this.editValue = '';
     }
 
     firstUpdated() {
@@ -153,14 +262,62 @@ export class MessageUser extends LitElement {
         return html`
             <div class="message-wrapper">
                 <div class="message-container">
-                    <div class="message-content">
-                        ${this.content}
-                    </div>
-                    ${this.timestamp ? html`
-                        <div class="message-meta">
-                            <span class="timestamp">${this._formatTimestamp(this.timestamp)}</span>
+                    ${this.isEditing ? html`
+                        <!-- Edit Mode -->
+                        <div class="edit-container">
+                            <textarea
+                                class="edit-textarea"
+                                .value=${this.editValue}
+                                @input=${(e) => { this.editValue = e.target.value; }}
+                                @keydown=${(e) => {
+                                    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                                        e.preventDefault();
+                                        this._handleSaveEdit();
+                                    } else if (e.key === 'Escape') {
+                                        e.preventDefault();
+                                        this._handleCancelEdit();
+                                    }
+                                }}
+                            ></textarea>
+                            <div class="edit-actions">
+                                <button
+                                    class="edit-button cancel"
+                                    @click=${this._handleCancelEdit}
+                                >
+                                    Annuler
+                                </button>
+                                <button
+                                    class="edit-button save"
+                                    @click=${this._handleSaveEdit}
+                                >
+                                    Enregistrer
+                                </button>
+                            </div>
                         </div>
-                    ` : ''}
+                    ` : html`
+                        <!-- View Mode -->
+                        <div class="message-content">
+                            ${this.content}
+                        </div>
+
+                        <!-- Actions -->
+                        ${this.showActions ? html`
+                            <div class="message-actions">
+                                <message-actions
+                                    role="user"
+                                    .messageId=${this.messageId}
+                                    .content=${this.content}
+                                    @action=${this._handleMessageAction}
+                                ></message-actions>
+                            </div>
+                        ` : ''}
+
+                        ${this.timestamp ? html`
+                            <div class="message-meta">
+                                <span class="timestamp">${this._formatTimestamp(this.timestamp)}</span>
+                            </div>
+                        ` : ''}
+                    `}
                 </div>
 
                 ${this.showAvatar ? html`
