@@ -1,6 +1,7 @@
 import { html, css, LitElement, unsafeHTML } from '../../assets/lit-core-2.7.4.min.js';
 import '../base/ClaudeAvatar.js';
 import './MessageActionBar.js';
+import './CodeBlock.js';
 
 /**
  * MessageAssistant - Assistant message component with Claude.ai styling
@@ -29,6 +30,8 @@ export class MessageAssistant extends LitElement {
         isStreaming: { type: Boolean },
         showActions: { type: Boolean, state: true },
         messageId: { type: String },
+        showLineNumbers: { type: Boolean }, // For code blocks
+        _contentSections: { type: Array, state: true },
     };
 
     static styles = css`
@@ -261,6 +264,14 @@ export class MessageAssistant extends LitElement {
         this.isStreaming = false;
         this.showActions = false;
         this.messageId = '';
+        this.showLineNumbers = false;
+        this._contentSections = [];
+    }
+
+    updated(changedProperties) {
+        if (changedProperties.has('content')) {
+            this._contentSections = this._parseContentIntoSections(this.content);
+        }
     }
 
     firstUpdated() {
@@ -278,10 +289,67 @@ export class MessageAssistant extends LitElement {
         return `${hours}:${minutes}`;
     }
 
+    /**
+     * Parse content into sections alternating between markdown and code blocks
+     * @param {string} content - Raw content with markdown and code blocks
+     * @returns {Array<{type: 'markdown'|'code', content?: string, language?: string, code?: string}>}
+     */
+    _parseContentIntoSections(content) {
+        if (!content) return [];
+
+        const sections = [];
+        const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
+        let lastIndex = 0;
+        let match;
+
+        while ((match = codeBlockRegex.exec(content)) !== null) {
+            // Add markdown section before this code block
+            if (match.index > lastIndex) {
+                const markdownContent = content.substring(lastIndex, match.index);
+                if (markdownContent.trim()) {
+                    sections.push({
+                        type: 'markdown',
+                        content: markdownContent
+                    });
+                }
+            }
+
+            // Add code block section
+            sections.push({
+                type: 'code',
+                language: match[1] || '',
+                code: match[2].trim()
+            });
+
+            lastIndex = match.index + match[0].length;
+        }
+
+        // Add remaining markdown content after last code block
+        if (lastIndex < content.length) {
+            const markdownContent = content.substring(lastIndex);
+            if (markdownContent.trim()) {
+                sections.push({
+                    type: 'markdown',
+                    content: markdownContent
+                });
+            }
+        }
+
+        // If no code blocks found, return single markdown section
+        if (sections.length === 0 && content.trim()) {
+            sections.push({
+                type: 'markdown',
+                content: content
+            });
+        }
+
+        return sections;
+    }
+
     _renderMarkdown(content) {
         if (!content) return '';
 
-        // Enhanced markdown rendering
+        // Enhanced markdown rendering (without code blocks, handled separately)
         let html = content;
 
         // Escape HTML first
@@ -290,13 +358,7 @@ export class MessageAssistant extends LitElement {
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;');
 
-        // Code blocks with language: ```language\ncode```
-        html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
-            const language = lang ? ` data-language="${lang}"` : '';
-            return `<pre${language}><code>${code.trim()}</code></pre>`;
-        });
-
-        // Inline code: `code`
+        // Inline code: `code` (single backticks only, not triple backticks)
         html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
 
         // Split into lines for block-level processing
@@ -444,8 +506,6 @@ export class MessageAssistant extends LitElement {
     }
 
     render() {
-        const renderedContent = this._renderMarkdown(this.content);
-
         return html`
             <div class="message-wrapper">
                 <div class="avatar-wrapper">
@@ -461,7 +521,21 @@ export class MessageAssistant extends LitElement {
                     </div>
 
                     <div class="message-content">
-                        ${unsafeHTML(renderedContent)}
+                        ${this._contentSections.map(section => {
+                            if (section.type === 'code') {
+                                return html`
+                                    <code-block
+                                        language="${section.language}"
+                                        .code="${section.code}"
+                                        ?showLineNumbers="${this.showLineNumbers}"
+                                    ></code-block>
+                                `;
+                            } else {
+                                // Markdown section
+                                const renderedMarkdown = this._renderMarkdown(section.content);
+                                return html`${unsafeHTML(renderedMarkdown)}`;
+                            }
+                        })}
                         ${this.isStreaming ? html`<span class="streaming-cursor"></span>` : ''}
                     </div>
 

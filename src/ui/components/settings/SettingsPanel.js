@@ -22,6 +22,7 @@ export class SettingsPanel extends LitElement {
         open: { type: Boolean, reflect: true },
         currentMode: { type: String, state: true },
         currentTheme: { type: String, state: true },
+        showCodeLineNumbers: { type: Boolean, state: true },
     };
 
     static styles = css`
@@ -258,6 +259,82 @@ export class SettingsPanel extends LitElement {
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
 
+        /* Toggle Switch */
+        .toggle-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: var(--claude-bg-tertiary, #FAFAF8);
+            border-radius: 12px;
+        }
+
+        .toggle-label-container {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .toggle-label {
+            font-size: var(--claude-font-size-base, 16px);
+            font-weight: 500;
+            color: var(--claude-text-primary, #1a1a1a);
+        }
+
+        .toggle-description {
+            font-size: var(--claude-font-size-xs, 12px);
+            color: var(--claude-text-secondary, #6b6b6b);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--claude-border-normal, #d4d4cf);
+            border-radius: 28px;
+            transition: all var(--claude-transition-fast, 150ms) ease;
+        }
+
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background: white;
+            border-radius: 50%;
+            transition: all var(--claude-transition-fast, 150ms) ease;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background: var(--claude-accent-orange, #D97706);
+        }
+
+        .toggle-switch input:checked + .toggle-slider::before {
+            transform: translateX(20px);
+        }
+
+        .toggle-switch:hover .toggle-slider {
+            opacity: 0.9;
+        }
+
         /* Mobile */
         @media (max-width: 768px) {
             .modal {
@@ -280,7 +357,23 @@ export class SettingsPanel extends LitElement {
         this.open = false;
         this.currentMode = uiModeService.getMode();
         this.currentTheme = uiModeService.getTheme();
+        this.showCodeLineNumbers = this._getCodeLineNumbersPreference();
         this._unsubscribe = null;
+    }
+
+    _getCodeLineNumbersPreference() {
+        const stored = localStorage.getItem('lucide-show-code-line-numbers');
+        return stored ? stored === 'true' : false; // Default to false
+    }
+
+    _setCodeLineNumbersPreference(value) {
+        localStorage.setItem('lucide-show-code-line-numbers', value.toString());
+        this.showCodeLineNumbers = value;
+
+        // Dispatch event for other components to listen
+        window.dispatchEvent(new CustomEvent('code-line-numbers-changed', {
+            detail: { showLineNumbers: value }
+        }));
     }
 
     connectedCallback() {
@@ -395,6 +488,32 @@ export class SettingsPanel extends LitElement {
                                         <div class="theme-icon">🔄</div>
                                         <div class="theme-label">Auto</div>
                                     </button>
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <!-- Code Display Section (only for Claude mode) -->
+                        ${this.currentMode === 'claude' ? html`
+                            <div class="section">
+                                <div class="section-title">Affichage du code</div>
+                                <div class="section-description">
+                                    Personnalisez l'affichage des blocs de code
+                                </div>
+                                <div class="toggle-option">
+                                    <div class="toggle-label-container">
+                                        <div class="toggle-label">Numéros de ligne</div>
+                                        <div class="toggle-description">
+                                            Afficher les numéros de ligne dans les blocs de code
+                                        </div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input
+                                            type="checkbox"
+                                            .checked="${this.showCodeLineNumbers}"
+                                            @change="${(e) => this._setCodeLineNumbersPreference(e.target.checked)}"
+                                        />
+                                        <span class="toggle-slider"></span>
+                                    </label>
                                 </div>
                             </div>
                         ` : ''}

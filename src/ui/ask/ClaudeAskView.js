@@ -47,6 +47,7 @@ export class ClaudeAskView extends LitElement {
         deleteDialogOpen: { type: Boolean, state: true },
         exportDialogOpen: { type: Boolean, state: true },
         selectedConversation: { type: Object, state: true },
+        showCodeLineNumbers: { type: Boolean, state: true },
     };
 
     static styles = css`
@@ -180,6 +181,15 @@ export class ClaudeAskView extends LitElement {
         this._unsubscribeStateUpdate = null;
         this._unsubscribeError = null;
         this._keydownHandler = this._handleKeyDown.bind(this);
+
+        // Load code line numbers preference
+        const stored = localStorage.getItem('lucide-show-code-line-numbers');
+        this.showCodeLineNumbers = stored ? stored === 'true' : false;
+
+        // Listen for code line numbers changes
+        this._codeLineNumbersHandler = (e) => {
+            this.showCodeLineNumbers = e.detail.showLineNumbers;
+        };
     }
 
     async connectedCallback() {
@@ -187,12 +197,18 @@ export class ClaudeAskView extends LitElement {
         await this._loadConversations();
         this._setupBridgeListeners();
         this._setupKeyboardShortcuts();
+
+        // Listen for code line numbers preference changes
+        window.addEventListener('code-line-numbers-changed', this._codeLineNumbersHandler);
     }
 
     disconnectedCallback() {
         super.disconnectedCallback();
         this._teardownBridgeListeners();
         this._teardownKeyboardShortcuts();
+
+        // Remove code line numbers listener
+        window.removeEventListener('code-line-numbers-changed', this._codeLineNumbersHandler);
     }
 
     /**
@@ -562,6 +578,7 @@ export class ClaudeAskView extends LitElement {
                 .assistantName=${"Lucide"}
                 .messageId="${message.id}"
                 ?isStreaming="${false}"
+                ?showLineNumbers="${this.showCodeLineNumbers}"
                 @message-copied="${this._handleMessageCopied}"
                 @message-feedback="${this._handleMessageFeedback}"
                 @message-regenerate="${this._handleMessageRegenerate}"
