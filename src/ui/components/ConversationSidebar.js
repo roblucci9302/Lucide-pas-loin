@@ -475,6 +475,24 @@ export class ConversationSidebar extends LitElement {
         }
     }
 
+    _handleRenameClick(e, conversation) {
+        e.stopPropagation();
+        this.dispatchEvent(new CustomEvent('conversation-rename', {
+            detail: { conversation },
+            bubbles: true,
+            composed: true
+        }));
+    }
+
+    _handleDeleteClick(e, conversation) {
+        e.stopPropagation();
+        this.dispatchEvent(new CustomEvent('conversation-delete', {
+            detail: { conversation },
+            bubbles: true,
+            composed: true
+        }));
+    }
+
     _filterConversations(conversations) {
         if (!this.searchQuery || this.searchQuery.trim() === '') {
             return conversations;
@@ -570,10 +588,10 @@ export class ConversationSidebar extends LitElement {
                                 <div class="conversation-time">${this._formatTime(conv.updated_at)}</div>
                             </div>
                             <div class="conversation-actions">
-                                <button class="action-btn" @click="${(e) => { e.stopPropagation(); /* TODO: rename */ }}" title="Renommer">
+                                <button class="action-btn" @click="${(e) => this._handleRenameClick(e, conv)}" title="Renommer">
                                     ✏️
                                 </button>
-                                <button class="action-btn" @click="${(e) => { e.stopPropagation(); /* TODO: delete */ }}" title="Supprimer">
+                                <button class="action-btn" @click="${(e) => this._handleDeleteClick(e, conv)}" title="Supprimer">
                                     🗑️
                                 </button>
                             </div>

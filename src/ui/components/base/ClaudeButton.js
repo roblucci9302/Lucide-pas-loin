@@ -7,10 +7,12 @@ import { html, css, LitElement } from '../../assets/lit-core-2.7.4.min.js';
  * - primary: Orange background (main actions)
  * - secondary: Gray background (secondary actions)
  * - ghost: Transparent background (subtle actions)
+ * - danger: Red background (destructive actions)
  * - icon: Icon-only button
  *
  * @example
  * <claude-button variant="primary" size="md">New Conversation</claude-button>
+ * <claude-button variant="danger" size="md">Delete</claude-button>
  * <claude-button variant="icon" size="sm" .icon=${'+'}>+</claude-button>
  */
 export class ClaudeButton extends LitElement {
@@ -119,6 +121,22 @@ export class ClaudeButton extends LitElement {
 
         .variant-ghost:active:not(:disabled) {
             background: var(--claude-active-overlay, rgba(0, 0, 0, 0.08));
+        }
+
+        .variant-danger {
+            background: var(--claude-error, #DC2626);
+            color: var(--claude-text-inverse, white);
+        }
+
+        .variant-danger:hover:not(:disabled) {
+            background: var(--claude-error-dark, #B91C1C);
+            transform: translateY(-1px);
+            box-shadow: var(--claude-shadow-md, 0 4px 12px rgba(220, 38, 38, 0.2));
+        }
+
+        .variant-danger:active:not(:disabled) {
+            transform: translateY(0);
+            background: #991B1B;
         }
 
         /* Icon variant */

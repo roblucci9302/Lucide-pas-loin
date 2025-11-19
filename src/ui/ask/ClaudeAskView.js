@@ -10,6 +10,8 @@ import '../components/input/ClaudeInputArea.js';
 import '../components/artifacts/ArtifactsPanel.js';
 import '../components/settings/SettingsPanel.js';
 import '../components/notifications/ToastContainer.js';
+import '../components/dialogs/RenameConversationDialog.js';
+import '../components/dialogs/ConfirmDialog.js';
 import { claudeAskBridgeService } from '../services/claudeAskBridgeService.js';
 import { toastService } from '../services/toastService.js';
 
@@ -39,6 +41,9 @@ export class ClaudeAskView extends LitElement {
         currentMode: { type: String },
         currentArtifact: { type: Object },
         settingsOpen: { type: Boolean, state: true },
+        renameDialogOpen: { type: Boolean, state: true },
+        deleteDialogOpen: { type: Boolean, state: true },
+        selectedConversation: { type: Object, state: true },
     };
 
     static styles = css`
@@ -164,6 +169,9 @@ export class ClaudeAskView extends LitElement {
         this.currentMode = 'ask';
         this.currentArtifact = null;
         this.settingsOpen = false;
+        this.renameDialogOpen = false;
+        this.deleteDialogOpen = false;
+        this.selectedConversation = null;
         this.streamingMessageId = null;
         this._unsubscribeStateUpdate = null;
         this._unsubscribeError = null;
@@ -406,6 +414,96 @@ export class ClaudeAskView extends LitElement {
         this.settingsOpen = false;
     }
 
+    _handleConversationRename(e) {
+        this.selectedConversation = e.detail.conversation;
+        this.renameDialogOpen = true;
+    }
+
+    _handleConversationDelete(e) {
+        this.selectedConversation = e.detail.conversation;
+        this.deleteDialogOpen = true;
+    }
+
+    async _handleRenameConfirm(e) {
+        const newTitle = e.detail.title;
+
+        try {
+            const result = await claudeAskBridgeService.updateConversationTitle(
+                this.selectedConversation.id,
+                newTitle
+            );
+
+            if (result.success) {
+                // Update conversation in list
+                this.conversations = this.conversations.map(conv =>
+                    conv.id === this.selectedConversation.id
+                        ? { ...conv, title: newTitle }
+                        : conv
+                );
+
+                // Update current conversation if it's the one being renamed
+                if (this.currentConversation?.id === this.selectedConversation.id) {
+                    this.currentConversation = { ...this.currentConversation, title: newTitle };
+                }
+
+                toastService.success('Conversation renommée avec succès');
+            } else {
+                toastService.error(`Échec du renommage: ${result.error || 'Erreur inconnue'}`);
+            }
+        } catch (error) {
+            console.error('[ClaudeAskView] Error renaming conversation:', error);
+            toastService.error(`Erreur lors du renommage: ${error.message}`);
+        } finally {
+            this.renameDialogOpen = false;
+            this.selectedConversation = null;
+        }
+    }
+
+    _handleRenameCancel() {
+        this.renameDialogOpen = false;
+        this.selectedConversation = null;
+    }
+
+    async _handleDeleteConfirm(e) {
+        try {
+            const result = await claudeAskBridgeService.deleteConversation(
+                this.selectedConversation.id
+            );
+
+            if (result.success) {
+                // Remove conversation from list
+                this.conversations = this.conversations.filter(
+                    conv => conv.id !== this.selectedConversation.id
+                );
+
+                // If deleting current conversation, start new one
+                if (this.currentConversation?.id === this.selectedConversation.id) {
+                    this._handleNewConversation();
+                }
+
+                toastService.success('Conversation supprimée avec succès');
+
+                // Save "don't ask again" preference
+                if (e.detail.dontAskAgain) {
+                    localStorage.setItem('lucide-skip-delete-confirm', 'true');
+                }
+            } else {
+                toastService.error(`Échec de la suppression: ${result.error || 'Erreur inconnue'}`);
+            }
+        } catch (error) {
+            console.error('[ClaudeAskView] Error deleting conversation:', error);
+            toastService.error(`Erreur lors de la suppression: ${error.message}`);
+        } finally {
+            this.deleteDialogOpen = false;
+            this.selectedConversation = null;
+        }
+    }
+
+    _handleDeleteCancel() {
+        this.deleteDialogOpen = false;
+        this.selectedConversation = null;
+    }
+
     _renderMessage(message) {
         if (message.role === 'user') {
             return html`
@@ -510,6 +608,8 @@ export class ClaudeAskView extends LitElement {
                         .currentConversationId="${this.currentConversation?.id}"
                         @new-conversation="${this._handleNewConversation}"
                         @conversation-selected="${this._handleConversationSelect}"
+                        @conversation-rename="${this._handleConversationRename}"
+                        @conversation-delete="${this._handleConversationDelete}"
                         @mode-changed="${this._handleModeChange}"
                         @settings-open="${this._handleSettingsOpen}"
                     ></conversation-sidebar>
@@ -549,6 +649,27 @@ export class ClaudeAskView extends LitElement {
                 ?open="${this.settingsOpen}"
                 @close="${this._handleSettingsClose}"
             ></settings-panel>
+
+            <!-- Rename Conversation Dialog -->
+            <rename-conversation-dialog
+                ?open="${this.renameDialogOpen}"
+                .conversationTitle="${this.selectedConversation?.title || ''}"
+                @confirm="${this._handleRenameConfirm}"
+                @cancel="${this._handleRenameCancel}"
+            ></rename-conversation-dialog>
+
+            <!-- Delete Confirmation Dialog -->
+            <confirm-dialog
+                ?open="${this.deleteDialogOpen}"
+                title="Supprimer la conversation"
+                message="Êtes-vous sûr de vouloir supprimer cette conversation ? Cette action est irréversible."
+                variant="danger"
+                confirmText="Supprimer"
+                cancelText="Annuler"
+                ?showDontAskAgain="${true}"
+                @confirm="${this._handleDeleteConfirm}"
+                @cancel="${this._handleDeleteCancel}"
+            ></confirm-dialog>
 
             <!-- Toast Container (for notifications) -->
             <toast-container></toast-container>
