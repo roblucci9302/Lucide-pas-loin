@@ -17,6 +17,7 @@ import '../components/command/CommandPalette.js';
 import '../components/tags/TagManager.js';
 import '../components/statistics/StatisticsModal.js';
 import '../components/search/AdvancedSearchPanel.js';
+import '../components/mobile/MobileHeader.js';
 import { claudeAskBridgeService } from '../services/claudeAskBridgeService.js';
 import { toastService } from '../services/toastService.js';
 import { exportService } from '../services/exportService.js';
@@ -24,6 +25,7 @@ import { commandRegistryService } from '../services/commandRegistryService.js';
 import { registerCommands, createCommandContext } from '../services/registerCommands.js';
 import { notificationService } from '../services/notificationService.js';
 import { themeService } from '../services/themeService.js';
+import { viewportService } from '../services/viewportService.js';
 
 /**
  * ClaudeAskView - Ask interface with Claude.ai layout
@@ -1021,8 +1023,20 @@ export class ClaudeAskView extends LitElement {
         `;
     }
 
+    _handleToggleSidebar() {
+        this.sidebarVisible = !this.sidebarVisible;
+    }
+
     render() {
         return html`
+            <!-- Mobile Header -->
+            <mobile-header
+                ?sidebarOpen="${this.sidebarVisible}"
+                .title="${this.currentConversation?.title || 'Nouvelle conversation'}"
+                @toggle-sidebar="${this._handleToggleSidebar}"
+                @search-open="${this._handleSearchOpen}"
+            ></mobile-header>
+
             <claude-layout
                 ?sidebar-visible="${this.sidebarVisible}"
                 ?artifacts-visible="${this.artifactsVisible}"
