@@ -482,14 +482,207 @@
 }
 
 /* ========================================
-   DARK MODE SUPPORT (Future)
+   DARK MODE SUPPORT
    ======================================== */
 
-@media (prefers-color-scheme: dark) {
-    :root[data-ui-mode="claude"][data-theme="auto"] {
-        /* Future: dark mode tokens */
-        /* For now, keep light mode */
+:root[data-ui-mode="claude"][data-theme="dark"],
+:root[data-ui-mode="claude"][data-theme="auto"]:has(body:not(.force-light)) {
+    @media (prefers-color-scheme: dark) {
+        /* Primary Background Colors (Dark) */
+        --claude-bg-primary: #1a1a1a;           /* Main background - dark */
+        --claude-bg-secondary: #2d2d2d;         /* Cards, input areas */
+        --claude-bg-tertiary: #242424;          /* Subtle variation */
+        --claude-bg-elevated: #333333;          /* Elevated surfaces */
+
+        /* Text Colors (Light on Dark) */
+        --claude-text-primary: #f5f5f0;         /* Main text - near white */
+        --claude-text-secondary: #a3a3a0;       /* Secondary text */
+        --claude-text-tertiary: #737373;        /* Tertiary text */
+        --claude-text-quaternary: #525252;      /* Disabled/placeholder */
+        --claude-text-inverse: #1a1a1a;         /* Dark text on light */
+
+        /* Accent Colors (Orange - adjusted for dark) */
+        --claude-accent-orange: #F59E0B;        /* Brighter orange for dark mode */
+        --claude-accent-orange-light: #FBBF24;  /* Even lighter */
+        --claude-accent-orange-dark: #D97706;   /* Darker variant */
+        --claude-accent-orange-subtle: #44321a; /* Dark orange bg */
+
+        /* Message Backgrounds */
+        --claude-message-user-bg: #2d2d2d;      /* User message background */
+        --claude-message-assistant-bg: transparent;
+        --claude-message-hover: #333333;        /* Hover state */
+
+        /* Borders & Dividers */
+        --claude-border-subtle: #404040;        /* Subtle borders */
+        --claude-border-normal: #525252;        /* Normal borders */
+        --claude-border-strong: #737373;        /* Strong borders */
+
+        /* Input & Interactive Elements */
+        --claude-input-bg: #2d2d2d;             /* Input background */
+        --claude-input-border: #404040;         /* Input border */
+        --claude-input-border-focus: #F59E0B;   /* Focus state */
+        --claude-input-placeholder: #737373;    /* Placeholder text */
+
+        /* Sidebar */
+        --claude-sidebar-bg: #242424;           /* Sidebar background */
+        --claude-sidebar-hover: #2d2d2d;        /* Sidebar item hover */
+        --claude-sidebar-active: #44321a;       /* Sidebar item active (orange tint) */
+        --claude-sidebar-border: #404040;       /* Sidebar divider */
+
+        /* Artifacts Panel */
+        --claude-artifacts-bg: #242424;         /* Artifacts background */
+        --claude-artifacts-border: #404040;     /* Artifacts divider */
+        --claude-artifacts-header-bg: #2d2d2d;  /* Artifacts header */
+
+        /* Code Blocks (Light on Dark) */
+        --claude-code-bg: #1a1a1a;              /* Code block background */
+        --claude-code-inline-bg: #2d2d2d;       /* Inline code background */
+        --claude-code-border: #404040;          /* Code block border */
+        --claude-code-text: #e8e8e8;            /* Code text color */
+
+        /* Shadows (Stronger for dark mode) */
+        --claude-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+        --claude-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
+        --claude-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+        --claude-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+        --claude-shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.7);
+
+        /* Hover & Active States */
+        --claude-hover-overlay: rgba(255, 255, 255, 0.06);
+        --claude-active-overlay: rgba(255, 255, 255, 0.12);
+        --claude-selected-overlay: rgba(245, 158, 11, 0.15);
+
+        /* Semantic Colors (dark mode) */
+        --claude-success-bg: #064e3b;
+        --claude-success-text: #6ee7b7;
+        --claude-success-border: #047857;
+
+        --claude-warning-bg: #78350f;
+        --claude-warning-text: #fde68a;
+        --claude-warning-border: #92400e;
+
+        --claude-error-bg: #7f1d1d;
+        --claude-error-text: #fca5a5;
+        --claude-error-border: #991b1b;
+
+        --claude-info-bg: #1e3a8a;
+        --claude-info-text: #93c5fd;
+        --claude-info-border: #1e40af;
+
+        /* Scrollbar (dark mode) */
+        --claude-scrollbar-thumb: #525252;
+        --claude-scrollbar-thumb-hover: #737373;
+
+        /* Send button (dark mode) */
+        --claude-send-btn-bg: var(--claude-accent-orange);
+        --claude-send-btn-bg-hover: var(--claude-accent-orange-light);
+        --claude-send-btn-bg-disabled: #404040;
+
+        /* Action icons (dark mode) */
+        --claude-action-btn-hover: #2d2d2d;
     }
+}
+
+/* Explicit dark mode (user preference) */
+:root[data-ui-mode="claude"][data-theme="dark"] {
+    /* Primary Background Colors (Dark) */
+    --claude-bg-primary: #1a1a1a;
+    --claude-bg-secondary: #2d2d2d;
+    --claude-bg-tertiary: #242424;
+    --claude-bg-elevated: #333333;
+
+    /* Text Colors (Light on Dark) */
+    --claude-text-primary: #f5f5f0;
+    --claude-text-secondary: #a3a3a0;
+    --claude-text-tertiary: #737373;
+    --claude-text-quaternary: #525252;
+    --claude-text-inverse: #1a1a1a;
+
+    /* Accent Colors (Orange - adjusted for dark) */
+    --claude-accent-orange: #F59E0B;
+    --claude-accent-orange-light: #FBBF24;
+    --claude-accent-orange-dark: #D97706;
+    --claude-accent-orange-subtle: #44321a;
+
+    /* Message Backgrounds */
+    --claude-message-user-bg: #2d2d2d;
+    --claude-message-assistant-bg: transparent;
+    --claude-message-hover: #333333;
+
+    /* Borders & Dividers */
+    --claude-border-subtle: #404040;
+    --claude-border-normal: #525252;
+    --claude-border-strong: #737373;
+
+    /* Input & Interactive Elements */
+    --claude-input-bg: #2d2d2d;
+    --claude-input-border: #404040;
+    --claude-input-border-focus: #F59E0B;
+    --claude-input-placeholder: #737373;
+
+    /* Sidebar */
+    --claude-sidebar-bg: #242424;
+    --claude-sidebar-hover: #2d2d2d;
+    --claude-sidebar-active: #44321a;
+    --claude-sidebar-border: #404040;
+
+    /* Artifacts Panel */
+    --claude-artifacts-bg: #242424;
+    --claude-artifacts-border: #404040;
+    --claude-artifacts-header-bg: #2d2d2d;
+
+    /* Code Blocks */
+    --claude-code-bg: #1a1a1a;
+    --claude-code-inline-bg: #2d2d2d;
+    --claude-code-border: #404040;
+    --claude-code-text: #e8e8e8;
+
+    /* Shadows */
+    --claude-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --claude-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
+    --claude-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+    --claude-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+    --claude-shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.7);
+
+    /* Hover & Active States */
+    --claude-hover-overlay: rgba(255, 255, 255, 0.06);
+    --claude-active-overlay: rgba(255, 255, 255, 0.12);
+    --claude-selected-overlay: rgba(245, 158, 11, 0.15);
+
+    /* Semantic Colors */
+    --claude-success-bg: #064e3b;
+    --claude-success-text: #6ee7b7;
+    --claude-success-border: #047857;
+
+    --claude-warning-bg: #78350f;
+    --claude-warning-text: #fde68a;
+    --claude-warning-border: #92400e;
+
+    --claude-error-bg: #7f1d1d;
+    --claude-error-text: #fca5a5;
+    --claude-error-border: #991b1b;
+
+    --claude-info-bg: #1e3a8a;
+    --claude-info-text: #93c5fd;
+    --claude-info-border: #1e40af;
+
+    /* Scrollbar */
+    --claude-scrollbar-thumb: #525252;
+    --claude-scrollbar-thumb-hover: #737373;
+
+    /* Send button */
+    --claude-send-btn-bg: var(--claude-accent-orange);
+    --claude-send-btn-bg-hover: var(--claude-accent-orange-light);
+    --claude-send-btn-bg-disabled: #404040;
+
+    /* Action icons */
+    --claude-action-btn-hover: #2d2d2d;
+
+    /* Override global tokens with dark values */
+    --bg-primary: var(--claude-bg-primary);
+    --bg-secondary: var(--claude-bg-secondary);
+    --text-primary: var(--claude-text-primary);
+    --text-secondary: var(--claude-text-secondary);
 }
 
 /* ========================================
