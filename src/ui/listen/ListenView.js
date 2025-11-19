@@ -46,8 +46,8 @@ export class ListenView extends LitElement {
 .insights-container pre {
     background: var(--color-black-40) !important;
     border-radius: var(--radius-md) !important;
-    padding: 12px !important;
-    margin: 8px 0 !important;
+    padding: var(--padding-sm) !important;
+    margin: var(--margin-xs) 0 !important;
     overflow-x: auto !important;
     border: 1px solid var(--color-white-10) !important;
     white-space: pre !important;
@@ -73,7 +73,7 @@ export class ListenView extends LitElement {
 
 .insights-container p code {
     background: var(--color-white-10) !important;
-    padding: 2px 4px !important;
+    padding: var(--space-0-5) var(--space-1) !important;
     border-radius: 4px !important;
     color: #ffd700 !important;
 }
@@ -138,7 +138,7 @@ export class ListenView extends LitElement {
             right: 0;
             bottom: 0;
             border-radius: 12px;
-            padding: 1px;
+            padding: var(--space-0-5);
             background: linear-gradient(169deg, rgba(255, 255, 255, 0.17) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.17) 100%);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: destination-out;
@@ -165,7 +165,7 @@ export class ListenView extends LitElement {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 6px 16px;
+            padding: var(--space-1-5) var(--padding-md);
             min-height: 32px;
             position: relative;
             z-index: 1;
@@ -199,25 +199,25 @@ export class ListenView extends LitElement {
 
         .bar-controls {
             display: flex;
-            gap: 4px;
+            gap: var(--gap-xs);
             align-items: center;
             flex-shrink: 0;
             width: 120px;
             justify-content: flex-end;
             box-sizing: border-box;
-            padding: 4px;
+            padding: var(--space-1);
         }
 
         .toggle-button {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: var(--space-1);
             background: transparent;
             color: rgba(255, 255, 255, 0.9);
             border: none;
             outline: none;
             box-shadow: none;
-            padding: 4px 8px;
+            padding: var(--space-1) var(--padding-xs);
             border-radius: 5px;
             font-size: 11px;
             font-weight: 500;

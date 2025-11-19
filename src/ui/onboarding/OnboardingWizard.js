@@ -35,7 +35,7 @@ export class OnboardingWizard extends LitElement {
             justify-content: center;
             height: 100%;
             background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-            padding: 40px;
+            padding: var(--space-10);
             box-sizing: border-box;
         }
 
@@ -44,7 +44,7 @@ export class OnboardingWizard extends LitElement {
             border-radius: 20px;
             outline: 1px rgba(255, 255, 255, 0.2) solid;
             outline-offset: -1px;
-            padding: 48px;
+            padding: var(--padding-xl) var(--padding-xl) var(--space-12);
             max-width: 600px;
             width: 100%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
@@ -54,8 +54,8 @@ export class OnboardingWizard extends LitElement {
         .step-indicators {
             display: flex;
             justify-content: center;
-            gap: 12px;
-            margin-bottom: 40px;
+            gap: var(--gap-sm);
+            margin-bottom: var(--space-10);
         }
 
         .step-dot {
@@ -86,7 +86,7 @@ export class OnboardingWizard extends LitElement {
             font-size: 32px;
             font-weight: 700;
             color: white;
-            margin: 0 0 12px 0;
+            margin: 0 0 var(--margin-sm) 0;
             text-align: center;
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
             -webkit-background-clip: text;
@@ -105,14 +105,14 @@ export class OnboardingWizard extends LitElement {
         .welcome-icon {
             font-size: 80px;
             text-align: center;
-            margin: 40px 0;
+            margin: var(--space-10) 0;
             animation: heartbeat 2s var(--easing-ease-in-out) infinite;
         }
 
         .profiles-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
+            gap: var(--gap-md);
             margin-bottom: 24px;
         }
 

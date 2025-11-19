@@ -37,14 +37,14 @@ export class ApiKeyHeader extends TranslationMixin(LitElement) {
         .container {
             width: 100%;
             height: 100%;
-            padding: 24px 16px;
+            padding: var(--padding-lg) var(--padding-md);
             background: var(--glass-bg);
             box-shadow: 0px 0px 0px 1.5px var(--color-white-64) inset;
             border-radius: var(--radius-lg);
             flex-direction: column;
             justify-content: flex-start;
             align-items: flex-start;
-            gap: 24px;
+            gap: var(--gap-lg);
             display: flex;
             -webkit-app-region: drag;
         }
@@ -54,7 +54,7 @@ export class ApiKeyHeader extends TranslationMixin(LitElement) {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: var(--margin-xs);
         }
         .close-button {
             -webkit-app-region: no-drag;
@@ -83,7 +83,7 @@ export class ApiKeyHeader extends TranslationMixin(LitElement) {
         }
         .back-button {
             -webkit-app-region: no-drag;
-            padding: 8px;
+            padding: var(--padding-xs);
             left: 0px;
             top: -7px;
             position: absolute;
@@ -92,7 +92,7 @@ export class ApiKeyHeader extends TranslationMixin(LitElement) {
             border: 0.5px solid var(--color-white-50);
             justify-content: center;
             align-items: center;
-            gap: 4px;
+            gap: var(--gap-xs);
             display: flex;
             cursor: pointer;
             transition: background-color var(--transition-base) var(--easing-ease);
@@ -104,14 +104,14 @@ export class ApiKeyHeader extends TranslationMixin(LitElement) {
             border: solid #dcdcdc;
             border-width: 0 1.2px 1.2px 0;
             display: inline-block;
-            padding: 3px;
+            padding: var(--space-3);
             transform: rotate(135deg);
         }
         .back-button-text {
             color: white;
             font-size: 12px;
             font-weight: 500;
-            padding-right: 4px;
+            padding-right: var(--space-1);
         }
         .title {
             color: white;
@@ -122,7 +122,7 @@ export class ApiKeyHeader extends TranslationMixin(LitElement) {
             width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: var(--space-2-5);
         }
         .row {
             width: 100%;
@@ -144,7 +144,7 @@ export class ApiKeyHeader extends TranslationMixin(LitElement) {
         }
         .provider-button {
             -webkit-app-region: no-drag;
-            padding: 4px 8px;
+            padding: var(--space-1) var(--padding-xs);
             background: var(--color-black-32);
             color: #dcdcdc;
             font-size: 11px;
@@ -165,7 +165,7 @@ export class ApiKeyHeader extends TranslationMixin(LitElement) {
         .api-input {
             -webkit-app-region: no-drag;
             width: 240px;
-            padding: 10px 8px;
+            padding: var(--space-2-5) var(--padding-xs);
             background: color-mix(in srgb, var(--color-gray-700) 80%, transparent);
             border-radius: var(--radius-md);
             border: 1px solid var(--color-white-24);
@@ -178,7 +178,7 @@ export class ApiKeyHeader extends TranslationMixin(LitElement) {
         .ollama-action-button {
             -webkit-app-region: no-drag;
             width: 240px;
-            padding: 10px 8px;
+            padding: var(--space-2-5) var(--padding-xs);
             border-radius: var(--radius-lg);
             border: none;
             color: white;
