@@ -4,6 +4,8 @@ import '../components/ConversationSidebar.js';
 import '../components/base/ClaudeInput.js';
 import '../components/base/ClaudeButton.js';
 import '../components/base/ClaudeAvatar.js';
+import '../components/messages/MessageUser.js';
+import '../components/messages/MessageAssistant.js';
 
 /**
  * ClaudeAskView - Ask interface with Claude.ai layout
@@ -141,61 +143,7 @@ export class ClaudeAskView extends LitElement {
             opacity: 0.5;
         }
 
-        /* Messages */
-        .message-wrapper {
-            display: flex;
-            gap: 12px;
-            max-width: 100%;
-        }
-
-        .message-wrapper.user {
-            justify-content: flex-end;
-        }
-
-        .message-wrapper.assistant {
-            justify-content: flex-start;
-        }
-
-        .message {
-            max-width: 70%;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .message.user .message-content {
-            background: var(--claude-message-user-bg, #F5F5F0);
-            border-radius: 16px;
-            padding: 12px 16px;
-            font-size: var(--claude-font-size-base, 16px);
-            line-height: var(--claude-line-height-normal, 1.6);
-            color: var(--claude-text-primary, #1a1a1a);
-        }
-
-        .message.assistant {
-            max-width: 100%;
-        }
-
-        .message.assistant .message-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
-        }
-
-        .message.assistant .assistant-name {
-            font-size: var(--claude-font-size-sm, 13px);
-            font-weight: 600;
-            color: var(--claude-text-secondary, #6b6b6b);
-        }
-
-        .message.assistant .message-content {
-            background: transparent;
-            padding: 0;
-            font-size: var(--claude-font-size-base, 16px);
-            line-height: var(--claude-line-height-normal, 1.6);
-            color: var(--claude-text-primary, #1a1a1a);
-        }
+        /* Messages - styles handled by message components */
 
         /* Empty state */
         .empty-state {
@@ -378,25 +326,48 @@ export class ClaudeAskView extends LitElement {
     _renderMessage(message) {
         if (message.role === 'user') {
             return html`
-                <div class="message-wrapper user">
-                    <div class="message user">
-                        <div class="message-content">${message.content}</div>
-                    </div>
-                </div>
+                <message-user
+                    .content="${message.content}"
+                    .timestamp="${message.created_at}"
+                    .userName=${"Vous"}
+                    ?showAvatar="${false}"
+                ></message-user>
             `;
         }
 
         return html`
-            <div class="message-wrapper assistant">
-                <div class="message assistant">
-                    <div class="message-header">
-                        <claude-avatar type="assistant" size="sm"></claude-avatar>
-                        <span class="assistant-name">Lucide</span>
-                    </div>
-                    <div class="message-content">${message.content}</div>
-                </div>
-            </div>
+            <message-assistant
+                .content="${message.content}"
+                .timestamp="${message.created_at}"
+                .assistantName=${"Lucide"}
+                .messageId="${message.id}"
+                ?isStreaming="${false}"
+                @message-copied="${this._handleMessageCopied}"
+                @message-feedback="${this._handleMessageFeedback}"
+                @message-regenerate="${this._handleMessageRegenerate}"
+                @message-share="${this._handleMessageShare}"
+            ></message-assistant>
         `;
+    }
+
+    _handleMessageCopied(e) {
+        console.log('[ClaudeAskView] Message copied:', e.detail.messageId);
+        // TODO: Show toast notification
+    }
+
+    _handleMessageFeedback(e) {
+        console.log('[ClaudeAskView] Message feedback:', e.detail);
+        // TODO: Send feedback to backend
+    }
+
+    _handleMessageRegenerate(e) {
+        console.log('[ClaudeAskView] Regenerate message:', e.detail.messageId);
+        // TODO: Regenerate response
+    }
+
+    _handleMessageShare(e) {
+        console.log('[ClaudeAskView] Share message:', e.detail.messageId);
+        // TODO: Show share dialog
     }
 
     _renderMessages() {
