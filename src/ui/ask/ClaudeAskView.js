@@ -13,9 +13,12 @@ import '../components/notifications/ToastContainer.js';
 import '../components/dialogs/RenameConversationDialog.js';
 import '../components/dialogs/ConfirmDialog.js';
 import '../components/dialogs/ExportDialog.js';
+import '../components/command/CommandPalette.js';
 import { claudeAskBridgeService } from '../services/claudeAskBridgeService.js';
 import { toastService } from '../services/toastService.js';
 import { exportService } from '../services/exportService.js';
+import { commandRegistryService } from '../services/commandRegistryService.js';
+import { registerCommands, createCommandContext } from '../services/registerCommands.js';
 
 /**
  * ClaudeAskView - Ask interface with Claude.ai layout
@@ -48,6 +51,7 @@ export class ClaudeAskView extends LitElement {
         exportDialogOpen: { type: Boolean, state: true },
         selectedConversation: { type: Object, state: true },
         showCodeLineNumbers: { type: Boolean, state: true },
+        commandPaletteOpen: { type: Boolean, state: true },
     };
 
     static styles = css`
@@ -178,6 +182,7 @@ export class ClaudeAskView extends LitElement {
         this.exportDialogOpen = false;
         this.selectedConversation = null;
         this.streamingMessageId = null;
+        this.commandPaletteOpen = false;
         this._unsubscribeStateUpdate = null;
         this._unsubscribeError = null;
         this._keydownHandler = this._handleKeyDown.bind(this);
@@ -197,9 +202,20 @@ export class ClaudeAskView extends LitElement {
         await this._loadConversations();
         this._setupBridgeListeners();
         this._setupKeyboardShortcuts();
+        this._registerCommands();
 
         // Listen for code line numbers preference changes
         window.addEventListener('code-line-numbers-changed', this._codeLineNumbersHandler);
+    }
+
+    /**
+     * Register all commands for command palette
+     * @private
+     */
+    _registerCommands() {
+        const context = createCommandContext(this);
+        registerCommands(context);
+        console.log('[ClaudeAskView] Commands registered');
     }
 
     disconnectedCallback() {
@@ -231,25 +247,24 @@ export class ClaudeAskView extends LitElement {
      * Handle keyboard shortcuts
      * @private
      */
-    _handleKeyDown(e) {
+    async _handleKeyDown(e) {
         const isMac = /Mac/.test(navigator.platform);
         const modKey = isMac ? e.metaKey : e.ctrlKey;
 
-        // Cmd/Ctrl + K: New conversation
-        if (modKey && e.key === 'k') {
+        // Cmd/Ctrl + P: Open command palette (priority shortcut)
+        if (modKey && e.key === 'p') {
             e.preventDefault();
-            this._handleNewConversation();
+            this.commandPaletteOpen = true;
             return;
         }
 
-        // Cmd/Ctrl + ,: Open settings
-        if (modKey && e.key === ',') {
-            e.preventDefault();
-            this.settingsOpen = true;
+        // Try to execute command by shortcut
+        const executed = await commandRegistryService.executeByShortcut(e);
+        if (executed) {
             return;
         }
 
-        // Esc: Close settings/artifacts
+        // Esc: Close settings/artifacts/command palette
         if (e.key === 'Escape') {
             if (this.settingsOpen) {
                 this.settingsOpen = false;
@@ -559,6 +574,28 @@ export class ClaudeAskView extends LitElement {
         this.selectedConversation = null;
     }
 
+    /**
+     * Handle command palette close
+     * @private
+     */
+    _handleCommandPaletteClose() {
+        this.commandPaletteOpen = false;
+    }
+
+    /**
+     * Handle command execution from palette
+     * @private
+     */
+    async _handleCommandExecute(e) {
+        const { commandId } = e.detail;
+        try {
+            await commandRegistryService.execute(commandId);
+        } catch (error) {
+            console.error('[ClaudeAskView] Error executing command:', error);
+            toastService.error(`Erreur lors de l'exécution de la commande: ${error.message}`);
+        }
+    }
+
     _renderMessage(message) {
         if (message.role === 'user') {
             return html`
@@ -736,6 +773,13 @@ export class ClaudeAskView extends LitElement {
                 @export="${this._handleExportConfirm}"
                 @cancel="${this._handleExportCancel}"
             ></export-dialog>
+
+            <!-- Command Palette -->
+            <command-palette
+                ?open="${this.commandPaletteOpen}"
+                @close="${this._handleCommandPaletteClose}"
+                @execute="${this._handleCommandExecute}"
+            ></command-palette>
 
             <!-- Toast Container (for notifications) -->
             <toast-container></toast-container>
