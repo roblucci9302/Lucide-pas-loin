@@ -1,0 +1,523 @@
+/**
+ * Claude Design Tokens - Claude.ai Inspired Theme
+ * Light mode color scheme with beige/cream palette
+ *
+ * This file extends design-tokens.css for Claude-style UI
+ * Import after design-tokens.css
+ */
+
+:root[data-ui-mode="claude"],
+.claude-theme {
+    /* ========================================
+       CLAUDE COLOR PALETTE (Light Mode)
+       ======================================== */
+
+    /* Primary Background Colors (Beige/Cream) */
+    --claude-bg-primary: #F5F5F0;           /* Main background - warm beige */
+    --claude-bg-secondary: #FFFFFF;         /* Cards, input areas - pure white */
+    --claude-bg-tertiary: #FAFAF8;          /* Subtle variation */
+    --claude-bg-elevated: #FFFFFF;          /* Elevated surfaces */
+
+    /* Text Colors (Dark on Light) */
+    --claude-text-primary: #1a1a1a;         /* Main text - near black */
+    --claude-text-secondary: #6b6b6b;       /* Secondary text - medium gray */
+    --claude-text-tertiary: #9b9b9b;        /* Tertiary text - light gray */
+    --claude-text-quaternary: #c0c0c0;      /* Disabled/placeholder */
+    --claude-text-inverse: #FFFFFF;         /* White text on dark */
+
+    /* Accent Colors (Orange - Claude brand) */
+    --claude-accent-orange: #D97706;        /* Primary orange accent */
+    --claude-accent-orange-light: #F59E0B;  /* Lighter orange */
+    --claude-accent-orange-dark: #B45309;   /* Darker orange */
+    --claude-accent-orange-subtle: #FEF3C7; /* Very light orange bg */
+
+    /* Message Backgrounds */
+    --claude-message-user-bg: #F5F5F0;      /* User message background */
+    --claude-message-assistant-bg: transparent; /* Claude message (no bg) */
+    --claude-message-hover: #FAFAF8;        /* Hover state */
+
+    /* Borders & Dividers */
+    --claude-border-subtle: #e5e5e0;        /* Subtle borders */
+    --claude-border-normal: #d4d4cf;        /* Normal borders */
+    --claude-border-strong: #a3a3a0;        /* Strong borders */
+
+    /* Input & Interactive Elements */
+    --claude-input-bg: #FFFFFF;             /* Input background */
+    --claude-input-border: #e5e5e0;         /* Input border */
+    --claude-input-border-focus: #D97706;   /* Focus state */
+    --claude-input-placeholder: #9b9b9b;    /* Placeholder text */
+
+    /* Sidebar */
+    --claude-sidebar-bg: #FFFFFF;           /* Sidebar background */
+    --claude-sidebar-hover: #F5F5F0;        /* Sidebar item hover */
+    --claude-sidebar-active: #FEF3C7;       /* Sidebar item active */
+    --claude-sidebar-border: #e5e5e0;       /* Sidebar divider */
+
+    /* Artifacts Panel */
+    --claude-artifacts-bg: #FFFFFF;         /* Artifacts background */
+    --claude-artifacts-border: #e5e5e0;     /* Artifacts divider */
+    --claude-artifacts-header-bg: #FAFAF8;  /* Artifacts header */
+
+    /* Code Blocks (Dark on Light) */
+    --claude-code-bg: #2d2d2d;              /* Code block background */
+    --claude-code-inline-bg: #F5F5F0;       /* Inline code background */
+    --claude-code-border: #e5e5e0;          /* Code block border */
+    --claude-code-text: #e8e8e8;            /* Code text color */
+
+    /* Shadows (Softer for light mode) */
+    --claude-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --claude-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+    --claude-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --claude-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+    --claude-shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.15);
+
+    /* Hover & Active States */
+    --claude-hover-overlay: rgba(0, 0, 0, 0.04);
+    --claude-active-overlay: rgba(0, 0, 0, 0.08);
+    --claude-selected-overlay: rgba(217, 119, 6, 0.08); /* Orange tint */
+
+    /* Semantic Colors (adapted for light mode) */
+    --claude-success-bg: #ECFDF5;
+    --claude-success-text: #065F46;
+    --claude-success-border: #A7F3D0;
+
+    --claude-warning-bg: #FEF3C7;
+    --claude-warning-text: #92400E;
+    --claude-warning-border: #FDE68A;
+
+    --claude-error-bg: #FEE2E2;
+    --claude-error-text: #991B1B;
+    --claude-error-border: #FECACA;
+
+    --claude-info-bg: #EFF6FF;
+    --claude-info-text: #1E40AF;
+    --claude-info-border: #BFDBFE;
+
+    /* ========================================
+       CLAUDE TYPOGRAPHY
+       ======================================== */
+
+    /* Font Family (similar to Claude.ai) */
+    --claude-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                          "Helvetica Neue", Arial, sans-serif;
+    --claude-font-family-mono: "SF Mono", "Monaco", "Inconsolata",
+                               "Fira Code", "Consolas", monospace;
+
+    /* Font Sizes (Claude-like) */
+    --claude-font-size-xs: 12px;
+    --claude-font-size-sm: 13px;
+    --claude-font-size-base: 16px;        /* Message text */
+    --claude-font-size-md: 18px;
+    --claude-font-size-lg: 20px;
+    --claude-font-size-xl: 24px;
+    --claude-font-size-2xl: 28px;
+
+    /* Line Heights (generous spacing) */
+    --claude-line-height-tight: 1.4;
+    --claude-line-height-normal: 1.6;     /* Default for messages */
+    --claude-line-height-relaxed: 1.8;
+
+    /* ========================================
+       CLAUDE SPACING
+       ======================================== */
+
+    /* Message spacing */
+    --claude-message-gap: 24px;           /* Between messages */
+    --claude-message-padding: 16px;       /* Inside messages */
+    --claude-message-radius: 16px;        /* Message border radius */
+
+    /* Input area */
+    --claude-input-padding: 16px;
+    --claude-input-radius: 24px;          /* Rounded input */
+    --claude-input-gap: 12px;
+
+    /* Sidebar */
+    --claude-sidebar-width: 260px;
+    --claude-sidebar-padding: 16px;
+    --claude-sidebar-item-padding: 12px 16px;
+    --claude-sidebar-item-radius: 8px;
+
+    /* Chat container */
+    --claude-chat-max-width: 800px;       /* Max width for messages */
+    --claude-chat-padding: 24px;
+
+    /* Artifacts */
+    --claude-artifacts-width-min: 400px;
+    --claude-artifacts-width-default: 40%;
+    --claude-artifacts-width-max: 60%;
+
+    /* ========================================
+       CLAUDE ANIMATIONS
+       ======================================== */
+
+    /* Smooth transitions */
+    --claude-transition-fast: 150ms;
+    --claude-transition-base: 200ms;
+    --claude-transition-slow: 300ms;
+
+    /* Easing (smooth curves) */
+    --claude-easing-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    --claude-easing-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    /* ========================================
+       CLAUDE SPECIFIC TOKENS
+       ======================================== */
+
+    /* Avatar sizes */
+    --claude-avatar-sm: 24px;
+    --claude-avatar-md: 32px;
+    --claude-avatar-lg: 40px;
+
+    /* Button heights */
+    --claude-btn-height-sm: 32px;
+    --claude-btn-height-md: 40px;
+    --claude-btn-height-lg: 48px;
+
+    /* Send button (circular) */
+    --claude-send-btn-size: 32px;
+    --claude-send-btn-bg: var(--claude-accent-orange);
+    --claude-send-btn-bg-hover: var(--claude-accent-orange-dark);
+    --claude-send-btn-bg-disabled: #e5e5e0;
+
+    /* Action icons (hover bar) */
+    --claude-action-icon-size: 16px;
+    --claude-action-btn-size: 32px;
+    --claude-action-btn-hover: #F5F5F0;
+
+    /* Scrollbar (subtle) */
+    --claude-scrollbar-width: 6px;
+    --claude-scrollbar-thumb: #d4d4cf;
+    --claude-scrollbar-thumb-hover: #a3a3a0;
+    --claude-scrollbar-track: transparent;
+
+    /* Z-index layers */
+    --claude-z-sidebar: 100;
+    --claude-z-header: 200;
+    --claude-z-input: 300;
+    --claude-z-artifacts: 400;
+    --claude-z-modal: 1000;
+    --claude-z-tooltip: 2000;
+}
+
+/* ========================================
+   CLAUDE MODE OVERRIDES
+   Map Claude tokens to global tokens
+   ======================================== */
+
+:root[data-ui-mode="claude"] {
+    /* Override global tokens with Claude values */
+    --bg-primary: var(--claude-bg-primary);
+    --bg-secondary: var(--claude-bg-secondary);
+    --text-primary: var(--claude-text-primary);
+    --text-secondary: var(--claude-text-secondary);
+    --font-family-primary: var(--claude-font-family);
+    --font-family-mono: var(--claude-font-family-mono);
+
+    /* Update semantic colors */
+    --color-primary-500: var(--claude-accent-orange);
+    --color-primary-600: var(--claude-accent-orange-dark);
+}
+
+/* ========================================
+   CLAUDE UTILITY CLASSES
+   ======================================== */
+
+/* Message styles */
+.claude-message-user {
+    background: var(--claude-message-user-bg);
+    border-radius: var(--claude-message-radius);
+    padding: var(--claude-message-padding);
+    align-self: flex-end;
+    max-width: 70%;
+}
+
+.claude-message-assistant {
+    background: var(--claude-message-assistant-bg);
+    padding: var(--claude-message-padding) 0;
+    max-width: 100%;
+}
+
+/* Input area */
+.claude-input-container {
+    background: var(--claude-input-bg);
+    border: 1px solid var(--claude-input-border);
+    border-radius: var(--claude-input-radius);
+    padding: var(--claude-input-padding);
+    transition: border-color var(--claude-transition-base) var(--claude-easing-smooth);
+}
+
+.claude-input-container:focus-within {
+    border-color: var(--claude-input-border-focus);
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
+}
+
+/* Sidebar */
+.claude-sidebar {
+    width: var(--claude-sidebar-width);
+    background: var(--claude-sidebar-bg);
+    border-right: 1px solid var(--claude-sidebar-border);
+    padding: var(--claude-sidebar-padding);
+}
+
+.claude-sidebar-item {
+    padding: var(--claude-sidebar-item-padding);
+    border-radius: var(--claude-sidebar-item-radius);
+    cursor: pointer;
+    transition: background var(--claude-transition-fast) var(--claude-easing-smooth);
+}
+
+.claude-sidebar-item:hover {
+    background: var(--claude-sidebar-hover);
+}
+
+.claude-sidebar-item.active {
+    background: var(--claude-sidebar-active);
+}
+
+/* Buttons */
+.claude-btn-primary {
+    background: var(--claude-accent-orange);
+    color: var(--claude-text-inverse);
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: 12px 24px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background var(--claude-transition-base) var(--claude-easing-smooth);
+}
+
+.claude-btn-primary:hover {
+    background: var(--claude-accent-orange-dark);
+}
+
+.claude-btn-primary:active {
+    background: #92400E;
+}
+
+/* Send button (circular) */
+.claude-send-btn {
+    width: var(--claude-send-btn-size);
+    height: var(--claude-send-btn-size);
+    border-radius: 50%;
+    background: var(--claude-send-btn-bg);
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--claude-transition-base) var(--claude-easing-smooth);
+}
+
+.claude-send-btn:hover:not(:disabled) {
+    background: var(--claude-send-btn-bg-hover);
+    transform: scale(1.05);
+}
+
+.claude-send-btn:disabled {
+    background: var(--claude-send-btn-bg-disabled);
+    cursor: not-allowed;
+}
+
+/* Avatar */
+.claude-avatar {
+    width: var(--claude-avatar-md);
+    height: var(--claude-avatar-md);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.claude-avatar-assistant {
+    background: var(--claude-accent-orange);
+    color: white;
+}
+
+.claude-avatar-user {
+    background: var(--claude-text-tertiary);
+    color: white;
+}
+
+/* Code blocks */
+.claude-code-block {
+    background: var(--claude-code-bg);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    overflow-x: auto;
+    border: 1px solid var(--claude-code-border);
+}
+
+.claude-code-inline {
+    background: var(--claude-code-inline-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: var(--claude-font-family-mono);
+    font-size: 14px;
+}
+
+/* Scrollbar styling for Claude mode */
+:root[data-ui-mode="claude"] ::-webkit-scrollbar {
+    width: var(--claude-scrollbar-width);
+    height: var(--claude-scrollbar-width);
+}
+
+:root[data-ui-mode="claude"] ::-webkit-scrollbar-track {
+    background: var(--claude-scrollbar-track);
+}
+
+:root[data-ui-mode="claude"] ::-webkit-scrollbar-thumb {
+    background: var(--claude-scrollbar-thumb);
+    border-radius: 10px;
+}
+
+:root[data-ui-mode="claude"] ::-webkit-scrollbar-thumb:hover {
+    background: var(--claude-scrollbar-thumb-hover);
+}
+
+/* ========================================
+   CLAUDE ANIMATIONS
+   ======================================== */
+
+/* Typing effect placeholder */
+@keyframes claudeTyping {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.claude-typing-indicator {
+    animation: claudeTyping 1.4s ease-in-out infinite;
+}
+
+/* Fade in messages */
+@keyframes claudeFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.claude-message-enter {
+    animation: claudeFadeIn var(--claude-transition-slow) var(--claude-easing-smooth);
+}
+
+/* Sidebar slide */
+@keyframes claudeSidebarSlide {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+.claude-sidebar-enter {
+    animation: claudeSidebarSlide var(--claude-transition-slow) var(--claude-easing-smooth);
+}
+
+/* Artifacts slide */
+@keyframes claudeArtifactsSlide {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.claude-artifacts-enter {
+    animation: claudeArtifactsSlide var(--claude-transition-slow) var(--claude-easing-smooth);
+}
+
+/* Bounce on send */
+@keyframes claudeBounce {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(0.95);
+    }
+}
+
+.claude-send-bounce {
+    animation: claudeBounce 0.3s var(--claude-easing-bounce);
+}
+
+/* ========================================
+   RESPONSIVE BREAKPOINTS
+   ======================================== */
+
+/* Tablet and below */
+@media (max-width: 1024px) {
+    :root[data-ui-mode="claude"] {
+        --claude-sidebar-width: 240px;
+        --claude-chat-max-width: 100%;
+        --claude-artifacts-width-default: 50%;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    :root[data-ui-mode="claude"] {
+        --claude-sidebar-width: 100%;
+        --claude-chat-padding: 16px;
+        --claude-message-gap: 16px;
+        --claude-artifacts-width-default: 100%;
+    }
+
+    .claude-message-user {
+        max-width: 85%;
+    }
+}
+
+/* ========================================
+   DARK MODE SUPPORT (Future)
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+    :root[data-ui-mode="claude"][data-theme="auto"] {
+        /* Future: dark mode tokens */
+        /* For now, keep light mode */
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    :root[data-ui-mode="claude"] {
+        --claude-border-subtle: #a3a3a0;
+        --claude-border-normal: #737373;
+        --claude-text-secondary: #404040;
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    :root[data-ui-mode="claude"] {
+        --claude-transition-fast: 0ms;
+        --claude-transition-base: 0ms;
+        --claude-transition-slow: 0ms;
+    }
+
+    .claude-message-enter,
+    .claude-sidebar-enter,
+    .claude-artifacts-enter,
+    .claude-send-bounce,
+    .claude-typing-indicator {
+        animation: none;
+    }
+}

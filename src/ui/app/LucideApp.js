@@ -5,6 +5,7 @@ import { AskView } from '../ask/AskView.js';
 import { BrowserView } from '../browser/BrowserView.js';
 import { ShortcutSettingsView } from '../settings/ShortCutSettingsView.js';
 import { i18n } from '../i18n/index.js';
+import { uiModeService } from '../services/uiModeService.js';
 
 import '../listen/audioCore/renderer.js';
 
@@ -47,7 +48,8 @@ export class LucideApp extends LitElement {
         layoutMode: { type: String },
         _viewInstances: { type: Object, state: true },
         _isClickThrough: { state: true },
-        structuredData: { type: Object }, 
+        structuredData: { type: Object },
+        uiMode: { type: String, state: true }, // 'classic' | 'claude'
     };
 
     constructor() {
@@ -81,11 +83,20 @@ export class LucideApp extends LitElement {
         this.selectedImageQuality = localStorage.getItem('selectedImageQuality') || 'medium';
         this._isClickThrough = false;
 
+        // Initialize UI mode
+        this.uiMode = uiModeService.getMode();
+        console.log(`[LucideApp] UI Mode initialized: ${this.uiMode}`);
     }
 
     connectedCallback() {
         super.connectedCallback();
-        
+
+        // Subscribe to UI mode changes
+        this._uiModeUnsubscribe = uiModeService.subscribe((newMode) => {
+            this.uiMode = newMode;
+            console.log(`[LucideApp] UI Mode changed to: ${newMode}`);
+        });
+
         if (window.api) {
             window.api.lucideApp.onClickThroughToggled((_, isEnabled) => {
                 this._isClickThrough = isEnabled;
@@ -95,6 +106,12 @@ export class LucideApp extends LitElement {
 
     disconnectedCallback() {
         super.disconnectedCallback();
+
+        // Unsubscribe from UI mode changes
+        if (this._uiModeUnsubscribe) {
+            this._uiModeUnsubscribe();
+        }
+
         if (window.api) {
             window.api.lucideApp.removeAllClickThroughListeners();
         }
@@ -133,6 +150,16 @@ export class LucideApp extends LitElement {
         if (window.api) {
             await window.api.common.quitApplication();
         }
+    }
+
+    // Helper method to toggle UI mode (exposed for debugging/testing)
+    toggleUIMode() {
+        uiModeService.toggleMode();
+    }
+
+    // Helper method to set UI mode
+    setUIMode(mode) {
+        uiModeService.setMode(mode);
     }
 
 
