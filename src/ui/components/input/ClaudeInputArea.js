@@ -1,5 +1,7 @@
 import { html, css, LitElement } from '../../assets/lit-core-2.7.4.min.js';
 import '../base/ClaudeInput.js';
+import '../upload/FilePreview.js';
+import '../upload/FileDropZone.js';
 
 /**
  * ClaudeInputArea - Advanced input area with file attachments (Claude.ai style)
@@ -84,59 +86,14 @@ export class ClaudeInputArea extends LitElement {
         /* Files preview area */
         .files-preview {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 8px;
             padding-bottom: 8px;
             border-bottom: 1px solid var(--claude-border-subtle, #e5e5e0);
         }
 
-        .file-chip {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--claude-bg-tertiary, #FAFAF8);
-            border: 1px solid var(--claude-border-subtle, #e5e5e0);
-            border-radius: 8px;
-            padding: 6px 8px 6px 12px;
-            font-size: var(--claude-font-size-sm, 13px);
-            color: var(--claude-text-primary, #1a1a1a);
-            max-width: 200px;
-        }
-
-        .file-icon {
-            font-size: 16px;
-        }
-
-        .file-name {
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .file-size {
-            font-size: var(--claude-font-size-xs, 12px);
-            color: var(--claude-text-tertiary, #9b9b9b);
-        }
-
-        .remove-file-btn {
-            width: 20px;
-            height: 20px;
-            border: none;
-            background: transparent;
-            color: var(--claude-text-secondary, #6b6b6b);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 4px;
-            transition: all var(--claude-transition-fast, 150ms) ease;
-            font-size: 14px;
-        }
-
-        .remove-file-btn:hover {
-            background: var(--claude-hover-overlay, rgba(0, 0, 0, 0.04));
-            color: var(--claude-text-primary, #1a1a1a);
+        file-preview {
+            width: 100%;
         }
 
         /* Input row */
@@ -468,19 +425,11 @@ export class ClaudeInputArea extends LitElement {
                         <!-- Files preview -->
                         ${this.attachedFiles.length > 0 ? html`
                             <div class="files-preview">
-                                ${this.attachedFiles.map(file => html`
-                                    <div class="file-chip">
-                                        <span class="file-icon">${this._getFileIcon(file.type)}</span>
-                                        <span class="file-name" title="${file.name}">${file.name}</span>
-                                        <span class="file-size">${this._formatFileSize(file.size)}</span>
-                                        <button
-                                            class="remove-file-btn"
-                                            @click="${() => this._removeFile(file.id)}"
-                                            title="Supprimer le fichier"
-                                        >
-                                            ✕
-                                        </button>
-                                    </div>
+                                ${this.attachedFiles.map(fileObj => html`
+                                    <file-preview
+                                        .file="${fileObj.file}"
+                                        @remove="${() => this._removeFile(fileObj.id)}"
+                                    ></file-preview>
                                 `)}
                             </div>
                         ` : ''}
