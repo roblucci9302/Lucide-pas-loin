@@ -1,4 +1,4 @@
-import { html, css, LitElement } from '../../assets/lit-core-2.7.4.min.js';
+import { html, css, LitElement, unsafeHTML } from '../../assets/lit-core-2.7.4.min.js';
 
 /**
  * CodeBlock - Syntax-highlighted code block with line numbers
@@ -461,20 +461,10 @@ export class CodeBlock extends LitElement {
                     </div>
                 ` : ''}
                 <div class="code-content">
-                    <pre><code>${highlightedLines.map(line => html`${this._unsafeHTML(line)}\n`)}</code></pre>
+                    <pre><code>${highlightedLines.map(line => html`${unsafeHTML(line)}\n`)}</code></pre>
                 </div>
             </div>
         `;
-    }
-
-    /**
-     * Render raw HTML (needed for syntax highlighting)
-     * WARNING: Only use with sanitized/escaped content
-     */
-    _unsafeHTML(htmlString) {
-        const template = document.createElement('template');
-        template.innerHTML = htmlString;
-        return template.content;
     }
 }
 

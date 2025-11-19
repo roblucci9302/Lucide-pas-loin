@@ -201,14 +201,36 @@ export class FilePreview extends LitElement {
     async _generateThumbnail() {
         if (!this.file) return;
 
-        // Generate thumbnail for images
+        // Generate thumbnail for images asynchronously
         if (this.file.type.startsWith('image/')) {
             try {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this._thumbnail = e.target.result;
+                // Use requestIdleCallback to avoid blocking the main thread
+                const generateAsync = () => {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            resolve(e.target.result);
+                        };
+                        reader.onerror = (e) => {
+                            reject(new Error('Failed to read file'));
+                        };
+                        reader.readAsDataURL(this.file);
+                    });
                 };
-                reader.readAsDataURL(this.file);
+
+                // Defer thumbnail generation to prevent blocking
+                if ('requestIdleCallback' in window) {
+                    requestIdleCallback(async () => {
+                        this._thumbnail = await generateAsync();
+                        this.requestUpdate();
+                    });
+                } else {
+                    // Fallback for browsers without requestIdleCallback
+                    setTimeout(async () => {
+                        this._thumbnail = await generateAsync();
+                        this.requestUpdate();
+                    }, 0);
+                }
             } catch (error) {
                 console.error('[FilePreview] Error generating thumbnail:', error);
             }

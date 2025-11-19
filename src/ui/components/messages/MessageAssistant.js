@@ -1,7 +1,7 @@
 import { html, css, LitElement, unsafeHTML } from '../../assets/lit-core-2.7.4.min.js';
 import '../base/ClaudeAvatar.js';
 import './MessageActionBar.js';
-import './CodeBlock.js';
+import '../code/CodeBlock.js';
 import { artifactDetectionService } from '../../services/artifactDetectionService.js';
 
 /**

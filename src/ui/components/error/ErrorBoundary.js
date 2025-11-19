@@ -173,7 +173,10 @@ export class ErrorBoundary extends LitElement {
         event.preventDefault();
 
         // Log to console in development
-        if (process.env.NODE_ENV !== 'production') {
+        // Safe check that works in browser environments
+        const isDevelopment = typeof process !== 'undefined' &&
+                             process.env?.NODE_ENV !== 'production';
+        if (isDevelopment || window.location.hostname === 'localhost') {
             console.error('[ErrorBoundary] Error caught:', this.error);
         }
 

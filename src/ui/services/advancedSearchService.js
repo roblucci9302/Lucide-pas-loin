@@ -93,6 +93,38 @@ class AdvancedSearchService {
     }
 
     /**
+     * Validate regex pattern for safety (prevent ReDoS attacks)
+     * @private
+     * @param {string} pattern - Regex pattern to validate
+     * @returns {boolean} True if pattern is safe
+     */
+    _isRegexSafe(pattern) {
+        // Maximum pattern length to prevent complexity attacks
+        if (pattern.length > 200) {
+            console.warn('[AdvancedSearch] Regex pattern too long:', pattern.length);
+            return false;
+        }
+
+        // Check for dangerous nested quantifiers that can cause ReDoS
+        // Examples: (a+)+, (a*)*, (a+)*, (a{1,5})+
+        const dangerousPatterns = [
+            /\([^)]*[+*]\)[+*{]/,  // (x+)+ or (x*)* or (x+){n}
+            /\([^)]*\{[^}]*\}\)[+*{]/,  // (x{n,m})+ or (x{n,m})*
+            /\([^)]*[+*]\)\+/,  // (x+)+ or (x*)+
+            /\*.*\*/,  // Multiple asterisks
+        ];
+
+        for (const dangerous of dangerousPatterns) {
+            if (dangerous.test(pattern)) {
+                console.warn('[AdvancedSearch] Potentially dangerous regex pattern detected:', pattern);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Parse query string into search terms with operators
      * @private
      * @param {string} query - Raw query string
@@ -126,6 +158,13 @@ class AdvancedSearchService {
         if (regexMatches) {
             regexMatches.forEach(match => {
                 const pattern = match.slice(1, -1); // Remove slashes
+
+                // Validate pattern for safety before creating RegExp
+                if (!this._isRegexSafe(pattern)) {
+                    console.warn('[AdvancedSearch] Unsafe regex pattern rejected:', pattern);
+                    return;
+                }
+
                 try {
                     terms.regex.push(new RegExp(pattern, caseSensitive ? '' : 'i'));
                     normalizedQuery = normalizedQuery.replace(match, '');

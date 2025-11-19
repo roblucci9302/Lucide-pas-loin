@@ -1,5 +1,6 @@
 import { html, css, LitElement } from '../../assets/lit-core-2.7.4.min.js';
 import { advancedSearchService } from '../../services/advancedSearchService.js';
+import { debounce } from '../../utils/performance.js';
 import '../base/ClaudeButton.js';
 
 /**
@@ -404,6 +405,9 @@ export class AdvancedSearchPanel extends LitElement {
         this._isSearching = false;
         this._searchHistory = [];
         this._showHistory = false;
+
+        // Create debounced search function to prevent excessive searches
+        this._debouncedSearch = debounce(() => this._performSearch(), 300);
     }
 
     connectedCallback() {
@@ -467,9 +471,9 @@ export class AdvancedSearchPanel extends LitElement {
         // Show history if query is empty
         this._showHistory = !this._query.trim();
 
-        // Perform search
+        // Perform debounced search
         if (this._query.trim()) {
-            this._performSearch();
+            this._debouncedSearch();
         } else {
             this._results = [];
         }
