@@ -214,7 +214,15 @@ function getDefaultSettings() {
         googleSearchEnabled: false,
         backgroundTransparency: 0.5,
         fontSize: 14,
-        contentProtection: true
+        contentProtection: true,
+        notifications: {
+            enabled: true,
+            streamingComplete: true,
+            newMessage: false,
+            mentions: true,
+            errors: true,
+            keywords: [], // Array of keywords to watch for
+        }
     };
 }
 

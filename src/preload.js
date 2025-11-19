@@ -448,3 +448,8 @@ contextBridge.exposeInMainWorld('api', {
     getSummary: (uid) => ipcRenderer.invoke('context:get-summary', uid)
   }
 });
+
+// Expose electronAPI for legacy compatibility (notifications, etc.)
+contextBridge.exposeInMainWorld('electronAPI', {
+  sendNotification: (options) => ipcRenderer.send('notification:send', options),
+});

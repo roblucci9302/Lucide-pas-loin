@@ -1,6 +1,8 @@
 import { html, css, LitElement } from '../../assets/lit-core-2.7.4.min.js';
 import { uiModeService } from '../../services/uiModeService.js';
+import { notificationService } from '../../services/notificationService.js';
 import '../base/ClaudeButton.js';
+import './NotificationSettings.js';
 
 /**
  * SettingsPanel - Settings dialog for UI mode and theme preferences
@@ -23,6 +25,7 @@ export class SettingsPanel extends LitElement {
         currentMode: { type: String, state: true },
         currentTheme: { type: String, state: true },
         showCodeLineNumbers: { type: Boolean, state: true },
+        notificationSettings: { type: Object, state: true },
     };
 
     static styles = css`
@@ -358,6 +361,7 @@ export class SettingsPanel extends LitElement {
         this.currentMode = uiModeService.getMode();
         this.currentTheme = uiModeService.getTheme();
         this.showCodeLineNumbers = this._getCodeLineNumbersPreference();
+        this.notificationSettings = this._getNotificationSettings();
         this._unsubscribe = null;
     }
 
@@ -376,6 +380,38 @@ export class SettingsPanel extends LitElement {
         }));
     }
 
+    _getNotificationSettings() {
+        const stored = localStorage.getItem('lucide-notification-settings');
+        if (stored) {
+            try {
+                return JSON.parse(stored);
+            } catch (e) {
+                console.error('[SettingsPanel] Error parsing notification settings:', e);
+            }
+        }
+        // Default settings
+        return {
+            enabled: true,
+            streamingComplete: true,
+            newMessage: false,
+            mentions: true,
+            errors: true,
+            keywords: [],
+        };
+    }
+
+    _setNotificationSettings(settings) {
+        localStorage.setItem('lucide-notification-settings', JSON.stringify(settings));
+        this.notificationSettings = settings;
+
+        // Update notification service
+        notificationService.updateSettings({ notifications: settings });
+    }
+
+    _handleNotificationSettingsChanged(e) {
+        this._setNotificationSettings(e.detail.notifications);
+    }
+
     connectedCallback() {
         super.connectedCallback();
         // Subscribe to mode/theme changes
@@ -383,6 +419,9 @@ export class SettingsPanel extends LitElement {
             this.currentMode = uiModeService.getMode();
             this.currentTheme = uiModeService.getTheme();
         });
+
+        // Initialize notification service with settings
+        notificationService.init({ notifications: this.notificationSettings });
     }
 
     disconnectedCallback() {
@@ -515,6 +554,16 @@ export class SettingsPanel extends LitElement {
                                         <span class="toggle-slider"></span>
                                     </label>
                                 </div>
+                            </div>
+                        ` : ''}
+
+                        <!-- Notifications Section (only for Claude mode) -->
+                        ${this.currentMode === 'claude' ? html`
+                            <div class="section">
+                                <notification-settings
+                                    .settings=${this.notificationSettings}
+                                    @settings-changed=${this._handleNotificationSettingsChanged}
+                                ></notification-settings>
                             </div>
                         ` : ''}
 

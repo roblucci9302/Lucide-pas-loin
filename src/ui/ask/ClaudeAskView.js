@@ -21,6 +21,7 @@ import { toastService } from '../services/toastService.js';
 import { exportService } from '../services/exportService.js';
 import { commandRegistryService } from '../services/commandRegistryService.js';
 import { registerCommands, createCommandContext } from '../services/registerCommands.js';
+import { notificationService } from '../services/notificationService.js';
 
 /**
  * ClaudeAskView - Ask interface with Claude.ai layout
@@ -297,6 +298,12 @@ export class ClaudeAskView extends LitElement {
             console.error('[ClaudeAskView] Error from bridge:', error);
             this.isLoading = false;
             toastService.error(`Erreur: ${error}`);
+
+            // Send error notification
+            notificationService.notifyError({
+                title: 'Erreur',
+                message: error.toString(),
+            });
         });
     }
 
@@ -349,8 +356,79 @@ export class ClaudeAskView extends LitElement {
                     ? { ...msg, content: state.currentResponse, isStreaming: false }
                     : msg
             );
+
+            // Send notification for streaming complete
+            notificationService.notifyStreamingComplete({
+                conversationTitle: this.currentConversation?.title || 'Conversation',
+                messageLength: state.currentResponse?.length || 0,
+            });
+
+            // Check for keyword mentions in the response
+            this._checkForKeywordMentions(state.currentResponse);
+
             this.streamingMessageId = null;
         }
+    }
+
+    /**
+     * Check for keyword mentions in message content
+     * @private
+     * @param {string} content - Message content to check
+     */
+    _checkForKeywordMentions(content) {
+        if (!content) return;
+
+        // Get notification settings from localStorage
+        const settingsStr = localStorage.getItem('lucide-notification-settings');
+        if (!settingsStr) return;
+
+        try {
+            const settings = JSON.parse(settingsStr);
+            if (!settings.mentions || !settings.keywords || settings.keywords.length === 0) {
+                return;
+            }
+
+            // Check for keyword matches (case-insensitive)
+            const lowerContent = content.toLowerCase();
+            for (const keyword of settings.keywords) {
+                if (lowerContent.includes(keyword.toLowerCase())) {
+                    // Found a keyword mention
+                    notificationService.notifyMention({
+                        conversationTitle: this.currentConversation?.title || 'Conversation',
+                        keyword,
+                        preview: this._extractPreview(content, keyword),
+                    });
+
+                    // Only notify once per message, even if multiple keywords match
+                    break;
+                }
+            }
+        } catch (error) {
+            console.error('[ClaudeAskView] Error checking keyword mentions:', error);
+        }
+    }
+
+    /**
+     * Extract preview text around a keyword
+     * @private
+     * @param {string} content - Full content
+     * @param {string} keyword - Keyword to find
+     * @returns {string} Preview text
+     */
+    _extractPreview(content, keyword) {
+        const index = content.toLowerCase().indexOf(keyword.toLowerCase());
+        if (index === -1) return content.substring(0, 100);
+
+        // Extract ~50 characters before and after the keyword
+        const start = Math.max(0, index - 50);
+        const end = Math.min(content.length, index + keyword.length + 50);
+        let preview = content.substring(start, end);
+
+        // Add ellipsis if truncated
+        if (start > 0) preview = '...' + preview;
+        if (end < content.length) preview = preview + '...';
+
+        return preview;
     }
 
     async _loadConversations() {
