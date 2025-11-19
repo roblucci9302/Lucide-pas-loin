@@ -384,7 +384,7 @@ export class ConversationSidebar extends LitElement {
     }
 
     _handleSettings() {
-        this.dispatchEvent(new CustomEvent('settings-clicked', {
+        this.dispatchEvent(new CustomEvent('settings-open', {
             bubbles: true,
             composed: true
         }));

@@ -8,6 +8,7 @@ import '../components/messages/MessageUser.js';
 import '../components/messages/MessageAssistant.js';
 import '../components/input/ClaudeInputArea.js';
 import '../components/artifacts/ArtifactsPanel.js';
+import '../components/settings/SettingsPanel.js';
 import { claudeAskBridgeService } from '../services/claudeAskBridgeService.js';
 
 /**
@@ -35,6 +36,7 @@ export class ClaudeAskView extends LitElement {
         artifactsVisible: { type: Boolean },
         currentMode: { type: String },
         currentArtifact: { type: Object },
+        settingsOpen: { type: Boolean, state: true },
     };
 
     static styles = css`
@@ -159,20 +161,73 @@ export class ClaudeAskView extends LitElement {
         this.artifactsVisible = false;
         this.currentMode = 'ask';
         this.currentArtifact = null;
+        this.settingsOpen = false;
         this.streamingMessageId = null;
         this._unsubscribeStateUpdate = null;
         this._unsubscribeError = null;
+        this._keydownHandler = this._handleKeyDown.bind(this);
     }
 
     async connectedCallback() {
         super.connectedCallback();
         await this._loadConversations();
         this._setupBridgeListeners();
+        this._setupKeyboardShortcuts();
     }
 
     disconnectedCallback() {
         super.disconnectedCallback();
         this._teardownBridgeListeners();
+        this._teardownKeyboardShortcuts();
+    }
+
+    /**
+     * Setup keyboard shortcuts
+     * @private
+     */
+    _setupKeyboardShortcuts() {
+        document.addEventListener('keydown', this._keydownHandler);
+    }
+
+    /**
+     * Teardown keyboard shortcuts
+     * @private
+     */
+    _teardownKeyboardShortcuts() {
+        document.removeEventListener('keydown', this._keydownHandler);
+    }
+
+    /**
+     * Handle keyboard shortcuts
+     * @private
+     */
+    _handleKeyDown(e) {
+        const isMac = /Mac/.test(navigator.platform);
+        const modKey = isMac ? e.metaKey : e.ctrlKey;
+
+        // Cmd/Ctrl + K: New conversation
+        if (modKey && e.key === 'k') {
+            e.preventDefault();
+            this._handleNewConversation();
+            return;
+        }
+
+        // Cmd/Ctrl + ,: Open settings
+        if (modKey && e.key === ',') {
+            e.preventDefault();
+            this.settingsOpen = true;
+            return;
+        }
+
+        // Esc: Close settings/artifacts
+        if (e.key === 'Escape') {
+            if (this.settingsOpen) {
+                this.settingsOpen = false;
+            } else if (this.artifactsVisible) {
+                this._handleArtifactClose();
+            }
+            return;
+        }
     }
 
     /**
@@ -341,6 +396,14 @@ export class ClaudeAskView extends LitElement {
         }));
     }
 
+    _handleSettingsOpen() {
+        this.settingsOpen = true;
+    }
+
+    _handleSettingsClose() {
+        this.settingsOpen = false;
+    }
+
     _renderMessage(message) {
         if (message.role === 'user') {
             return html`
@@ -446,6 +509,7 @@ export class ClaudeAskView extends LitElement {
                         @new-conversation="${this._handleNewConversation}"
                         @conversation-selected="${this._handleConversationSelect}"
                         @mode-changed="${this._handleModeChange}"
+                        @settings-open="${this._handleSettingsOpen}"
                     ></conversation-sidebar>
                 </div>
 
@@ -477,6 +541,12 @@ export class ClaudeAskView extends LitElement {
                     ></artifacts-panel>
                 </div>
             </claude-layout>
+
+            <!-- Settings Panel (modal overlay) -->
+            <settings-panel
+                ?open="${this.settingsOpen}"
+                @close="${this._handleSettingsClose}"
+            ></settings-panel>
         `;
     }
 }
