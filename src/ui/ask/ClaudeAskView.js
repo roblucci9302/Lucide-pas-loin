@@ -15,6 +15,7 @@ import '../components/dialogs/ConfirmDialog.js';
 import '../components/dialogs/ExportDialog.js';
 import '../components/command/CommandPalette.js';
 import '../components/tags/TagManager.js';
+import '../components/statistics/StatisticsModal.js';
 import { claudeAskBridgeService } from '../services/claudeAskBridgeService.js';
 import { toastService } from '../services/toastService.js';
 import { exportService } from '../services/exportService.js';
@@ -54,6 +55,7 @@ export class ClaudeAskView extends LitElement {
         showCodeLineNumbers: { type: Boolean, state: true },
         commandPaletteOpen: { type: Boolean, state: true },
         tagManagerOpen: { type: Boolean, state: true },
+        statisticsOpen: { type: Boolean, state: true },
     };
 
     static styles = css`
@@ -186,6 +188,7 @@ export class ClaudeAskView extends LitElement {
         this.streamingMessageId = null;
         this.commandPaletteOpen = false;
         this.tagManagerOpen = false;
+        this.statisticsOpen = false;
         this._unsubscribeStateUpdate = null;
         this._unsubscribeError = null;
         this._keydownHandler = this._handleKeyDown.bind(this);
@@ -450,6 +453,14 @@ export class ClaudeAskView extends LitElement {
 
     _handleSettingsClose() {
         this.settingsOpen = false;
+    }
+
+    _handleStatisticsOpen() {
+        this.statisticsOpen = true;
+    }
+
+    _handleStatisticsClose() {
+        this.statisticsOpen = false;
     }
 
     _handleConversationRename(e) {
@@ -736,6 +747,7 @@ export class ClaudeAskView extends LitElement {
                         @conversation-delete="${this._handleConversationDelete}"
                         @conversation-manage-tags="${this._handleManageTags}"
                         @mode-changed="${this._handleModeChange}"
+                        @statistics-open="${this._handleStatisticsOpen}"
                         @settings-open="${this._handleSettingsOpen}"
                     ></conversation-sidebar>
                 </div>
@@ -774,6 +786,15 @@ export class ClaudeAskView extends LitElement {
                 ?open="${this.settingsOpen}"
                 @close="${this._handleSettingsClose}"
             ></settings-panel>
+
+            <!-- Statistics Modal -->
+            <statistics-modal
+                ?open="${this.statisticsOpen}"
+                .conversations="${this.conversations}"
+                @close="${this._handleStatisticsClose}"
+                @export-success="${() => toastService.success('Statistiques exportées avec succès')}"
+                @export-error="${(e) => toastService.error(`Erreur lors de l'export: ${e.detail.error.message}`)}"
+            ></statistics-modal>
 
             <!-- Rename Conversation Dialog -->
             <rename-conversation-dialog

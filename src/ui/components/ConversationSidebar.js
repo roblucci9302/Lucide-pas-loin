@@ -468,6 +468,13 @@ export class ConversationSidebar extends LitElement {
         }));
     }
 
+    _handleStatistics() {
+        this.dispatchEvent(new CustomEvent('statistics-open', {
+            bubbles: true,
+            composed: true
+        }));
+    }
+
     _handleSearchInput(e) {
         this.searchQuery = e.target.value;
     }
@@ -769,6 +776,10 @@ export class ConversationSidebar extends LitElement {
 
                 <!-- Footer -->
                 <div class="footer">
+                    <div class="footer-item" @click="${this._handleStatistics}">
+                        <span class="footer-icon">📊</span>
+                        <span class="footer-label">Statistiques</span>
+                    </div>
                     <div class="footer-item" @click="${this._handleSettings}">
                         <span class="footer-icon">⚙️</span>
                         <span class="footer-label">Paramètres</span>
