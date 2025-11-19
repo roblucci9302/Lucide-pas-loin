@@ -169,6 +169,101 @@ module.exports = {
         // Ask Feature
         ipcMain.handle('ask:sendQuestionFromAsk', async (event, userPrompt) => await askService.sendMessage(userPrompt));
         ipcMain.handle('ask:sendQuestionFromSummary', async (event, userPrompt) => await askService.sendMessage(userPrompt));
+
+        // Claude UI Integration - Enhanced Ask handlers
+        ipcMain.handle('ask:sendMessage', async (event, { message, files = [], conversationHistory = [] }) => {
+            try {
+                console.log('[ConversationBridge] ask:sendMessage called from Claude UI');
+                // askService.sendMessage already handles conversation history internally via DB
+                return await askService.sendMessage(message, conversationHistory);
+            } catch (error) {
+                console.error('[ConversationBridge] ask:sendMessage failed:', error);
+                return { success: false, error: error.message };
+            }
+        });
+
+        ipcMain.handle('ask:getConversations', async () => {
+            try {
+                const userId = authService.getCurrentUserId();
+                const sessions = await conversationHistoryService.getAllSessions(userId, {
+                    limit: 50,
+                    sortBy: 'updated_at',
+                    sortOrder: 'DESC'
+                });
+                return sessions || [];
+            } catch (error) {
+                console.error('[ConversationBridge] ask:getConversations failed:', error);
+                return [];
+            }
+        });
+
+        ipcMain.handle('ask:getConversationHistory', async (event, { sessionId }) => {
+            try {
+                if (!sessionId) {
+                    return [];
+                }
+                return await conversationHistoryService.getSessionMessages(sessionId);
+            } catch (error) {
+                console.error('[ConversationBridge] ask:getConversationHistory failed:', error);
+                return [];
+            }
+        });
+
+        ipcMain.handle('ask:createSession', async () => {
+            try {
+                const sessionRepository = require('../../features/common/repositories/session');
+                const sessionId = await sessionRepository.getOrCreateActive('ask');
+                return { sessionId };
+            } catch (error) {
+                console.error('[ConversationBridge] ask:createSession failed:', error);
+                return { sessionId: null };
+            }
+        });
+
+        ipcMain.handle('ask:getSessionMessages', async (event, { sessionId }) => {
+            try {
+                return await conversationHistoryService.getSessionMessages(sessionId);
+            } catch (error) {
+                console.error('[ConversationBridge] ask:getSessionMessages failed:', error);
+                return [];
+            }
+        });
+
+        ipcMain.handle('ask:deleteSession', async (event, { sessionId }) => {
+            try {
+                await conversationHistoryService.deleteSession(sessionId);
+                return { success: true };
+            } catch (error) {
+                console.error('[ConversationBridge] ask:deleteSession failed:', error);
+                return { success: false, error: error.message };
+            }
+        });
+
+        ipcMain.handle('ask:updateSessionTitle', async (event, { sessionId, title }) => {
+            try {
+                await conversationHistoryService.updateSessionMetadata(sessionId, { title });
+                return { success: true };
+            } catch (error) {
+                console.error('[ConversationBridge] ask:updateSessionTitle failed:', error);
+                return { success: false, error: error.message };
+            }
+        });
+
+        ipcMain.handle('ask:stopGeneration', async () => {
+            try {
+                // askService has abortController for stopping streams
+                if (askService.abortController) {
+                    askService.abortController.abort('User cancelled generation');
+                    return { success: true };
+                }
+                return { success: false, error: 'No active generation to stop' };
+            } catch (error) {
+                console.error('[ConversationBridge] ask:stopGeneration failed:', error);
+                return { success: false, error: error.message };
+            }
+        });
+
+        // Original Ask handlers
         ipcMain.handle('ask:toggleAskButton', async () => await askService.toggleAskButton());
         ipcMain.handle('ask:closeAskWindow', async () => await askService.closeAskWindow());
         ipcMain.handle('ask:minimizeAskWindow', async () => await askService.minimizeAskWindow());

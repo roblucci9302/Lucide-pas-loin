@@ -8,6 +8,7 @@ import '../components/messages/MessageUser.js';
 import '../components/messages/MessageAssistant.js';
 import '../components/input/ClaudeInputArea.js';
 import '../components/artifacts/ArtifactsPanel.js';
+import { claudeAskBridgeService } from '../services/claudeAskBridgeService.js';
 
 /**
  * ClaudeAskView - Ask interface with Claude.ai layout
@@ -158,37 +159,110 @@ export class ClaudeAskView extends LitElement {
         this.artifactsVisible = false;
         this.currentMode = 'ask';
         this.currentArtifact = null;
+        this.streamingMessageId = null;
+        this._unsubscribeStateUpdate = null;
+        this._unsubscribeError = null;
     }
 
     async connectedCallback() {
         super.connectedCallback();
         await this._loadConversations();
+        this._setupBridgeListeners();
+    }
+
+    disconnectedCallback() {
+        super.disconnectedCallback();
+        this._teardownBridgeListeners();
+    }
+
+    /**
+     * Setup listeners for bridge service events
+     * @private
+     */
+    _setupBridgeListeners() {
+        // Listen for state updates (streaming)
+        this._unsubscribeStateUpdate = claudeAskBridgeService.on('stateUpdate', (state) => {
+            console.log('[ClaudeAskView] State update:', state);
+            this._handleStateUpdate(state);
+        });
+
+        // Listen for errors
+        this._unsubscribeError = claudeAskBridgeService.on('error', ({ error }) => {
+            console.error('[ClaudeAskView] Error from bridge:', error);
+            this.isLoading = false;
+            // TODO: Show error notification
+        });
+    }
+
+    /**
+     * Teardown bridge listeners
+     * @private
+     */
+    _teardownBridgeListeners() {
+        if (this._unsubscribeStateUpdate) {
+            this._unsubscribeStateUpdate();
+        }
+        if (this._unsubscribeError) {
+            this._unsubscribeError();
+        }
+    }
+
+    /**
+     * Handle state updates from Ask service (streaming)
+     * @private
+     */
+    _handleStateUpdate(state) {
+        this.isLoading = state.isLoading || false;
+
+        // Update streaming message
+        if (state.isStreaming && state.currentResponse) {
+            // Find or create streaming message
+            if (!this.streamingMessageId) {
+                // Create new assistant message for streaming
+                const assistantMessage = {
+                    id: `streaming-${Date.now()}`,
+                    role: 'assistant',
+                    content: state.currentResponse,
+                    created_at: new Date().toISOString(),
+                    isStreaming: true
+                };
+                this.streamingMessageId = assistantMessage.id;
+                this.messages = [...this.messages, assistantMessage];
+            } else {
+                // Update existing streaming message
+                this.messages = this.messages.map(msg =>
+                    msg.id === this.streamingMessageId
+                        ? { ...msg, content: state.currentResponse, isStreaming: true }
+                        : msg
+                );
+            }
+        } else if (!state.isStreaming && state.currentResponse && this.streamingMessageId) {
+            // Streaming finished, mark message as complete
+            this.messages = this.messages.map(msg =>
+                msg.id === this.streamingMessageId
+                    ? { ...msg, content: state.currentResponse, isStreaming: false }
+                    : msg
+            );
+            this.streamingMessageId = null;
+        }
     }
 
     async _loadConversations() {
-        // TODO: Load from conversationHistoryService via IPC
-        // For now, mock data
-        this.conversations = [
-            {
-                id: '1',
-                title: 'Comment créer un composant React ?',
-                updated_at: new Date().toISOString(),
-                created_at: new Date().toISOString()
-            },
-            {
-                id: '2',
-                title: 'Expliquer les closures en JavaScript',
-                updated_at: new Date(Date.now() - 3600000).toISOString(),
-                created_at: new Date(Date.now() - 3600000).toISOString()
-            }
-        ];
+        try {
+            console.log('[ClaudeAskView] Loading conversations from bridge...');
+            this.conversations = await claudeAskBridgeService.loadConversations();
+            console.log(`[ClaudeAskView] Loaded ${this.conversations.length} conversations`);
+        } catch (error) {
+            console.error('[ClaudeAskView] Error loading conversations:', error);
+            this.conversations = [];
+        }
     }
 
     _handleInput(e) {
         this.inputValue = e.detail.value;
     }
 
-    _handleInputSubmit(e) {
+    async _handleInputSubmit(e) {
         if ((!this.inputValue.trim() && this.attachedFiles.length === 0) || this.isLoading) return;
 
         const userMessage = {
@@ -199,61 +273,40 @@ export class ClaudeAskView extends LitElement {
             created_at: new Date().toISOString()
         };
 
+        // Add user message to UI immediately
         this.messages = [...this.messages, userMessage];
+
+        // Save input values before clearing
+        const messageText = this.inputValue;
+        const attachedFiles = this.attachedFiles;
+
+        // Clear input
         this.inputValue = '';
         this.attachedFiles = [];
         this.isLoading = true;
 
-        // TODO: Send to AI via IPC (include files)
-        // Mock response with artifact detection
-        setTimeout(() => {
-            const shouldShowArtifact = /code|exemple|function|component|html|react/i.test(userMessage.content);
+        try {
+            // Send message through bridge service
+            console.log('[ClaudeAskView] Sending message through bridge...');
+            const result = await claudeAskBridgeService.sendMessage(
+                messageText,
+                attachedFiles,
+                this.messages
+            );
 
-            let assistantContent = `Ceci est une réponse de démonstration. ${userMessage.files ? `J'ai reçu ${userMessage.files.length} fichier(s).` : ''} L'intégration avec le service Ask sera ajoutée prochainement.`;
-
-            if (shouldShowArtifact) {
-                assistantContent += '\n\nVoici un exemple de code pour vous aider :';
-
-                // Create mock artifact
-                const artifact = {
-                    id: `artifact-${Date.now()}`,
-                    title: 'Exemple de code',
-                    type: 'code',
-                    language: 'javascript',
-                    content: `// Exemple de fonction JavaScript
-function greet(name) {
-    return \`Bonjour, \${name}!\`;
-}
-
-// Utilisation
-const message = greet("Lucide");
-console.log(message);
-
-// Fonction asynchrone
-async function fetchData(url) {
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Erreur:', error);
-        throw error;
-    }
-}`
-                };
-
-                this._showArtifact(artifact);
+            if (!result.success) {
+                console.error('[ClaudeAskView] Failed to send message:', result.error);
+                // TODO: Show error notification
+                this.isLoading = false;
             }
 
-            const assistantMessage = {
-                id: (Date.now() + 1).toString(),
-                role: 'assistant',
-                content: assistantContent,
-                created_at: new Date().toISOString()
-            };
-            this.messages = [...this.messages, assistantMessage];
+            // Note: The response will come through stateUpdate listener
+            // which will handle the streaming updates
+        } catch (error) {
+            console.error('[ClaudeAskView] Error sending message:', error);
             this.isLoading = false;
-        }, 1500);
+            // TODO: Show error notification
+        }
     }
 
     _handleFilesAttached(e) {
