@@ -23,6 +23,7 @@ import { exportService } from '../services/exportService.js';
 import { commandRegistryService } from '../services/commandRegistryService.js';
 import { registerCommands, createCommandContext } from '../services/registerCommands.js';
 import { notificationService } from '../services/notificationService.js';
+import { themeService } from '../services/themeService.js';
 
 /**
  * ClaudeAskView - Ask interface with Claude.ai layout

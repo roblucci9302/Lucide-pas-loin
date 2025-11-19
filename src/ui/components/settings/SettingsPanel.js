@@ -1,8 +1,10 @@
 import { html, css, LitElement } from '../../assets/lit-core-2.7.4.min.js';
 import { uiModeService } from '../../services/uiModeService.js';
+import { themeService } from '../../services/themeService.js';
 import { notificationService } from '../../services/notificationService.js';
 import '../base/ClaudeButton.js';
 import './NotificationSettings.js';
+import '../theme/ThemeSelector.js';
 
 /**
  * SettingsPanel - Settings dialog for UI mode and theme preferences
@@ -359,7 +361,7 @@ export class SettingsPanel extends LitElement {
         super();
         this.open = false;
         this.currentMode = uiModeService.getMode();
-        this.currentTheme = uiModeService.getTheme();
+        this.currentTheme = themeService.getTheme();
         this.showCodeLineNumbers = this._getCodeLineNumbersPreference();
         this.notificationSettings = this._getNotificationSettings();
         this._unsubscribe = null;
@@ -450,7 +452,7 @@ export class SettingsPanel extends LitElement {
     }
 
     _handleThemeChange(theme) {
-        uiModeService.setTheme(theme);
+        themeService.setTheme(theme);
         this.currentTheme = theme;
     }
 
@@ -501,33 +503,7 @@ export class SettingsPanel extends LitElement {
                         <!-- Theme Section (only for Claude mode) -->
                         ${this.currentMode === 'claude' ? html`
                             <div class="section">
-                                <div class="section-title">Thème</div>
-                                <div class="section-description">
-                                    Sélectionnez votre préférence de couleur
-                                </div>
-                                <div class="theme-selector">
-                                    <button
-                                        class="theme-option ${this.currentTheme === 'light' ? 'active' : ''}"
-                                        @click="${() => this._handleThemeChange('light')}"
-                                    >
-                                        <div class="theme-icon">☀️</div>
-                                        <div class="theme-label">Clair</div>
-                                    </button>
-                                    <button
-                                        class="theme-option ${this.currentTheme === 'dark' ? 'active' : ''}"
-                                        @click="${() => this._handleThemeChange('dark')}"
-                                    >
-                                        <div class="theme-icon">🌙</div>
-                                        <div class="theme-label">Sombre</div>
-                                    </button>
-                                    <button
-                                        class="theme-option ${this.currentTheme === 'auto' ? 'active' : ''}"
-                                        @click="${() => this._handleThemeChange('auto')}"
-                                    >
-                                        <div class="theme-icon">🔄</div>
-                                        <div class="theme-label">Auto</div>
-                                    </button>
-                                </div>
+                                <theme-selector></theme-selector>
                             </div>
                         ` : ''}
 

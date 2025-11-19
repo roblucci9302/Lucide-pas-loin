@@ -2,6 +2,7 @@ import { html, css, LitElement } from '../assets/lit-core-2.7.4.min.js';
 import './base/ClaudeButton.js';
 import './base/ClaudeAvatar.js';
 import './tags/TagFilter.js';
+import './theme/ThemeToggle.js';
 import { tagService } from '../services/tagService.js';
 
 /**
@@ -790,6 +791,9 @@ export class ConversationSidebar extends LitElement {
                     <div class="footer-item" @click="${this._handleSearchOpen}">
                         <span class="footer-icon">🔍</span>
                         <span class="footer-label">Recherche</span>
+                    </div>
+                    <div class="footer-item">
+                        <theme-toggle></theme-toggle>
                     </div>
                     <div class="footer-item" @click="${this._handleSettings}">
                         <span class="footer-icon">⚙️</span>
