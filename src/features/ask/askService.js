@@ -139,6 +139,7 @@ class AskService {
             currentQuestion: '',
             currentResponse: '',
             showTextInput: true,
+            sessionId: null, // Phase 4: RAG - Session ID for citations
         };
         console.log('[AskService] Service instance created.');
     }
@@ -298,6 +299,10 @@ class AskService {
             sessionId = await sessionRepository.getOrCreateActive('ask');
             await askRepository.addAiMessage({ sessionId, role: 'user', content: userPrompt.trim() });
             console.log(`[AskService] DB: Saved user prompt to session ${sessionId}`);
+
+            // Phase 4: RAG - Update state with sessionId for citations
+            this.state.sessionId = sessionId;
+            this._broadcastState();
 
             // PHASE 1: AGENT ROUTER - Intelligent routing to specialized agents
             // Auto-detect and switch to the most appropriate agent based on question

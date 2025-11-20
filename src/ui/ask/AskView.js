@@ -1,6 +1,7 @@
 import { html, css, LitElement } from '../../ui/assets/lit-core-2.7.4.min.js';
 import { parser, parser_write, parser_end, default_renderer } from '../../ui/assets/smd.js';
 import './QuickActionsPanel.js';
+import './CitationView.js';
 
 export class AskView extends LitElement {
     static properties = {
@@ -15,6 +16,7 @@ export class AskView extends LitElement {
         headerText: { type: String },
         headerAnimating: { type: Boolean },
         isStreaming: { type: Boolean },
+        sessionId: { type: String }, // Phase 4: RAG - Session ID for citations
     };
 
     static styles = css`
@@ -738,6 +740,7 @@ export class AskView extends LitElement {
                 this.currentQuestion = newState.currentQuestion;
                 this.isLoading       = newState.isLoading;
                 this.isStreaming     = newState.isStreaming;
+                this.sessionId       = newState.sessionId; // Phase 4: RAG - Session ID for citations
 
                 const wasHidden = !this.showTextInput;
                 this.showTextInput = newState.showTextInput;
@@ -1412,6 +1415,11 @@ export class AskView extends LitElement {
                 <div class="response-container ${!hasResponse ? 'hidden' : ''}" id="responseContainer">
                     <!-- Content is dynamically generated in updateResponseContent() -->
                 </div>
+
+                <!-- Phase 4: RAG - Citations from Knowledge Base -->
+                ${hasResponse && this.sessionId ? html`
+                    <citation-view .sessionId=${this.sessionId}></citation-view>
+                ` : ''}
 
                 <!-- Quick Actions Panel (Phase 3: Workflows) - DÉSACTIVÉ -->
                 <!-- ${!hasResponse ? html`<quick-actions-panel></quick-actions-panel>` : ''} -->
