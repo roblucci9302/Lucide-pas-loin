@@ -20,6 +20,7 @@ export class AskView extends LitElement {
         isStreaming: { type: Boolean },
         sessionId: { type: String }, // Phase 4: RAG - Session ID for citations
         attachments: { type: Array, state: true }, // Document upload attachments
+        generatedDocuments: { type: Array, state: true }, // Phase 4: Generated documents from AI
     };
 
     static styles = css`
@@ -653,6 +654,15 @@ export class AskView extends LitElement {
             padding-top: 8px;
         }
 
+        /* Generated Documents wrapper (Phase 4) */
+        .generated-documents-wrapper {
+            padding: 0 16px;
+            padding-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
         .header-clear-btn {
             background: transparent;
             border: none;
@@ -691,6 +701,7 @@ export class AskView extends LitElement {
         this.headerAnimating = false;
         this.isStreaming = false;
         this.attachments = []; // Document upload attachments
+        this.generatedDocuments = []; // Generated documents from AI
 
         this.marked = null;
         this.hljs = null;
@@ -1009,10 +1020,80 @@ export class AskView extends LitElement {
     }
 
 
+    /**
+     * Phase 4: Parse AI response for generated documents
+     * Detects document markers like <<DOCUMENT:type>> and extracts them
+     */
+    parseDocuments(text) {
+        if (!text || typeof text !== 'string') {
+            return { documents: [], cleanText: text || '' };
+        }
+
+        const documents = [];
+        let cleanText = text;
+
+        // Regex for full format: <<DOCUMENT:type>>title: Title---Content<</DOCUMENT>>
+        const fullRegex = /<<DOCUMENT:(\w+)>>\s*title:\s*(.+?)\s*---\s*([\s\S]+?)<<\/DOCUMENT>>/gi;
+
+        // Regex for simple format: <<DOC:type:title>>Content<</DOC>>
+        const simpleRegex = /<<DOC:(\w+):(.+?)>>\s*([\s\S]+?)<<\/DOC>>/gi;
+
+        // Parse full format
+        let match;
+        while ((match = fullRegex.exec(text)) !== null) {
+            const [fullMatch, type, title, content] = match;
+
+            documents.push({
+                id: `doc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                type: type.toLowerCase(),
+                title: title.trim(),
+                content: content.trim(),
+                metadata: {
+                    source: 'ai_generated',
+                    timestamp: new Date().toISOString(),
+                    format: 'markdown'
+                }
+            });
+
+            // Replace with placeholder in clean text
+            cleanText = cleanText.replace(
+                fullMatch,
+                `\n\n📄 **Document généré**: ${title.trim()} (${type})\n\n`
+            );
+        }
+
+        // Parse simple format
+        while ((match = simpleRegex.exec(text)) !== null) {
+            const [fullMatch, type, title, content] = match;
+
+            documents.push({
+                id: `doc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                type: type.toLowerCase(),
+                title: title.trim(),
+                content: content.trim(),
+                metadata: {
+                    source: 'ai_generated',
+                    timestamp: new Date().toISOString(),
+                    format: 'markdown'
+                }
+            });
+
+            cleanText = cleanText.replace(
+                fullMatch,
+                `\n\n📄 **Document généré**: ${title.trim()} (${type})\n\n`
+            );
+        }
+
+        return {
+            documents,
+            cleanText: cleanText.trim()
+        };
+    }
+
     renderContent() {
         const responseContainer = this.shadowRoot.getElementById('responseContainer');
         if (!responseContainer) return;
-    
+
         // Check loading state
         if (this.isLoading) {
             responseContainer.innerHTML = `
@@ -1022,18 +1103,32 @@ export class AskView extends LitElement {
                 <div class="loading-dot"></div>
               </div>`;
             this.resetStreamingParser();
+            this.generatedDocuments = []; // Clear documents on new loading
             return;
         }
-        
+
         // If there is no response, show empty state
         if (!this.currentResponse) {
             responseContainer.innerHTML = `<div class="empty-state">...</div>`;
             this.resetStreamingParser();
+            this.generatedDocuments = [];
             return;
         }
-        
-        // Set streaming markdown parser
-        this.renderStreamingMarkdown(responseContainer);
+
+        // Phase 4: Parse response for generated documents
+        const { documents, cleanText } = this.parseDocuments(this.currentResponse);
+
+        // Store generated documents for display
+        if (documents.length > 0 && !this.isStreaming) {
+            console.log(`[AskView] Found ${documents.length} generated documents`);
+            this.generatedDocuments = documents;
+            this.requestUpdate(); // Trigger re-render to show DocumentPreview
+        }
+
+        // Render markdown (using cleanText if documents were found)
+        const textToRender = documents.length > 0 ? cleanText : this.currentResponse;
+        this.currentResponseClean = textToRender;
+        this.renderStreamingMarkdown(responseContainer, textToRender);
 
         // After updating content, recalculate window height
         this.adjustWindowHeightThrottled();
@@ -1067,7 +1162,7 @@ export class AskView extends LitElement {
         });
     }
 
-    renderStreamingMarkdown(responseContainer) {
+    renderStreamingMarkdown(responseContainer, textToRender = null) {
         try {
             // 파서가 없거나 컨테이너가 변경되었으면 새로 생성
             if (!this.smdParser || this.smdContainer !== responseContainer) {
@@ -1083,8 +1178,8 @@ export class AskView extends LitElement {
                 this.setupLinkInterception(responseContainer);
             }
 
-            // 새로운 텍스트만 처리 (스트리밍 최적화)
-            const currentText = this.currentResponse;
+            // Use provided text or fall back to currentResponse
+            const currentText = textToRender !== null ? textToRender : this.currentResponse;
             const newText = currentText.slice(this.lastProcessedLength);
 
             if (newText.length > 0) {
@@ -1481,6 +1576,19 @@ export class AskView extends LitElement {
         console.log('[AskView] Attachment removed:', attachment.name);
     }
 
+    // Generated Documents Handlers (Phase 4)
+    handleDocumentExportSuccess(e) {
+        const { format, filePath } = e.detail;
+        console.log(`[AskView] Document exported successfully to ${format}: ${filePath}`);
+        // Success - document was exported
+    }
+
+    handleDocumentExportError(e) {
+        const { format, error } = e.detail;
+        console.error(`[AskView] Document export error (${format}):`, error);
+        // Error - show to user if needed
+    }
+
     updated(changedProperties) {
         super.updated(changedProperties);
 
@@ -1574,6 +1682,19 @@ export class AskView extends LitElement {
                 <!-- Phase 4: RAG - Citations from Knowledge Base -->
                 ${hasResponse && this.sessionId ? html`
                     <citation-view .sessionId=${this.sessionId}></citation-view>
+                ` : ''}
+
+                <!-- Phase 4: Generated Documents Display -->
+                ${this.generatedDocuments && this.generatedDocuments.length > 0 ? html`
+                    <div class="generated-documents-wrapper">
+                        ${this.generatedDocuments.map(doc => html`
+                            <document-preview
+                                .document=${doc}
+                                @export-success=${this.handleDocumentExportSuccess}
+                                @export-error=${this.handleDocumentExportError}
+                            ></document-preview>
+                        `)}
+                    </div>
                 ` : ''}
 
                 <!-- Quick Actions Panel (Phase 3: Workflows) -->

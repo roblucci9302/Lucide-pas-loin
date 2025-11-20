@@ -13,6 +13,7 @@ const {
 } = require('../prompts/workflowTemplates');
 
 const agentProfileService = require('./agentProfileService');
+const workflowDocumentEnhancer = require('./workflowDocumentEnhancer');
 
 /**
  * @class WorkflowService
@@ -94,6 +95,7 @@ class WorkflowService {
 
     /**
      * Build a complete prompt from a workflow template with specific profile
+     * Phase 4: Automatically enhances prompts for document generation
      * @param {string} profileId - Agent profile ID
      * @param {string} workflowId - Workflow ID
      * @param {Object} formData - Optional form data
@@ -102,11 +104,20 @@ class WorkflowService {
     buildPrompt(profileId, workflowId, formData = {}) {
         const prompt = buildWorkflowPrompt(profileId, workflowId, formData);
 
-        if (prompt) {
-            console.log(`[WorkflowService] Built prompt for workflow: ${workflowId} (length: ${prompt.length} chars)`);
+        if (!prompt) {
+            return null;
         }
 
-        return prompt;
+        // Phase 4: Enhance prompt for document generation if applicable
+        const enhancedPrompt = workflowDocumentEnhancer.enhancePrompt(workflowId, prompt, formData);
+
+        if (enhancedPrompt !== prompt) {
+            console.log(`[WorkflowService] Enhanced prompt for document generation: ${workflowId}`);
+        }
+
+        console.log(`[WorkflowService] Built prompt for workflow: ${workflowId} (length: ${enhancedPrompt.length} chars)`);
+
+        return enhancedPrompt;
     }
 
     /**
