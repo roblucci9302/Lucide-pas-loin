@@ -174,8 +174,39 @@ module.exports = {
                     const result = await mammoth.extractRawText({ buffer: bufferObj });
                     extractedText = result.value;
                 } else if (['jpg', 'jpeg', 'png', 'gif'].includes(fileType)) {
-                    // OCR for images (will be implemented in Phase 3)
-                    throw new Error('Image OCR not yet implemented. Coming in Phase 3!');
+                    // OCR for images (Phase 3)
+                    try {
+                        const { createWorker } = require('tesseract.js');
+
+                        console.log(`[KnowledgeBridge] Starting OCR for ${filename}...`);
+
+                        const worker = await createWorker('fra+eng', 1, {
+                            logger: (m) => {
+                                if (m.status === 'recognizing text') {
+                                    console.log(`[KnowledgeBridge] OCR Progress: ${Math.round(m.progress * 100)}%`);
+                                }
+                            }
+                        });
+
+                        const { data: { text } } = await worker.recognize(bufferObj);
+                        await worker.terminate();
+
+                        extractedText = text;
+                        console.log(`[KnowledgeBridge] OCR completed: ${extractedText.length} characters extracted`);
+
+                        if (!extractedText || extractedText.trim().length === 0) {
+                            throw new Error('No text could be extracted from the image. The image may be blank or contain no readable text.');
+                        }
+                    } catch (ocrError) {
+                        console.error('[KnowledgeBridge] OCR Error:', ocrError);
+
+                        // Check if tesseract.js is not installed
+                        if (ocrError.code === 'MODULE_NOT_FOUND') {
+                            throw new Error('OCR support not available. Please ensure tesseract.js is installed (npm install).');
+                        }
+
+                        throw new Error(`OCR failed: ${ocrError.message}`);
+                    }
                 } else {
                     throw new Error(`Unsupported file type: ${fileType}`);
                 }
