@@ -350,6 +350,11 @@ contextBridge.exposeInMainWorld('api', {
     getSessionCitations: (sessionId) => ipcRenderer.invoke('rag:get-session-citations', sessionId)
   },
 
+  // src/ui/knowledge/KnowledgeBaseView.js
+  knowledgeBase: {
+    closeWindow: () => ipcRenderer.invoke('knowledge-base:close-window')
+  },
+
   // src/ui/settings/ShortCutSettingsView.js
   shortcutSettingsView: {
     // Shortcut Management

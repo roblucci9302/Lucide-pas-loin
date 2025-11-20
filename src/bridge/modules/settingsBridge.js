@@ -7,6 +7,7 @@ const shortcutsService = require('../../features/shortcuts/shortcutsService');
 const presetRepository = require('../../features/common/repositories/preset');
 const firebaseKnowledgeSync = require('../../features/knowledge/services/firebaseKnowledgeSync');
 const authService = require('../../features/common/services/authService');
+const knowledgeBaseService = require('../../features/knowledge/knowledgeBaseService');
 
 module.exports = {
     initialize() {
@@ -103,10 +104,21 @@ module.exports = {
 
         ipcMain.handle('settings:open-knowledge-base-manager', async () => {
             try {
-                // Placeholder - will be implemented in Phase 2
-                return { success: true, message: 'Gestionnaire en cours de développement' };
+                await knowledgeBaseService.showKnowledgeBase();
+                return { success: true };
             } catch (error) {
                 console.error('[SettingsBridge] Error opening knowledge base manager:', error);
+                return { success: false, error: error.message };
+            }
+        });
+
+        // Knowledge Base Window Management
+        ipcMain.handle('knowledge-base:close-window', async () => {
+            try {
+                knowledgeBaseService.closeKnowledgeBase();
+                return { success: true };
+            } catch (error) {
+                console.error('[SettingsBridge] Error closing knowledge base window:', error);
                 return { success: false, error: error.message };
             }
         });
