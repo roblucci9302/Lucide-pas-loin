@@ -8,6 +8,7 @@ const presetRepository = require('../../features/common/repositories/preset');
 const firebaseKnowledgeSync = require('../../features/knowledge/services/firebaseKnowledgeSync');
 const authService = require('../../features/common/services/authService');
 const knowledgeBaseService = require('../../features/knowledge/knowledgeBaseService');
+const databaseManager = require('../../features/knowledge/databaseManager');
 
 module.exports = {
     initialize() {
@@ -74,15 +75,11 @@ module.exports = {
 
         ipcMain.handle('settings:connect-external-knowledge-base', async () => {
             try {
-                // Placeholder for external database connection
-                // Full implementation would show a dialog to collect Firebase config
-                return {
-                    success: false,
-                    cancelled: true,
-                    message: 'Fonctionnalité en cours de développement'
-                };
+                await databaseManager.initialize();
+                await knowledgeBaseService.showExternalDialog();
+                return { success: true };
             } catch (error) {
-                console.error('[SettingsBridge] Error connecting to external knowledge base:', error);
+                console.error('[SettingsBridge] Error opening external database dialog:', error);
                 return { success: false, error: error.message };
             }
         });
@@ -119,6 +116,84 @@ module.exports = {
                 return { success: true };
             } catch (error) {
                 console.error('[SettingsBridge] Error closing knowledge base window:', error);
+                return { success: false, error: error.message };
+            }
+        });
+
+        // External Database Connection
+        ipcMain.handle('knowledge:test-external-connection', async (event, config) => {
+            try {
+                await databaseManager.initialize();
+                return await databaseManager.testConnection(config);
+            } catch (error) {
+                console.error('[SettingsBridge] Error testing external connection:', error);
+                return { success: false, error: error.message };
+            }
+        });
+
+        ipcMain.handle('knowledge:connect-external', async (event, config) => {
+            try {
+                const userId = authService.getCurrentUserId();
+                if (!userId) {
+                    throw new Error('User not authenticated');
+                }
+
+                await databaseManager.initialize();
+                const result = await databaseManager.addDatabase(config);
+
+                if (result.success) {
+                    // Switch to the new database
+                    await databaseManager.switchDatabase(result.dbId);
+
+                    // Get document count from the new database
+                    const status = await firebaseKnowledgeSync.getStatus(userId);
+
+                    // Close the dialog
+                    knowledgeBaseService.closeExternalDialog();
+
+                    return {
+                        success: true,
+                        name: result.name,
+                        documentCount: status.documentCount || 0
+                    };
+                }
+
+                return result;
+            } catch (error) {
+                console.error('[SettingsBridge] Error connecting to external database:', error);
+                return { success: false, error: error.message };
+            }
+        });
+
+        ipcMain.handle('knowledge:close-external-dialog', async () => {
+            try {
+                knowledgeBaseService.closeExternalDialog();
+                return { success: true };
+            } catch (error) {
+                console.error('[SettingsBridge] Error closing external dialog:', error);
+                return { success: false, error: error.message };
+            }
+        });
+
+        ipcMain.handle('knowledge:get-all-databases', async () => {
+            try {
+                await databaseManager.initialize();
+                return {
+                    success: true,
+                    databases: databaseManager.getAllDatabases()
+                };
+            } catch (error) {
+                console.error('[SettingsBridge] Error getting databases:', error);
+                return { success: false, error: error.message, databases: [] };
+            }
+        });
+
+        ipcMain.handle('knowledge:switch-database', async (event, dbId) => {
+            try {
+                await databaseManager.initialize();
+                return await databaseManager.switchDatabase(dbId);
+            } catch (error) {
+                console.error('[SettingsBridge] Error switching database:', error);
                 return { success: false, error: error.message };
             }
         });

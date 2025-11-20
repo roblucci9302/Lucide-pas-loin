@@ -10,6 +10,7 @@ const path = require('path');
 class KnowledgeBaseService {
     constructor() {
         this.knowledgeBaseWindow = null;
+        this.externalDialogWindow = null;
         console.log('[KnowledgeBaseService] Service initialized');
     }
 
@@ -85,6 +86,73 @@ class KnowledgeBaseService {
      */
     isOpen() {
         return this.knowledgeBaseWindow !== null && !this.knowledgeBaseWindow.isDestroyed();
+    }
+
+    /**
+     * Show external database connection dialog
+     */
+    async showExternalDialog() {
+        console.log('[KnowledgeBaseService] Opening external database dialog');
+
+        if (this.externalDialogWindow) {
+            // Dialog already exists, just focus it
+            if (this.externalDialogWindow.isMinimized()) {
+                this.externalDialogWindow.restore();
+            }
+            this.externalDialogWindow.focus();
+            return;
+        }
+
+        // Create new dialog window
+        this.externalDialogWindow = new BrowserWindow({
+            width: 700,
+            height: 850,
+            minWidth: 600,
+            minHeight: 700,
+            backgroundColor: '#1a1a1a',
+            titleBarStyle: 'hiddenInset',
+            trafficLightPosition: { x: 10, y: 10 },
+            show: false,
+            webPreferences: {
+                preload: path.join(__dirname, '../../preload.js'),
+                nodeIntegration: false,
+                contextIsolation: true,
+                sandbox: false
+            }
+        });
+
+        // Load the HTML file
+        const htmlPath = path.join(__dirname, '../../ui/knowledge/external-database-dialog.html');
+        await this.externalDialogWindow.loadFile(htmlPath);
+
+        // Show when ready
+        this.externalDialogWindow.once('ready-to-show', () => {
+            console.log('[KnowledgeBaseService] External dialog ready to show');
+            this.externalDialogWindow.show();
+        });
+
+        // Clean up on close
+        this.externalDialogWindow.on('closed', () => {
+            console.log('[KnowledgeBaseService] External dialog closed');
+            this.externalDialogWindow = null;
+        });
+
+        // Open DevTools in development
+        if (process.env.NODE_ENV === 'development') {
+            this.externalDialogWindow.webContents.openDevTools();
+        }
+    }
+
+    /**
+     * Close external database dialog
+     */
+    closeExternalDialog() {
+        console.log('[KnowledgeBaseService] Closing external database dialog');
+
+        if (this.externalDialogWindow) {
+            this.externalDialogWindow.close();
+            this.externalDialogWindow = null;
+        }
     }
 }
 

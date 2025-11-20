@@ -355,6 +355,15 @@ contextBridge.exposeInMainWorld('api', {
     closeWindow: () => ipcRenderer.invoke('knowledge-base:close-window')
   },
 
+  // src/ui/knowledge/ExternalDatabaseDialog.js
+  knowledge: {
+    testExternalConnection: (config) => ipcRenderer.invoke('knowledge:test-external-connection', config),
+    connectExternal: (config) => ipcRenderer.invoke('knowledge:connect-external', config),
+    closeExternalDialog: () => ipcRenderer.invoke('knowledge:close-external-dialog'),
+    getAllDatabases: () => ipcRenderer.invoke('knowledge:get-all-databases'),
+    switchDatabase: (dbId) => ipcRenderer.invoke('knowledge:switch-database', dbId)
+  },
+
   // src/ui/settings/ShortCutSettingsView.js
   shortcutSettingsView: {
     // Shortcut Management
