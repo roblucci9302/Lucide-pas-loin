@@ -18,14 +18,14 @@ class AgentProfileService {
             },
             {
                 id: 'student_assistant',
-                name: 'Lucy - Assistant Étudiant',
+                name: 'Lucy - Étudiant',
                 description: 'Assistant académique pour études et examens',
                 icon: '🎓',
                 color: '#3b82f6'
             },
             {
                 id: 'researcher_assistant',
-                name: 'Lucy - Assistant Chercheur',
+                name: 'Lucy - Chercheur',
                 description: 'Expert en recherche scientifique et publications',
                 icon: '🔬',
                 color: '#8b5cf6'
