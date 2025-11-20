@@ -2,6 +2,7 @@ import { html, css, LitElement } from '../../ui/assets/lit-core-2.7.4.min.js';
 import { parser, parser_write, parser_end, default_renderer } from '../../ui/assets/smd.js';
 import './QuickActionsPanel.js';
 import './CitationView.js';
+import './AttachmentBubble.js';
 
 export class AskView extends LitElement {
     static properties = {
@@ -17,6 +18,7 @@ export class AskView extends LitElement {
         headerAnimating: { type: Boolean },
         isStreaming: { type: Boolean },
         sessionId: { type: String }, // Phase 4: RAG - Session ID for citations
+        attachments: { type: Array, state: true }, // Document upload attachments
     };
 
     static styles = css`
@@ -609,6 +611,46 @@ export class AskView extends LitElement {
             height: 13px;
             display: block;
         }
+
+        /* Upload button styles */
+        .upload-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 122, 255, 0.1);
+            border: 1px solid rgba(0, 122, 255, 0.3);
+            color: rgba(0, 122, 255, 1);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            font-size: 20px;
+            font-weight: 300;
+            line-height: 1;
+        }
+
+        .upload-btn:hover {
+            background: rgba(0, 122, 255, 0.2);
+            border-color: rgba(0, 122, 255, 0.5);
+            transform: scale(1.05);
+        }
+
+        .upload-btn:active {
+            transform: scale(0.95);
+        }
+
+        .upload-btn input[type="file"] {
+            display: none;
+        }
+
+        /* Attachments wrapper */
+        .attachments-wrapper {
+            padding: 0 16px;
+            padding-top: 8px;
+        }
+
         .header-clear-btn {
             background: transparent;
             border: none;
@@ -646,6 +688,7 @@ export class AskView extends LitElement {
         this.headerText = 'AI Response';
         this.headerAnimating = false;
         this.isStreaming = false;
+        this.attachments = []; // Document upload attachments
 
         this.marked = null;
         this.hljs = null;
@@ -1305,7 +1348,29 @@ export class AskView extends LitElement {
         }
 
         if (window.api) {
-            window.api.askView.sendMessage(text).catch(error => {
+            // Build enriched message with attachments context
+            let enrichedMessage = text;
+
+            if (this.attachments && this.attachments.length > 0) {
+                const analyzedAttachments = this.attachments.filter(att => att.status === 'analyzed');
+
+                if (analyzedAttachments.length > 0) {
+                    // Prepend attachment context
+                    const contextParts = analyzedAttachments.map(att => {
+                        const preview = att.extractedText?.substring(0, 2000) || '';
+                        return `[Document: ${att.name}]\n${preview}${att.extractedText?.length > 2000 ? '...' : ''}`;
+                    });
+
+                    enrichedMessage = `Context from uploaded documents:\n\n${contextParts.join('\n\n---\n\n')}\n\n---\n\nUser Question: ${text}`;
+
+                    console.log('[AskView] Sending message with', analyzedAttachments.length, 'document contexts');
+                }
+
+                // Clear attachments after sending
+                this.attachments = [];
+            }
+
+            window.api.askView.sendMessage(enrichedMessage).catch(error => {
                 console.error('Error sending text:', error);
             });
         }
@@ -1324,6 +1389,94 @@ export class AskView extends LitElement {
             e.preventDefault();
             this.handleSendText();
         }
+    }
+
+    // Document Upload Handlers
+    handleUploadClick() {
+        const fileInput = this.shadowRoot?.getElementById('fileInput');
+        if (fileInput) {
+            fileInput.click();
+        }
+    }
+
+    async handleFileSelect(e) {
+        const files = Array.from(e.target.files || []);
+        if (files.length === 0) return;
+
+        console.log('[AskView] Files selected:', files.length);
+
+        for (const file of files) {
+            // Add to attachments with analyzing status
+            const attachment = {
+                id: Date.now() + Math.random(),
+                name: file.name,
+                size: file.size,
+                type: file.name.split('.').pop(),
+                status: 'analyzing',
+                file: file
+            };
+
+            this.attachments = [...this.attachments, attachment];
+
+            // Upload and analyze
+            try {
+                const result = await this.uploadAndAnalyzeFile(file);
+
+                // Update attachment status
+                this.attachments = this.attachments.map(att =>
+                    att.id === attachment.id
+                        ? { ...att, status: 'analyzed', extractedText: result.text, documentId: result.documentId }
+                        : att
+                );
+
+                console.log('[AskView] File analyzed successfully:', file.name);
+            } catch (error) {
+                console.error('[AskView] Error analyzing file:', error);
+
+                // Update to error status
+                this.attachments = this.attachments.map(att =>
+                    att.id === attachment.id
+                        ? { ...att, status: 'error', error: error.message }
+                        : att
+                );
+            }
+        }
+
+        // Reset file input
+        e.target.value = '';
+    }
+
+    async uploadAndAnalyzeFile(file) {
+        if (!window.api || !window.api.documents) {
+            throw new Error('Upload API not available');
+        }
+
+        // Convert File to Uint8Array
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = new Uint8Array(arrayBuffer);
+
+        // Call analyze-file handler
+        const result = await window.api.documents.analyzeFile({
+            filename: file.name,
+            buffer: Array.from(buffer) // Convert Uint8Array to regular array for IPC
+        });
+
+        if (!result.success) {
+            throw new Error(result.error || 'Failed to analyze file');
+        }
+
+        return {
+            text: result.extractedText || '',
+            filename: result.filename,
+            fileType: result.fileType,
+            success: true
+        };
+    }
+
+    handleRemoveAttachment(e) {
+        const { attachment } = e.detail;
+        this.attachments = this.attachments.filter(att => att.id !== attachment.id);
+        console.log('[AskView] Attachment removed:', attachment.name);
     }
 
     updated(changedProperties) {
@@ -1421,11 +1574,36 @@ export class AskView extends LitElement {
                     <citation-view .sessionId=${this.sessionId}></citation-view>
                 ` : ''}
 
-                <!-- Quick Actions Panel (Phase 3: Workflows) - DÉSACTIVÉ -->
-                <!-- ${!hasResponse ? html`<quick-actions-panel></quick-actions-panel>` : ''} -->
+                <!-- Quick Actions Panel (Phase 3: Workflows) -->
+                ${!hasResponse ? html`<quick-actions-panel></quick-actions-panel>` : ''}
+
+                <!-- Attachments Display -->
+                ${this.attachments && this.attachments.length > 0 ? html`
+                    <div class="attachments-wrapper">
+                        <attachment-bubble
+                            .attachments=${this.attachments}
+                            @remove-attachment=${this.handleRemoveAttachment}
+                        ></attachment-bubble>
+                    </div>
+                ` : ''}
 
                 <!-- Text Input Container -->
                 <div class="text-input-container ${!hasResponse ? 'no-response' : ''} ${!this.showTextInput ? 'hidden' : ''}">
+                    <!-- Upload Button -->
+                    <button class="upload-btn" @click=${this.handleUploadClick} title="Ajouter des documents">
+                        +
+                    </button>
+
+                    <!-- Hidden File Input -->
+                    <input
+                        type="file"
+                        id="fileInput"
+                        multiple
+                        accept=".pdf,.docx,.doc,.txt,.md,.jpg,.jpeg,.png,.gif"
+                        @change=${this.handleFileSelect}
+                        style="display: none;"
+                    />
+
                     <input
                         type="text"
                         id="textInput"

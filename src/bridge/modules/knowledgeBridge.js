@@ -138,6 +138,66 @@ module.exports = {
             }
         });
 
+        // Document analysis for conversation (Phase: Document Upload in Chat)
+        ipcMain.handle('documents:analyze-file', async (event, fileData) => {
+            try {
+                const { filename, buffer } = fileData;
+
+                if (!filename || !buffer) {
+                    throw new Error('Missing filename or buffer');
+                }
+
+                console.log(`[KnowledgeBridge] Analyzing file for conversation: ${filename}`);
+
+                // Check file size
+                const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+                if (buffer.length > MAX_FILE_SIZE) {
+                    throw new Error(`File too large. Maximum size is ${MAX_FILE_SIZE / 1024 / 1024}MB`);
+                }
+
+                // Extract text content only (no DB storage)
+                const bufferObj = Buffer.from(buffer);
+                const fileType = filename.split('.').pop().toLowerCase();
+
+                let extractedText = '';
+
+                // Use documentService private methods via reflection
+                // Or create a dedicated method for extraction only
+                if (fileType === 'txt' || fileType === 'md') {
+                    extractedText = bufferObj.toString('utf-8');
+                } else if (fileType === 'pdf') {
+                    const pdfParse = require('pdf-parse');
+                    const data = await pdfParse(bufferObj);
+                    extractedText = data.text;
+                } else if (fileType === 'docx') {
+                    const mammoth = require('mammoth');
+                    const result = await mammoth.extractRawText({ buffer: bufferObj });
+                    extractedText = result.value;
+                } else if (['jpg', 'jpeg', 'png', 'gif'].includes(fileType)) {
+                    // OCR for images (will be implemented in Phase 3)
+                    throw new Error('Image OCR not yet implemented. Coming in Phase 3!');
+                } else {
+                    throw new Error(`Unsupported file type: ${fileType}`);
+                }
+
+                console.log(`[KnowledgeBridge] Text extracted: ${extractedText.length} characters`);
+
+                return {
+                    success: true,
+                    filename,
+                    fileType,
+                    extractedText,
+                    size: buffer.length
+                };
+            } catch (error) {
+                console.error('[KnowledgeBridge] Error analyzing file:', error);
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        });
+
         // RAG (Phase 4)
         ipcMain.handle('rag:retrieve-context', async (event, query, options) => {
             return await ragService.retrieveContext(query, options);
