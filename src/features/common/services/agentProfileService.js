@@ -2,7 +2,8 @@ const sqliteClient = require('./sqliteClient');
 
 /**
  * Service for managing Lucy's agent profiles (modes)
- * Profiles: lucide_assistant (default), hr_specialist, it_expert, marketing_expert
+ * Profiles: lucide_assistant (default), student_assistant, researcher_assistant,
+ *           hr_specialist, it_expert, marketing_expert, ceo_advisor, sales_expert, manager_coach
  */
 class AgentProfileService {
     constructor() {
@@ -14,6 +15,20 @@ class AgentProfileService {
                 description: 'Assistant polyvalent pour toutes vos questions',
                 icon: '🤖',
                 color: '#6366f1'
+            },
+            {
+                id: 'student_assistant',
+                name: 'Lucy - Assistant Étudiant',
+                description: 'Assistant académique pour études et examens',
+                icon: '🎓',
+                color: '#3b82f6'
+            },
+            {
+                id: 'researcher_assistant',
+                name: 'Lucy - Assistant Chercheur',
+                description: 'Expert en recherche scientifique et publications',
+                icon: '🔬',
+                color: '#8b5cf6'
             },
             {
                 id: 'hr_specialist',
