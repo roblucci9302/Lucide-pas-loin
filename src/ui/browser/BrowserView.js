@@ -750,14 +750,19 @@ export class BrowserView extends LitElement {
         }
     }
 
-    handleCloseBrowser() {
+    async handleCloseBrowser() {
         console.log('[BrowserView] Closing browser');
 
-        // Dispatch event to parent to switch back to Ask view
-        this.dispatchEvent(new CustomEvent('close-browser', {
-            bubbles: true,
-            composed: true
-        }));
+        try {
+            if (window.api && window.api.browserView) {
+                await window.api.browserView.closeBrowser();
+                console.log('[BrowserView] Browser closed successfully');
+            } else {
+                console.error('[BrowserView] window.api.browserView not available');
+            }
+        } catch (error) {
+            console.error('[BrowserView] Error closing browser:', error);
+        }
     }
 
     // ═══════════════════════════════════════════════════════════

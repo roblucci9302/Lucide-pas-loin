@@ -180,6 +180,9 @@ contextBridge.exposeInMainWorld('api', {
 
   // src/ui/browser/BrowserView.js
   browserView: {
+    // Window Management
+    closeBrowser: () => ipcRenderer.invoke('browser:close'),
+
     // Listeners
     onNavigateTo: (callback) => ipcRenderer.on('browser:navigate-to', callback),
     removeOnNavigateTo: (callback) => ipcRenderer.removeListener('browser:navigate-to', callback)
