@@ -619,29 +619,32 @@ export class AskView extends LitElement {
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.08);
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.9);
             border-radius: 50%;
             width: 36px;
             height: 36px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             flex-shrink: 0;
-            font-size: 20px;
-            font-weight: 300;
+            font-size: 22px;
+            font-weight: 400;
             line-height: 1;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
         .upload-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
             color: rgba(255, 255, 255, 1);
-            transform: scale(1.05);
+            transform: scale(1.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
         }
 
         .upload-btn:active {
-            transform: scale(0.95);
+            transform: scale(0.96);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
         }
 
         .upload-btn input[type="file"] {
