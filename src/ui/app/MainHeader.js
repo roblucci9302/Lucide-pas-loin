@@ -580,26 +580,6 @@ export class MainHeader extends TranslationMixin(LitElement) {
         console.log('[MainHeader] ===========================================');
     }
 
-    async _handleBrowserClick() {
-        console.log('[MainHeader] Browser button clicked');
-
-        if (this.wasJustDragged) {
-            console.warn('[MainHeader] Click ignored because wasJustDragged is true');
-            return;
-        }
-
-        try {
-            if (window.api) {
-                console.log('[MainHeader] Calling sendBrowserButtonClick()...');
-                await window.api.mainHeader.sendBrowserButtonClick();
-                console.log('[MainHeader] sendBrowserButtonClick() succeeded');
-            } else {
-                console.error('[MainHeader] window.api is undefined!');
-            }
-        } catch (error) {
-            console.error('[MainHeader] IPC invoke for browser button failed:', error);
-        }
-    }
 
     async _handleToggleAllWindowsVisibility() {
         if (this.wasJustDragged) return;
@@ -689,18 +669,6 @@ export class MainHeader extends TranslationMixin(LitElement) {
                         </div>
                         <div class="icon-container">
                             ${this.renderShortcut(this.shortcuts.nextStep)}
-                        </div>
-                    </div>
-
-                    <div class="header-actions" @click=${() => this._handleBrowserClick()}>
-                        <div class="action-text">
-                            <div class="action-text-content">Browser</div>
-                        </div>
-                        <div class="icon-container ask-icons">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <circle cx="12" cy="12" r="3"/>
-                            </svg>
                         </div>
                     </div>
 
