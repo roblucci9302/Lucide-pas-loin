@@ -509,6 +509,11 @@ export class SettingsView extends LitElement {
         // Agent profile properties
         availableProfiles: { type: Array, state: true },
         activeProfile: { type: String, state: true },
+        // Knowledge base properties
+        knowledgeBaseStatus: { type: String, state: true },
+        knowledgeBaseName: { type: String, state: true },
+        documentCount: { type: Number, state: true },
+        knowledgeBaseLoading: { type: Boolean, state: true },
     };
     //////// after_modelStateService ////////
 
@@ -545,6 +550,11 @@ export class SettingsView extends LitElement {
         // Agent profiles
         this.availableProfiles = [];
         this.activeProfile = 'lucide_assistant';
+        // Knowledge base
+        this.knowledgeBaseStatus = 'inactive'; // 'inactive' | 'active' | 'syncing'
+        this.knowledgeBaseName = '';
+        this.documentCount = 0;
+        this.knowledgeBaseLoading = false;
         this.loadInitialData();
         //////// after_modelStateService ////////
     }
@@ -621,7 +631,7 @@ export class SettingsView extends LitElement {
         this.isLoading = true;
         try {
             // Load essential data first
-            const [userState, modelSettings, presets, contentProtection, screenshotEnabled, shortcuts, availableProfiles, activeProfile] = await Promise.all([
+            const [userState, modelSettings, presets, contentProtection, screenshotEnabled, shortcuts, availableProfiles, activeProfile, knowledgeBaseStatus] = await Promise.all([
                 window.api.settingsView.getCurrentUser(),
                 window.api.settingsView.getModelSettings(), // Facade call
                 window.api.settingsView.getPresets(),
@@ -629,7 +639,8 @@ export class SettingsView extends LitElement {
                 window.api.settingsView.getScreenshotEnabled(),
                 window.api.settingsView.getCurrentShortcuts(),
                 window.api.settingsView.getAvailableProfiles(),
-                window.api.settingsView.getActiveProfile()
+                window.api.settingsView.getActiveProfile(),
+                window.api.settingsView.getKnowledgeBaseStatus().catch(() => ({ status: 'inactive', name: '', documentCount: 0 }))
             ]);
             
             if (userState && userState.isLoggedIn) this.firebaseUser = userState;
@@ -650,6 +661,13 @@ export class SettingsView extends LitElement {
             this.shortcuts = shortcuts || {};
             this.availableProfiles = availableProfiles || [];
             this.activeProfile = activeProfile || 'lucide_assistant';
+
+            // Knowledge base status
+            if (knowledgeBaseStatus) {
+                this.knowledgeBaseStatus = knowledgeBaseStatus.status || 'inactive';
+                this.knowledgeBaseName = knowledgeBaseStatus.name || '';
+                this.documentCount = knowledgeBaseStatus.documentCount || 0;
+            }
 
             if (this.presets.length > 0) {
                 const firstUserPreset = this.presets.find(p => p.is_default === 0);
@@ -1188,16 +1206,16 @@ export class SettingsView extends LitElement {
 
     async handleOllamaShutdown() {
         console.log('[SettingsView] Shutting down Ollama service...');
-        
+
         if (!window.api) return;
-        
+
         try {
             // Show loading state
             this.ollamaStatus = { ...this.ollamaStatus, running: false };
             this.requestUpdate();
-            
+
             const result = await window.api.settingsView.shutdownOllama(false); // Graceful shutdown
-            
+
             if (result.success) {
                 console.log('[SettingsView] Ollama shut down successfully');
                 // Refresh status to reflect the change
@@ -1211,6 +1229,115 @@ export class SettingsView extends LitElement {
             console.error('[SettingsView] Error during Ollama shutdown:', error);
             // Restore previous state on error
             await this.refreshOllamaStatus();
+        }
+    }
+
+    // Knowledge Base Handlers
+    async handleCreatePersonalDatabase() {
+        console.log('[SettingsView] Creating personal knowledge base...');
+
+        if (!window.api) return;
+
+        // Check if user is logged in
+        if (!this.firebaseUser) {
+            alert('Veuillez vous connecter à Firebase pour créer une base de données personnelle.');
+            return;
+        }
+
+        try {
+            this.knowledgeBaseLoading = true;
+            this.requestUpdate();
+
+            const result = await window.api.settingsView.createPersonalKnowledgeBase();
+
+            if (result.success) {
+                console.log('[SettingsView] Personal knowledge base created successfully');
+                this.knowledgeBaseStatus = 'active';
+                this.knowledgeBaseName = result.name || 'Base Personnelle';
+                this.documentCount = result.documentCount || 0;
+                alert('Base de données personnelle créée avec succès !');
+            } else {
+                console.error('[SettingsView] Failed to create knowledge base:', result.error);
+                alert(`Échec de la création : ${result.error}`);
+            }
+        } catch (error) {
+            console.error('[SettingsView] Error creating knowledge base:', error);
+            alert(`Erreur : ${error.message}`);
+        } finally {
+            this.knowledgeBaseLoading = false;
+            this.requestUpdate();
+        }
+    }
+
+    async handleConnectExternalDatabase() {
+        console.log('[SettingsView] Connecting to external database...');
+
+        if (!window.api) return;
+
+        try {
+            this.knowledgeBaseLoading = true;
+            this.requestUpdate();
+
+            const result = await window.api.settingsView.connectExternalKnowledgeBase();
+
+            if (result.success) {
+                console.log('[SettingsView] Connected to external database successfully');
+                this.knowledgeBaseStatus = 'active';
+                this.knowledgeBaseName = result.name || 'Base Externe';
+                this.documentCount = result.documentCount || 0;
+                alert('Connexion à la base externe réussie !');
+            } else if (!result.cancelled) {
+                console.error('[SettingsView] Failed to connect to external database:', result.error);
+                alert(`Échec de la connexion : ${result.error}`);
+            }
+        } catch (error) {
+            console.error('[SettingsView] Error connecting to external database:', error);
+            alert(`Erreur : ${error.message}`);
+        } finally {
+            this.knowledgeBaseLoading = false;
+            this.requestUpdate();
+        }
+    }
+
+    async handleManageKnowledgeBase() {
+        console.log('[SettingsView] Opening knowledge base manager...');
+
+        if (!window.api) return;
+
+        try {
+            await window.api.settingsView.openKnowledgeBaseManager();
+        } catch (error) {
+            console.error('[SettingsView] Error opening knowledge base manager:', error);
+        }
+    }
+
+    async handleSyncKnowledgeBase() {
+        console.log('[SettingsView] Syncing knowledge base...');
+
+        if (!window.api) return;
+
+        try {
+            this.knowledgeBaseStatus = 'syncing';
+            this.requestUpdate();
+
+            const result = await window.api.settingsView.syncKnowledgeBase();
+
+            if (result.success) {
+                console.log('[SettingsView] Knowledge base synced successfully');
+                this.documentCount = result.documentCount || this.documentCount;
+                alert(`Synchronisation réussie ! ${result.syncedCount || 0} documents synchronisés.`);
+            } else {
+                console.error('[SettingsView] Sync failed:', result.error);
+                alert(`Échec de la synchronisation : ${result.error}`);
+            }
+
+            this.knowledgeBaseStatus = 'active';
+        } catch (error) {
+            console.error('[SettingsView] Error syncing knowledge base:', error);
+            alert(`Erreur de synchronisation : ${error.message}`);
+            this.knowledgeBaseStatus = 'active';
+        } finally {
+            this.requestUpdate();
         }
     }
 
@@ -1450,6 +1577,62 @@ export class SettingsView extends LitElement {
                                 </div>
                             </div>
                         `)}
+                    </div>
+                </div>
+
+                <!-- Knowledge Base Section -->
+                <div class="knowledge-base-section" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--color-white-10);">
+                    <div class="section-header" style="font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.7); margin-bottom: 8px;">
+                        📚 Base de Connaissances
+                    </div>
+
+                    <!-- Status Display -->
+                    <div class="kb-status" style="margin-bottom: 8px; padding: 8px; background: ${this.knowledgeBaseStatus === 'active' ? 'rgba(0,255,0,0.1)' : 'rgba(255,255,255,0.05)'}; border-radius: 6px; font-size: 10px;">
+                        ${this.knowledgeBaseStatus === 'active' ? html`
+                            <div style="color: rgba(0,255,0,0.8);">
+                                ✓ Base active : <strong>${this.knowledgeBaseName}</strong>
+                            </div>
+                            <div style="color: rgba(255,255,255,0.6); margin-top: 2px;">
+                                ${this.documentCount} document${this.documentCount !== 1 ? 's' : ''}
+                            </div>
+                        ` : this.knowledgeBaseStatus === 'syncing' ? html`
+                            <div style="color: rgba(255,200,0,0.8);">
+                                ⟳ Synchronisation en cours...
+                            </div>
+                        ` : html`
+                            <div style="color: rgba(255,255,255,0.5);">
+                                Aucune base de connaissances active
+                            </div>
+                        `}
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <button class="settings-button full-width"
+                                @click=${this.handleCreatePersonalDatabase}
+                                ?disabled=${this.knowledgeBaseLoading || this.knowledgeBaseStatus === 'active'}>
+                            ${this.knowledgeBaseStatus === 'active' ? '✓ Base Personnelle Créée' : '📚 Créer Base Personnelle'}
+                        </button>
+
+                        <button class="settings-button full-width"
+                                @click=${this.handleConnectExternalDatabase}
+                                ?disabled=${this.knowledgeBaseLoading}>
+                            🔗 Connecter Base Externe
+                        </button>
+
+                        ${this.knowledgeBaseStatus === 'active' ? html`
+                            <button class="settings-button full-width"
+                                    @click=${this.handleSyncKnowledgeBase}
+                                    ?disabled=${this.knowledgeBaseLoading || this.knowledgeBaseStatus === 'syncing'}>
+                                ⟳ Synchroniser
+                            </button>
+
+                            <button class="settings-button full-width"
+                                    @click=${this.handleManageKnowledgeBase}
+                                    ?disabled=${this.knowledgeBaseLoading}>
+                                ⚙️ Gérer les Documents
+                            </button>
+                        ` : ''}
                     </div>
                 </div>
 

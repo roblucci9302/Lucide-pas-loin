@@ -9,6 +9,7 @@ const workflowService = require('../../features/common/services/workflowService'
 const documentService = require('../../features/common/services/documentService');
 const indexingService = require('../../features/common/services/indexingService');
 const ragService = require('../../features/common/services/ragService');
+const firebaseKnowledgeSync = require('../../features/knowledge/services/firebaseKnowledgeSync');
 
 module.exports = {
     initialize() {
@@ -143,6 +144,137 @@ module.exports = {
         });
         ipcMain.handle('rag:get-session-citations', async (event, sessionId) => {
             return await ragService.getSessionCitations(sessionId);
+        });
+
+        // Knowledge Base Sync (Firebase)
+        ipcMain.handle('knowledge:get-status', async () => {
+            try {
+                const userId = authService.getCurrentUserId();
+                if (!userId) {
+                    return { status: 'inactive', name: '', documentCount: 0 };
+                }
+
+                await firebaseKnowledgeSync.initialize();
+                const status = await firebaseKnowledgeSync.getStatus(userId);
+                return status;
+            } catch (error) {
+                console.error('[KnowledgeBridge] Error getting knowledge base status:', error);
+                return { status: 'inactive', name: '', documentCount: 0, error: error.message };
+            }
+        });
+
+        ipcMain.handle('knowledge:create-personal-db', async () => {
+            try {
+                const userId = authService.getCurrentUserId();
+                if (!userId) {
+                    throw new Error('User not authenticated');
+                }
+
+                console.log('[KnowledgeBridge] Creating personal knowledge base for user:', userId);
+
+                await firebaseKnowledgeSync.initialize();
+                const result = await firebaseKnowledgeSync.createPersonalKnowledgeBase(userId);
+
+                if (result.success) {
+                    // Setup real-time sync
+                    firebaseKnowledgeSync.setupRealtimeSync(userId);
+                }
+
+                return result;
+            } catch (error) {
+                console.error('[KnowledgeBridge] Error creating personal knowledge base:', error);
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        });
+
+        ipcMain.handle('knowledge:connect-external-db', async () => {
+            try {
+                const userId = authService.getCurrentUserId();
+                if (!userId) {
+                    throw new Error('User not authenticated');
+                }
+
+                console.log('[KnowledgeBridge] Connecting to external knowledge base');
+
+                // Show dialog to get Firebase config
+                const result = await dialog.showMessageBox({
+                    type: 'question',
+                    title: 'Connecter une Base Externe',
+                    message: 'Voulez-vous entrer la configuration Firebase manuellement ?',
+                    buttons: ['Annuler', 'Entrer la Configuration'],
+                    defaultId: 1,
+                    cancelId: 0
+                });
+
+                if (result.response === 0) {
+                    return { success: false, cancelled: true };
+                }
+
+                // For now, return success with placeholder
+                // In a full implementation, you'd show a custom dialog to collect Firebase config
+                console.log('[KnowledgeBridge] External database connection not fully implemented yet');
+
+                return {
+                    success: true,
+                    name: 'Base Externe',
+                    documentCount: 0,
+                    message: 'Fonctionnalité en cours de développement'
+                };
+            } catch (error) {
+                console.error('[KnowledgeBridge] Error connecting to external database:', error);
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        });
+
+        ipcMain.handle('knowledge:sync-now', async () => {
+            try {
+                const userId = authService.getCurrentUserId();
+                if (!userId) {
+                    throw new Error('User not authenticated');
+                }
+
+                console.log('[KnowledgeBridge] Starting knowledge base sync');
+
+                await firebaseKnowledgeSync.initialize();
+                const result = await firebaseKnowledgeSync.syncToFirebase(userId);
+
+                return result;
+            } catch (error) {
+                console.error('[KnowledgeBridge] Error syncing knowledge base:', error);
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        });
+
+        ipcMain.handle('knowledge:open-manager', async () => {
+            try {
+                console.log('[KnowledgeBridge] Opening knowledge base manager');
+
+                // For now, just show a message
+                // In a full implementation, you'd open a new window or navigate to the KB manager view
+                await dialog.showMessageBox({
+                    type: 'info',
+                    title: 'Gestionnaire de Knowledge Base',
+                    message: 'Le gestionnaire de documents sera bientôt disponible dans une future mise à jour.',
+                    buttons: ['OK']
+                });
+
+                return { success: true };
+            } catch (error) {
+                console.error('[KnowledgeBridge] Error opening knowledge base manager:', error);
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
         });
 
         console.log('[KnowledgeBridge] Initialized');

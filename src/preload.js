@@ -271,7 +271,14 @@ contextBridge.exposeInMainWorld('api', {
     getAvailableProfiles: () => ipcRenderer.invoke('agent:get-available-profiles'),
     getActiveProfile: () => ipcRenderer.invoke('agent:get-active-profile'),
     setActiveProfile: (profileId) => ipcRenderer.invoke('agent:set-active-profile', profileId),
-    
+
+    // Knowledge Base Management
+    getKnowledgeBaseStatus: () => ipcRenderer.invoke('settings:get-knowledge-base-status'),
+    createPersonalKnowledgeBase: () => ipcRenderer.invoke('settings:create-personal-knowledge-base'),
+    connectExternalKnowledgeBase: () => ipcRenderer.invoke('settings:connect-external-knowledge-base'),
+    syncKnowledgeBase: () => ipcRenderer.invoke('settings:sync-knowledge-base'),
+    openKnowledgeBaseManager: () => ipcRenderer.invoke('settings:open-knowledge-base-manager'),
+
     // Window Management
     moveWindowStep: (direction) => ipcRenderer.invoke('move-window-step', direction),
     cancelHideSettingsWindow: () => ipcRenderer.send('cancel-hide-settings-window'),

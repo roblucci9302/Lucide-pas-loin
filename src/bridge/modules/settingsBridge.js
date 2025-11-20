@@ -5,6 +5,8 @@ const { ipcMain } = require('electron');
 const settingsService = require('../../features/settings/settingsService');
 const shortcutsService = require('../../features/shortcuts/shortcutsService');
 const presetRepository = require('../../features/common/repositories/preset');
+const firebaseKnowledgeSync = require('../../features/knowledge/services/firebaseKnowledgeSync');
+const authService = require('../../features/common/services/authService');
 
 module.exports = {
     initialize() {
@@ -31,6 +33,83 @@ module.exports = {
         // General
         ipcMain.handle('get-preset-templates', () => presetRepository.getPresetTemplates());
         ipcMain.handle('get-web-url', () => process.env.pickleglass_WEB_URL || 'http://localhost:3000');
+
+        // Knowledge Base
+        ipcMain.handle('settings:get-knowledge-base-status', async () => {
+            try {
+                const userId = authService.getCurrentUserId();
+                if (!userId) {
+                    return { status: 'inactive', name: '', documentCount: 0 };
+                }
+
+                await firebaseKnowledgeSync.initialize();
+                return await firebaseKnowledgeSync.getStatus(userId);
+            } catch (error) {
+                console.error('[SettingsBridge] Error getting knowledge base status:', error);
+                return { status: 'inactive', name: '', documentCount: 0 };
+            }
+        });
+
+        ipcMain.handle('settings:create-personal-knowledge-base', async () => {
+            try {
+                const userId = authService.getCurrentUserId();
+                if (!userId) {
+                    throw new Error('User not authenticated');
+                }
+
+                await firebaseKnowledgeSync.initialize();
+                const result = await firebaseKnowledgeSync.createPersonalKnowledgeBase(userId);
+
+                if (result.success) {
+                    firebaseKnowledgeSync.setupRealtimeSync(userId);
+                }
+
+                return result;
+            } catch (error) {
+                console.error('[SettingsBridge] Error creating personal knowledge base:', error);
+                return { success: false, error: error.message };
+            }
+        });
+
+        ipcMain.handle('settings:connect-external-knowledge-base', async () => {
+            try {
+                // Placeholder for external database connection
+                // Full implementation would show a dialog to collect Firebase config
+                return {
+                    success: false,
+                    cancelled: true,
+                    message: 'Fonctionnalité en cours de développement'
+                };
+            } catch (error) {
+                console.error('[SettingsBridge] Error connecting to external knowledge base:', error);
+                return { success: false, error: error.message };
+            }
+        });
+
+        ipcMain.handle('settings:sync-knowledge-base', async () => {
+            try {
+                const userId = authService.getCurrentUserId();
+                if (!userId) {
+                    throw new Error('User not authenticated');
+                }
+
+                await firebaseKnowledgeSync.initialize();
+                return await firebaseKnowledgeSync.syncToFirebase(userId);
+            } catch (error) {
+                console.error('[SettingsBridge] Error syncing knowledge base:', error);
+                return { success: false, error: error.message };
+            }
+        });
+
+        ipcMain.handle('settings:open-knowledge-base-manager', async () => {
+            try {
+                // Placeholder - will be implemented in Phase 2
+                return { success: true, message: 'Gestionnaire en cours de développement' };
+            } catch (error) {
+                console.error('[SettingsBridge] Error opening knowledge base manager:', error);
+                return { success: false, error: error.message };
+            }
+        });
 
         console.log('[SettingsBridge] Initialized');
     }
