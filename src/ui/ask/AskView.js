@@ -1697,8 +1697,8 @@ export class AskView extends LitElement {
                     </div>
                 ` : ''}
 
-                <!-- Quick Actions Panel (Phase 3: Workflows) -->
-                ${!hasResponse ? html`<quick-actions-panel></quick-actions-panel>` : ''}
+                <!-- Quick Actions Panel (Phase 3: Workflows) - DÉSACTIVÉ -->
+                <!-- ${!hasResponse ? html`<quick-actions-panel></quick-actions-panel>` : ''} -->
 
                 <!-- Attachments Display -->
                 ${this.attachments && this.attachments.length > 0 ? html`

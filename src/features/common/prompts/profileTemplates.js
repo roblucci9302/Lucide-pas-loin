@@ -1767,7 +1767,7 @@ Tu comprends les défis des chercheurs : publish or perish, compétition pour fi
             'comité de sélection', 'audition', 'PEDR', 'PES',
             // Enseignement
             'syllabus', 'learning outcomes', 'évaluation', 'pédagogie active',
-            'classe inversée', 'feedback', "charge d'enseignement", 'TD/TP/CM'
+            'classe inversée', 'feedback', 'charge d\'enseignement', 'TD/TP/CM'
         ],
 
         outputStructure: {

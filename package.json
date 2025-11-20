@@ -79,6 +79,7 @@
     "devDependencies": {
         "@electron/fuses": "^1.8.0",
         "@electron/notarize": "^2.5.0",
+        "@esbuild/linux-x64": "^0.27.0",
         "electron": "^30.5.1",
         "electron-builder": "^26.0.12",
         "electron-rebuild": "^3.2.9",
