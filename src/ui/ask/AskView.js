@@ -3,6 +3,7 @@ import { parser, parser_write, parser_end, default_renderer } from '../../ui/ass
 import './QuickActionsPanel.js';
 import './CitationView.js';
 import './AttachmentBubble.js';
+import './DocumentPreview.js';
 
 export class AskView extends LitElement {
     static properties = {

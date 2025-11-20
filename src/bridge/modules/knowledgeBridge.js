@@ -368,6 +368,47 @@ module.exports = {
             }
         });
 
+        // Document Export (Phase 4)
+        const documentExportService = require('../../features/common/services/documentExportService');
+
+        ipcMain.handle('documents:export', async (event, documentData) => {
+            try {
+                const { title, content, type, format } = documentData;
+
+                if (!title || !content || !format) {
+                    throw new Error('Missing required fields: title, content, or format');
+                }
+
+                console.log(`[KnowledgeBridge] Exporting document "${title}" to ${format.toUpperCase()}`);
+
+                const result = await documentExportService.exportDocument({
+                    title,
+                    content,
+                    type: type || 'document'
+                }, format);
+
+                return result;
+            } catch (error) {
+                console.error('[KnowledgeBridge] Error exporting document:', error);
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        });
+
+        ipcMain.handle('documents:open-export-folder', async () => {
+            try {
+                return await documentExportService.openExportDirectory();
+            } catch (error) {
+                console.error('[KnowledgeBridge] Error opening export folder:', error);
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        });
+
         console.log('[KnowledgeBridge] Initialized');
     }
 };

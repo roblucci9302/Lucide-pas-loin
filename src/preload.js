@@ -334,7 +334,9 @@ contextBridge.exposeInMainWorld('api', {
     getStats: () => ipcRenderer.invoke('documents:get-stats'),
     deleteDocument: (documentId) => ipcRenderer.invoke('documents:delete', documentId),
     uploadDocument: () => ipcRenderer.invoke('documents:upload'),
-    analyzeFile: (fileData) => ipcRenderer.invoke('documents:analyze-file', fileData)
+    analyzeFile: (fileData) => ipcRenderer.invoke('documents:analyze-file', fileData),
+    exportDocument: (documentData) => ipcRenderer.invoke('documents:export', documentData),
+    openExportFolder: () => ipcRenderer.invoke('documents:open-export-folder')
   },
 
   // Phase 5: Export - Conversation Export
