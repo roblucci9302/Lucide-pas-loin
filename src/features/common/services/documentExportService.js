@@ -97,12 +97,82 @@ class DocumentExportService {
                 doc.moveDown(2);
             }
 
-            // Add content with basic formatting
+            // Add content with advanced formatting
             const lines = content.split('\n');
+            let i = 0;
 
-            for (const line of lines) {
+            while (i < lines.length) {
+                const line = lines[i];
+
                 if (!line.trim()) {
                     doc.moveDown(0.5);
+                    i++;
+                    continue;
+                }
+
+                // Check for markdown table
+                if (this.isTableLine(line)) {
+                    const { table, endIndex } = this.parseMarkdownTable(lines, i);
+                    if (table) {
+                        this.drawPDFTable(doc, table);
+                        doc.moveDown();
+                        i = endIndex;
+                        continue;
+                    }
+                }
+
+                // Images: ![alt](url)
+                const imageMatch = line.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+                if (imageMatch) {
+                    const [, altText, imageUrl] = imageMatch;
+                    doc.fontSize(10)
+                        .font('Helvetica-Oblique')
+                        .fillColor('#666666')
+                        .text(`[Image: ${altText || imageUrl}]`, {
+                            align: 'center'
+                        })
+                        .fillColor('#000000');
+                    doc.moveDown();
+                    i++;
+                    continue;
+                }
+
+                // Blockquote: > text
+                if (line.startsWith('> ')) {
+                    const quoteText = line.substring(2);
+                    doc.fontSize(11)
+                        .font('Helvetica-Oblique')
+                        .fillColor('#555555')
+                        .text(quoteText, {
+                            indent: 30,
+                            align: 'left'
+                        })
+                        .fillColor('#000000');
+                    doc.moveDown(0.5);
+                    i++;
+                    continue;
+                }
+
+                // Code block: ```
+                if (line.trim().startsWith('```')) {
+                    const codeLines = [];
+                    i++; // Skip opening ```
+                    while (i < lines.length && !lines[i].trim().startsWith('```')) {
+                        codeLines.push(lines[i]);
+                        i++;
+                    }
+                    i++; // Skip closing ```
+
+                    doc.fontSize(9)
+                        .font('Courier')
+                        .fillColor('#000000')
+                        .rect(doc.x - 5, doc.y - 5, doc.page.width - 100, codeLines.length * 12 + 10)
+                        .fillAndStroke('#F5F5F5', '#CCCCCC')
+                        .fillColor('#000000')
+                        .text(codeLines.join('\n'), {
+                            continued: false
+                        });
+                    doc.moveDown();
                     continue;
                 }
 
@@ -123,29 +193,17 @@ class DocumentExportService {
                         .text(line.substring(4), { align: 'left' });
                     doc.moveDown(0.3);
                 } else if (line.startsWith('- ') || line.startsWith('* ')) {
-                    // Bullet points
-                    doc.fontSize(11)
-                        .font('Helvetica')
-                        .text(`• ${line.substring(2)}`, {
-                            indent: 20,
-                            align: 'left'
-                        });
+                    // Bullet points with inline formatting
+                    this.writePDFLineWithFormatting(doc, `• ${line.substring(2)}`, { indent: 20 });
                 } else if (/^\d+\.\s/.test(line)) {
-                    // Numbered lists
-                    doc.fontSize(11)
-                        .font('Helvetica')
-                        .text(line, {
-                            indent: 20,
-                            align: 'left'
-                        });
+                    // Numbered lists with inline formatting
+                    this.writePDFLineWithFormatting(doc, line, { indent: 20 });
                 } else {
-                    // Regular paragraph
-                    doc.fontSize(11)
-                        .font('Helvetica')
-                        .text(line, {
-                            align: 'justify'
-                        });
+                    // Regular paragraph with inline formatting
+                    this.writePDFLineWithFormatting(doc, line, { align: 'justify' });
                 }
+
+                i++;
             }
 
             // Add footer with generation date
@@ -231,10 +289,85 @@ class DocumentExportService {
 
             // Process content lines
             const lines = content.split('\n');
+            let i = 0;
 
-            for (const line of lines) {
+            while (i < lines.length) {
+                const line = lines[i];
+
                 if (!line.trim()) {
                     sections.push(new Paragraph({ text: '' }));
+                    i++;
+                    continue;
+                }
+
+                // Check for markdown table
+                if (this.isTableLine(line)) {
+                    const { table, endIndex } = this.parseMarkdownTable(lines, i);
+                    if (table) {
+                        const tableElement = this.createDOCXTable(table);
+                        sections.push(tableElement);
+                        i = endIndex;
+                        continue;
+                    }
+                }
+
+                // Images: ![alt](url)
+                const imageMatch = line.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+                if (imageMatch) {
+                    const [, altText, imageUrl] = imageMatch;
+                    sections.push(
+                        new Paragraph({
+                            children: [
+                                new TextRun({
+                                    text: `[Image: ${altText || imageUrl}]`,
+                                    italics: true,
+                                    color: '666666'
+                                })
+                            ]
+                        })
+                    );
+                    i++;
+                    continue;
+                }
+
+                // Blockquote: > text
+                if (line.startsWith('> ')) {
+                    const runs = this.parseInlineFormatting(line.substring(2));
+                    sections.push(
+                        new Paragraph({
+                            children: runs,
+                            shading: { fill: 'F0F0F0' },
+                            indent: { left: 720 }, // 0.5 inch
+                            spacing: { before: 100, after: 100 }
+                        })
+                    );
+                    i++;
+                    continue;
+                }
+
+                // Code block: ```
+                if (line.trim().startsWith('```')) {
+                    const codeLines = [];
+                    i++; // Skip opening ```
+                    while (i < lines.length && !lines[i].trim().startsWith('```')) {
+                        codeLines.push(lines[i]);
+                        i++;
+                    }
+                    i++; // Skip closing ```
+
+                    sections.push(
+                        new Paragraph({
+                            children: [
+                                new TextRun({
+                                    text: codeLines.join('\n'),
+                                    font: 'Courier New',
+                                    size: 20
+                                })
+                            ],
+                            shading: { fill: 'F5F5F5' },
+                            spacing: { before: 100, after: 100 }
+                        })
+                    );
                     continue;
                 }
 
@@ -261,20 +394,23 @@ class DocumentExportService {
                         })
                     );
                 } else if (line.startsWith('- ') || line.startsWith('* ')) {
-                    // Bullet points
+                    // Bullet points with inline formatting
+                    const runs = this.parseInlineFormatting(line.substring(2));
                     sections.push(
                         new Paragraph({
-                            text: line.substring(2),
+                            children: runs,
                             bullet: {
                                 level: 0
                             }
                         })
                     );
                 } else if (/^\d+\.\s/.test(line)) {
-                    // Numbered lists
+                    // Numbered lists with inline formatting
+                    const text = line.replace(/^\d+\.\s/, '');
+                    const runs = this.parseInlineFormatting(text);
                     sections.push(
                         new Paragraph({
-                            text: line.replace(/^\d+\.\s/, ''),
+                            children: runs,
                             numbering: {
                                 reference: 'default-numbering',
                                 level: 0
@@ -282,10 +418,12 @@ class DocumentExportService {
                         })
                     );
                 } else {
-                    // Parse inline formatting (bold, italic)
+                    // Parse inline formatting (bold, italic, links, code)
                     const runs = this.parseInlineFormatting(line);
                     sections.push(new Paragraph({ children: runs }));
                 }
+
+                i++;
             }
 
             // Add footer
@@ -330,15 +468,219 @@ class DocumentExportService {
     }
 
     /**
-     * Parse inline formatting (bold, italic) for DOCX
+     * Draw table in PDF
+     */
+    drawPDFTable(doc, tableData) {
+        const { headers, rows } = tableData;
+        const tableTop = doc.y;
+        const cellPadding = 5;
+        const rowHeight = 25;
+        const tableWidth = doc.page.width - 100;
+        const colWidth = tableWidth / headers.length;
+
+        // Draw header row
+        let currentX = 50;
+        let currentY = tableTop;
+
+        // Header background
+        doc.rect(50, currentY, tableWidth, rowHeight)
+            .fillAndStroke('#E0E0E0', '#000000');
+
+        // Header text
+        headers.forEach((header, i) => {
+            doc.fontSize(11)
+                .font('Helvetica-Bold')
+                .fillColor('#000000')
+                .text(
+                    header,
+                    currentX + cellPadding,
+                    currentY + cellPadding,
+                    {
+                        width: colWidth - cellPadding * 2,
+                        align: 'left'
+                    }
+                );
+            currentX += colWidth;
+        });
+
+        currentY += rowHeight;
+
+        // Draw data rows
+        rows.forEach((row, rowIndex) => {
+            currentX = 50;
+
+            // Alternate row colors
+            const fillColor = rowIndex % 2 === 0 ? '#FFFFFF' : '#F9F9F9';
+            doc.rect(50, currentY, tableWidth, rowHeight)
+                .fillAndStroke(fillColor, '#CCCCCC');
+
+            row.forEach((cell, i) => {
+                doc.fontSize(10)
+                    .font('Helvetica')
+                    .fillColor('#000000')
+                    .text(
+                        cell,
+                        currentX + cellPadding,
+                        currentY + cellPadding,
+                        {
+                            width: colWidth - cellPadding * 2,
+                            align: 'left'
+                        }
+                    );
+                currentX += colWidth;
+            });
+
+            currentY += rowHeight;
+        });
+
+        // Move document cursor after table
+        doc.y = currentY;
+    }
+
+    /**
+     * Write PDF line with inline formatting (bold, italic, links, code)
+     */
+    writePDFLineWithFormatting(doc, text, options = {}) {
+        const defaultOptions = {
+            fontSize: 11,
+            align: 'left',
+            indent: 0
+        };
+        const opts = { ...defaultOptions, ...options };
+
+        let i = 0;
+        let currentText = '';
+        let startX = doc.x;
+        let startY = doc.y;
+
+        // Start with default font
+        doc.fontSize(opts.fontSize).font('Helvetica');
+
+        // Simple inline parsing for PDF
+        while (i < text.length) {
+            // Links: [text](url) - just show text in blue
+            if (text[i] === '[') {
+                const closeBracket = text.indexOf(']', i);
+                if (closeBracket !== -1 && text[closeBracket + 1] === '(') {
+                    const closeParen = text.indexOf(')', closeBracket + 2);
+                    if (closeParen !== -1) {
+                        if (currentText) {
+                            doc.text(currentText, { continued: true });
+                            currentText = '';
+                        }
+                        const linkText = text.substring(i + 1, closeBracket);
+                        doc.fillColor('#0563C1')
+                            .text(linkText, { continued: true, underline: true })
+                            .fillColor('#000000');
+                        i = closeParen + 1;
+                        continue;
+                    }
+                }
+            }
+
+            // Bold: **text**
+            if (text.substring(i, i + 2) === '**') {
+                if (currentText) {
+                    doc.text(currentText, { continued: true });
+                    currentText = '';
+                }
+                const endIndex = text.indexOf('**', i + 2);
+                if (endIndex !== -1) {
+                    const boldText = text.substring(i + 2, endIndex);
+                    doc.font('Helvetica-Bold')
+                        .text(boldText, { continued: true })
+                        .font('Helvetica');
+                    i = endIndex + 2;
+                    continue;
+                }
+            }
+
+            // Italic: *text*
+            if (text[i] === '*' && text[i + 1] !== '*') {
+                if (currentText) {
+                    doc.text(currentText, { continued: true });
+                    currentText = '';
+                }
+                const endIndex = text.indexOf('*', i + 1);
+                if (endIndex !== -1) {
+                    const italicText = text.substring(i + 1, endIndex);
+                    doc.font('Helvetica-Oblique')
+                        .text(italicText, { continued: true })
+                        .font('Helvetica');
+                    i = endIndex + 1;
+                    continue;
+                }
+            }
+
+            // Code: `text`
+            if (text[i] === '`') {
+                if (currentText) {
+                    doc.text(currentText, { continued: true });
+                    currentText = '';
+                }
+                const endIndex = text.indexOf('`', i + 1);
+                if (endIndex !== -1) {
+                    const codeText = text.substring(i + 1, endIndex);
+                    doc.font('Courier')
+                        .fontSize(opts.fontSize - 1)
+                        .fillColor('#666666')
+                        .text(codeText, { continued: true })
+                        .fillColor('#000000')
+                        .font('Helvetica')
+                        .fontSize(opts.fontSize);
+                    i = endIndex + 1;
+                    continue;
+                }
+            }
+
+            currentText += text[i];
+            i++;
+        }
+
+        // Write remaining text
+        if (currentText) {
+            doc.text(currentText, { ...opts, continued: false });
+        } else {
+            doc.text('', { ...opts, continued: false });
+        }
+    }
+
+    /**
+     * Parse inline formatting (bold, italic, links) for DOCX
      */
     parseInlineFormatting(text) {
-        const { TextRun } = require('docx');
+        const { TextRun, ExternalHyperlink } = require('docx');
         const runs = [];
         let currentText = '';
         let i = 0;
 
         while (i < text.length) {
+            // Links: [text](url)
+            if (text[i] === '[') {
+                const closeBracket = text.indexOf(']', i);
+                if (closeBracket !== -1 && text[closeBracket + 1] === '(') {
+                    const closeParen = text.indexOf(')', closeBracket + 2);
+                    if (closeParen !== -1) {
+                        if (currentText) {
+                            runs.push(new TextRun({ text: currentText }));
+                            currentText = '';
+                        }
+                        const linkText = text.substring(i + 1, closeBracket);
+                        const linkUrl = text.substring(closeBracket + 2, closeParen);
+                        runs.push(
+                            new TextRun({
+                                text: linkText,
+                                style: 'Hyperlink',
+                                color: '0563C1',
+                                underline: {}
+                            })
+                        );
+                        i = closeParen + 1;
+                        continue;
+                    }
+                }
+            }
+
             // Bold: **text**
             if (text.substring(i, i + 2) === '**') {
                 if (currentText) {
@@ -369,6 +711,25 @@ class DocumentExportService {
                 }
             }
 
+            // Code: `text`
+            if (text[i] === '`') {
+                if (currentText) {
+                    runs.push(new TextRun({ text: currentText }));
+                    currentText = '';
+                }
+                const endIndex = text.indexOf('`', i + 1);
+                if (endIndex !== -1) {
+                    const codeText = text.substring(i + 1, endIndex);
+                    runs.push(new TextRun({
+                        text: codeText,
+                        font: 'Courier New',
+                        shading: { fill: 'F0F0F0' }
+                    }));
+                    i = endIndex + 1;
+                    continue;
+                }
+            }
+
             currentText += text[i];
             i++;
         }
@@ -378,6 +739,112 @@ class DocumentExportService {
         }
 
         return runs.length > 0 ? runs : [new TextRun({ text })];
+    }
+
+    /**
+     * Check if line is a markdown table
+     */
+    isTableLine(line) {
+        return line.trim().startsWith('|') && line.trim().endsWith('|');
+    }
+
+    /**
+     * Parse markdown table
+     */
+    parseMarkdownTable(lines, startIndex) {
+        const tableLines = [];
+        let i = startIndex;
+
+        // Collect all table lines
+        while (i < lines.length && this.isTableLine(lines[i])) {
+            tableLines.push(lines[i]);
+            i++;
+        }
+
+        if (tableLines.length < 2) {
+            return { table: null, endIndex: startIndex };
+        }
+
+        // Parse header
+        const headerCells = tableLines[0]
+            .split('|')
+            .map(cell => cell.trim())
+            .filter(cell => cell);
+
+        // Skip separator line (|---|---|)
+        const dataRows = tableLines.slice(2).map(line =>
+            line.split('|')
+                .map(cell => cell.trim())
+                .filter(cell => cell)
+        );
+
+        return {
+            table: {
+                headers: headerCells,
+                rows: dataRows
+            },
+            endIndex: i
+        };
+    }
+
+    /**
+     * Create DOCX table from parsed markdown table
+     */
+    createDOCXTable(tableData) {
+        const { Table, TableRow, TableCell, Paragraph, TextRun, WidthType, BorderStyle } = require('docx');
+
+        const { headers, rows } = tableData;
+
+        // Create header row
+        const headerRow = new TableRow({
+            children: headers.map(header =>
+                new TableCell({
+                    children: [
+                        new Paragraph({
+                            children: [
+                                new TextRun({
+                                    text: header,
+                                    bold: true
+                                })
+                            ]
+                        })
+                    ],
+                    shading: { fill: 'E0E0E0' }
+                })
+            )
+        });
+
+        // Create data rows
+        const dataTableRows = rows.map(row =>
+            new TableRow({
+                children: row.map(cell =>
+                    new TableCell({
+                        children: [
+                            new Paragraph({
+                                children: this.parseInlineFormatting(cell)
+                            })
+                        ]
+                    })
+                )
+            })
+        );
+
+        // Create table
+        return new Table({
+            rows: [headerRow, ...dataTableRows],
+            width: {
+                size: 100,
+                type: WidthType.PERCENTAGE
+            },
+            borders: {
+                top: { style: BorderStyle.SINGLE, size: 1 },
+                bottom: { style: BorderStyle.SINGLE, size: 1 },
+                left: { style: BorderStyle.SINGLE, size: 1 },
+                right: { style: BorderStyle.SINGLE, size: 1 },
+                insideHorizontal: { style: BorderStyle.SINGLE, size: 1 },
+                insideVertical: { style: BorderStyle.SINGLE, size: 1 }
+            }
+        });
     }
 
     /**
