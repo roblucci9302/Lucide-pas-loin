@@ -617,9 +617,9 @@ export class AskView extends LitElement {
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(0, 122, 255, 0.1);
-            border: 1px solid rgba(0, 122, 255, 0.3);
-            color: rgba(0, 122, 255, 1);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.8);
             border-radius: 50%;
             width: 36px;
             height: 36px;
@@ -632,8 +632,9 @@ export class AskView extends LitElement {
         }
 
         .upload-btn:hover {
-            background: rgba(0, 122, 255, 0.2);
-            border-color: rgba(0, 122, 255, 0.5);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.25);
+            color: rgba(255, 255, 255, 1);
             transform: scale(1.05);
         }
 

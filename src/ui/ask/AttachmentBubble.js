@@ -35,8 +35,8 @@ export class AttachmentBubble extends LitElement {
             align-items: center;
             gap: 10px;
             padding: 8px 12px;
-            background: rgba(0, 122, 255, 0.1);
-            border: 1px solid rgba(0, 122, 255, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 8px;
             transition: all 0.2s ease;
         }
