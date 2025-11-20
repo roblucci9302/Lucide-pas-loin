@@ -644,6 +644,17 @@ export class BrowserView extends LitElement {
         // Setup keyboard shortcuts
         document.addEventListener('keydown', this.handleBrowserKeydown);
 
+        // Listen for navigation requests from main process
+        if (window.api && window.api.browserView) {
+            this._navigationListener = (event, url) => {
+                console.log('[BrowserView] Received navigation request:', url);
+                if (url) {
+                    this.navigateTo(url);
+                }
+            };
+            window.api.browserView.onNavigateTo(this._navigationListener);
+        }
+
         // Setup webview listeners après le premier render
         this.updateComplete.then(() => {
             this.setupWebviewListeners();
@@ -656,6 +667,12 @@ export class BrowserView extends LitElement {
 
         // Cleanup
         document.removeEventListener('keydown', this.handleBrowserKeydown);
+
+        // Remove IPC listener
+        if (window.api && window.api.browserView && this._navigationListener) {
+            window.api.browserView.removeOnNavigateTo(this._navigationListener);
+        }
+
         this.cleanupWebviewListeners();
     }
 

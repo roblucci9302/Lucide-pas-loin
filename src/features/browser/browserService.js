@@ -64,13 +64,12 @@ class BrowserService {
 
             console.log('[BrowserService] Browser view loaded successfully');
 
-            // Si une URL spécifique est demandée, on peut l'envoyer au renderer après le chargement
-            if (url) {
-                askWindow.webContents.once('did-finish-load', () => {
-                    console.log('[BrowserService] Sending initial URL to browser:', url);
-                    askWindow.webContents.send('browser:navigate-to', url);
-                });
-            }
+            // Toujours envoyer une URL (spécifique ou par défaut)
+            const targetUrl = url || this.initialUrl;
+            askWindow.webContents.once('did-finish-load', () => {
+                console.log('[BrowserService] Sending initial URL to browser:', targetUrl);
+                askWindow.webContents.send('browser:navigate-to', targetUrl);
+            });
 
             return { success: true };
 

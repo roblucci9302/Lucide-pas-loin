@@ -178,6 +178,13 @@ contextBridge.exposeInMainWorld('api', {
     removeOnOpenUrl: (callback) => ipcRenderer.removeListener('ask:open-url', callback)
   },
 
+  // src/ui/browser/BrowserView.js
+  browserView: {
+    // Listeners
+    onNavigateTo: (callback) => ipcRenderer.on('browser:navigate-to', callback),
+    removeOnNavigateTo: (callback) => ipcRenderer.removeListener('browser:navigate-to', callback)
+  },
+
   // src/ui/listen/ListenView.js
   listenView: {
     // Window Management
