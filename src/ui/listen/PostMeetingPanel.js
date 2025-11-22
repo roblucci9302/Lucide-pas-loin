@@ -1,4 +1,5 @@
 import { html, css, LitElement } from '../assets/lit-core-2.7.4.min.js';
+import './ParticipantModal.js';
 
 /**
  * Post-Meeting Panel Component
@@ -393,6 +394,7 @@ export class PostMeetingPanel extends LitElement {
         isLoading: { type: Boolean },
         isGenerating: { type: Boolean },
         message: { type: Object }, // { type: 'success' | 'error', text: string }
+        showParticipantModal: { type: Boolean },
     };
 
     constructor() {
@@ -404,6 +406,7 @@ export class PostMeetingPanel extends LitElement {
         this.isLoading = false;
         this.isGenerating = false;
         this.message = null;
+        this.showParticipantModal = false;
 
         // Setup IPC listeners
         this._setupListeners();
@@ -519,6 +522,35 @@ export class PostMeetingPanel extends LitElement {
         this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
     }
 
+    handleOpenParticipantModal() {
+        this.showParticipantModal = true;
+    }
+
+    handleCloseParticipantModal() {
+        this.showParticipantModal = false;
+    }
+
+    async handleParticipantsSaved(event) {
+        const { sessionId } = event.detail;
+
+        this.message = { type: 'success', text: '✅ Participants enregistrés avec succès' };
+        setTimeout(() => { this.message = null; }, 3000);
+
+        // Reload meeting notes if they exist to update with participant names
+        if (this.meetingNotes) {
+            try {
+                await window.api.participants.updateNotesWithParticipants(sessionId, this.meetingNotes.id);
+                await this.loadMeetingNotes();
+                this.message = { type: 'success', text: '✅ Notes mises à jour avec les participants' };
+                setTimeout(() => { this.message = null; }, 3000);
+            } catch (error) {
+                console.error('[PostMeetingPanel] Error updating notes with participants:', error);
+            }
+        }
+
+        this.showParticipantModal = false;
+    }
+
     renderSummaryTab() {
         if (!this.meetingNotes) {
             return html`
@@ -536,16 +568,29 @@ export class PostMeetingPanel extends LitElement {
 
         return html`
             <div class="summary-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h3 class="section-title" style="margin: 0;">👥 Attribution des participants</h3>
+                    <button
+                        class="export-button"
+                        style="padding: 6px 12px; font-size: 10px;"
+                        @click=${this.handleOpenParticipantModal}
+                    >
+                        ✏️ Assigner
+                    </button>
+                </div>
+                ${data.participants && data.participants.length > 0 ? html`
+                    <div class="summary-text">${data.participants.join(', ')}</div>
+                ` : html`
+                    <div class="summary-text" style="color: var(--color-white-60); font-style: italic;">
+                        Aucun participant assigné. Cliquez sur "Assigner" pour attribuer les speakers.
+                    </div>
+                `}
+            </div>
+
+            <div class="summary-section">
                 <h3 class="section-title">📝 Résumé exécutif</h3>
                 <div class="summary-text">${data.executiveSummary || 'Aucun résumé disponible'}</div>
             </div>
-
-            ${data.participants && data.participants.length > 0 ? html`
-                <div class="summary-section">
-                    <h3 class="section-title">👥 Participants</h3>
-                    <div class="summary-text">${data.participants.join(', ')}</div>
-                </div>
-            ` : ''}
 
             ${data.keyPoints && data.keyPoints.length > 0 ? html`
                 <div class="summary-section">
@@ -752,6 +797,14 @@ export class PostMeetingPanel extends LitElement {
                     `}
                 </div>
             </div>
+
+            ${this.showParticipantModal ? html`
+                <participant-modal
+                    .sessionId=${this.sessionId}
+                    @close=${this.handleCloseParticipantModal}
+                    @save=${this.handleParticipantsSaved}
+                ></participant-modal>
+            ` : ''}
         `;
     }
 }

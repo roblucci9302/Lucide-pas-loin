@@ -367,12 +367,30 @@ const LATEST_SCHEMA = {
             // Task details
             { name: 'task_description', type: 'TEXT NOT NULL' }, // What needs to be done
             { name: 'assigned_to', type: 'TEXT' }, // Speaker name or 'Team' or 'TBD'
+            { name: 'assigned_to_email', type: 'TEXT' }, // Phase 2: Email of assignee
             { name: 'deadline', type: 'TEXT' }, // ISO date or 'TBD' or timeframe
             { name: 'priority', type: 'TEXT DEFAULT \'medium\'' }, // 'low', 'medium', 'high'
             { name: 'context', type: 'TEXT' }, // Why this task matters
             // Status tracking
             { name: 'status', type: 'TEXT DEFAULT \'pending\'' }, // 'pending', 'in_progress', 'completed', 'cancelled'
             { name: 'completed_at', type: 'INTEGER' }, // When marked complete
+            // Metadata
+            { name: 'created_at', type: 'INTEGER' },
+            { name: 'updated_at', type: 'INTEGER' },
+            { name: 'sync_state', type: 'TEXT DEFAULT \'clean\'' }
+        ]
+    },
+    // Phase 2: Meeting Assistant - Participant Attribution
+    session_participants: {
+        columns: [
+            { name: 'id', type: 'TEXT PRIMARY KEY' },
+            { name: 'session_id', type: 'TEXT NOT NULL' }, // Foreign key to sessions
+            { name: 'speaker_label', type: 'TEXT NOT NULL' }, // 'Me' or 'Them' (as detected in transcripts)
+            // Participant details
+            { name: 'participant_name', type: 'TEXT NOT NULL' }, // Full name
+            { name: 'participant_email', type: 'TEXT' }, // Email address (optional)
+            { name: 'participant_role', type: 'TEXT' }, // Job title or role (optional)
+            { name: 'participant_company', type: 'TEXT' }, // Company name (optional)
             // Metadata
             { name: 'created_at', type: 'INTEGER' },
             { name: 'updated_at', type: 'INTEGER' },

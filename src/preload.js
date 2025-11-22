@@ -520,5 +520,55 @@ contextBridge.exposeInMainWorld('api', {
     removeOnExportComplete: (callback) => ipcRenderer.removeListener('post-meeting:export-complete', callback),
     onError: (callback) => ipcRenderer.on('post-meeting:error', (event, data) => callback(data)),
     removeOnError: (callback) => ipcRenderer.removeListener('post-meeting:error', callback)
+  },
+
+  // Phase 2 - Participant Attribution
+  participants: {
+    // Detect speakers from session transcripts
+    detectSpeakers: (sessionId) => ipcRenderer.invoke('participants:detect-speakers', sessionId)
+      .then(result => result.success ? result.speakers : []),
+
+    // Get participants for a session
+    getSessionParticipants: (sessionId) => ipcRenderer.invoke('participants:get-session-participants', sessionId)
+      .then(result => result.success ? result.participants : []),
+
+    // Save participants for a session
+    saveParticipants: (sessionId, participantsData) => ipcRenderer.invoke('participants:save-participants', sessionId, participantsData)
+      .then(result => {
+        if (!result.success) throw new Error(result.error);
+        return result;
+      }),
+
+    // Get frequent participants for autocomplete
+    getFrequentParticipants: (limit = 10) => ipcRenderer.invoke('participants:get-frequent', limit)
+      .then(result => result.success ? result.participants : []),
+
+    // Check if participants are assigned
+    hasParticipantsAssigned: (sessionId) => ipcRenderer.invoke('participants:has-assigned', sessionId)
+      .then(result => result.success ? result.hasAssigned : false),
+
+    // Get participant mapping (speaker label -> participant info)
+    getParticipantMapping: (sessionId) => ipcRenderer.invoke('participants:get-mapping', sessionId)
+      .then(result => result.success ? result.mapping : {}),
+
+    // Delete participants for a session
+    deleteSessionParticipants: (sessionId) => ipcRenderer.invoke('participants:delete-session-participants', sessionId)
+      .then(result => {
+        if (!result.success) throw new Error(result.error);
+        return result;
+      }),
+
+    // Update meeting notes with participant names
+    updateNotesWithParticipants: (sessionId, meetingNoteId) => ipcRenderer.invoke('participants:update-notes', sessionId, meetingNoteId)
+      .then(result => {
+        if (!result.success) throw new Error(result.error);
+        return result;
+      }),
+
+    // Listeners
+    onParticipantsSaved: (callback) => ipcRenderer.on('participants:saved', (event, data) => callback(data)),
+    removeOnParticipantsSaved: (callback) => ipcRenderer.removeListener('participants:saved', callback),
+    onError: (callback) => ipcRenderer.on('participants:error', (event, data) => callback(data)),
+    removeOnError: (callback) => ipcRenderer.removeListener('participants:error', callback)
   }
 });
