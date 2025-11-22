@@ -2,6 +2,7 @@ import { html, css, LitElement } from '../assets/lit-core-2.7.4.min.js';
 import './stt/SttView.js';
 import './summary/SummaryView.js';
 import './response/ResponseView.js';
+import './LiveInsightsPanel.js'; // Phase 3
 
 export class ListenView extends LitElement {
     static styles = css`
@@ -753,6 +754,11 @@ export class ListenView extends LitElement {
                 <response-view
                     .visible=${this.viewMode === 'suggestions'}
                 ></response-view>
+
+                <!-- Phase 3: Live Insights Panel -->
+                <live-insights-panel
+                    style="display: ${this.viewMode === 'insights' ? 'block' : 'none'}"
+                ></live-insights-panel>
             </div>
         `;
     }
