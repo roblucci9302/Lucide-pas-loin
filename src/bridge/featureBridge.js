@@ -13,6 +13,12 @@ const eventsBridge = require('./modules/eventsBridge');
 const profileBridge = require('./modules/profileBridge');
 const promptBridge = require('./modules/promptBridge'); // Phase WOW 1 - Jour 5
 const postMeetingBridge = require('./modules/postMeetingBridge'); // Phase 1 - Meeting Assistant
+const participantBridge = require('./modules/participantBridge'); // Phase 2 - Participant Attribution
+const emailBridge = require('./modules/emailBridge'); // Phase 2 - Email Generation
+const taskBridge = require('./modules/taskBridge'); // Phase 2.3 - Task Management
+const liveInsightsBridge = require('./modules/liveInsightsBridge'); // Phase 3 - Live Insights
+const notificationBridge = require('./modules/notificationBridge'); // Phase 3.3 - Notifications
+const analyticsBridge = require('./modules/analyticsBridge'); // Phase 4 - Analytics
 
 module.exports = {
     /**
@@ -32,6 +38,12 @@ module.exports = {
         profileBridge.initialize();
         promptBridge.initialize(); // Phase WOW 1 - Jour 5
         postMeetingBridge.initialize(); // Phase 1 - Meeting Assistant
+        participantBridge.initialize(); // Phase 2 - Participant Attribution
+        emailBridge.initialize(); // Phase 2 - Email Generation
+        taskBridge.initialize(); // Phase 2.3 - Task Management
+        liveInsightsBridge.initialize(); // Phase 3 - Live Insights
+        notificationBridge.initialize(); // Phase 3.3 - Notifications
+        analyticsBridge.initialize(); // Phase 4 - Analytics
 
         console.log('[FeatureBridge] All bridges initialized successfully');
     },

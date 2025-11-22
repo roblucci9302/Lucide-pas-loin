@@ -2,6 +2,9 @@ const { BrowserWindow } = require('electron');
 const SttService = require('./stt/sttService');
 const SummaryService = require('./summary/summaryService');
 const responseService = require('./response/responseService');
+const liveInsightsService = require('./liveInsights/liveInsightsService');
+const { liveInsightsRepository } = require('./liveInsights/repositories');
+const notificationService = require('./liveInsights/notificationService'); // Phase 3.3
 const authService = require('../common/services/authService');
 const sessionRepository = require('../common/repositories/session');
 const sttRepository = require('./stt/repositories');
@@ -50,6 +53,47 @@ class ListenService {
                 console.error('❌ AI suggestions error:', error.message);
                 this.sendToRenderer('ai-response-error', { error: error.message });
             }
+        });
+
+        // Live Insights service callbacks (Phase 3)
+        liveInsightsService.on('insight-detected', (insight) => {
+            console.log(`[LiveInsights] ${insight.priority.toUpperCase()}: ${insight.title}`);
+
+            // Send to renderer for real-time display
+            this.sendToRenderer('insight-detected', { insight });
+
+            // Save to database
+            this._saveInsightToDatabase(insight);
+        });
+
+        liveInsightsService.on('insight-dismissed', (insight) => {
+            console.log(`[LiveInsights] Dismissed: ${insight.title}`);
+            this.sendToRenderer('insight-dismissed', { insightId: insight.id });
+        });
+
+        // Notification service callbacks (Phase 3.3)
+        notificationService.on('notification', (notification) => {
+            this.sendToRenderer('notification', notification);
+        });
+
+        notificationService.on('notification-read', (notification) => {
+            this.sendToRenderer('notification-read', notification);
+        });
+
+        notificationService.on('all-notifications-read', () => {
+            this.sendToRenderer('all-notifications-read', {});
+        });
+
+        notificationService.on('notification-expired', (notificationId) => {
+            this.sendToRenderer('notification-expired', notificationId);
+        });
+
+        notificationService.on('all-notifications-cleared', () => {
+            this.sendToRenderer('all-notifications-cleared', {});
+        });
+
+        notificationService.on('preferences-updated', (preferences) => {
+            this.sendToRenderer('notification-preferences-updated', { preferences });
         });
     }
 
@@ -123,6 +167,9 @@ class ListenService {
         // Add to response service for real-time suggestions
         responseService.addConversationTurn(speaker, text);
 
+        // Process for live insights (Phase 3)
+        liveInsightsService.processConversationTurn(speaker, text);
+
         // Sauvegarder la dernière transcription si c'est l'utilisateur qui parle
         if (speaker === 'Me') {
             this.lastTranscription = text;
@@ -170,6 +217,9 @@ class ListenService {
 
             // Set session ID for summary service
             this.summaryService.setSessionId(this.currentSessionId);
+
+            // Set session ID for live insights service (Phase 3)
+            liveInsightsService.setSessionId(this.currentSessionId);
 
             // Reset conversation history
             this.summaryService.resetConversationHistory();
@@ -276,6 +326,7 @@ class ListenService {
             this.currentSessionId = null;
             this.summaryService.resetConversationHistory();
             responseService.resetConversationHistory();
+            liveInsightsService.reset(); // Phase 3
 
             console.log('Listen service session closed.');
             return { success: true };
@@ -304,6 +355,25 @@ class ListenService {
 
     getRecentTranscriptions(count = 3) {
         return this.summaryService.getConversationHistory().slice(-count);
+    }
+
+    /**
+     * Save insight to database (Phase 3)
+     * @private
+     */
+    async _saveInsightToDatabase(insight) {
+        try {
+            const uid = authService.getCurrentUserId();
+
+            await liveInsightsRepository.create({
+                ...insight,
+                user_id: uid
+            });
+
+            console.log(`[LiveInsights] Saved to DB: ${insight.type} - ${insight.title}`);
+        } catch (error) {
+            console.error('[LiveInsights] Failed to save to database:', error);
+        }
     }
 
     _createHandler(asyncFn, successMessage, errorMessage) {

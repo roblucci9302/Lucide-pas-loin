@@ -2,6 +2,8 @@ import { html, css, LitElement } from '../assets/lit-core-2.7.4.min.js';
 import './stt/SttView.js';
 import './summary/SummaryView.js';
 import './response/ResponseView.js';
+import './LiveInsightsPanel.js'; // Phase 3
+import './NotificationCenter.js'; // Phase 3.3
 
 export class ListenView extends LitElement {
     static styles = css`
@@ -700,6 +702,7 @@ export class ListenView extends LitElement {
                         <span class="bar-left-text-content ${this.isAnimating ? 'slide-in' : ''}">${displayText}</span>
                     </div>
                     <div class="bar-controls">
+                        <notification-center></notification-center>
                         <button class="close-button" @click=${this.handleCloseWindow} title="Fermer">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <line x1="18" y1="6" x2="6" y2="18" />
@@ -753,6 +756,11 @@ export class ListenView extends LitElement {
                 <response-view
                     .visible=${this.viewMode === 'suggestions'}
                 ></response-view>
+
+                <!-- Phase 3: Live Insights Panel -->
+                <live-insights-panel
+                    style="display: ${this.viewMode === 'insights' ? 'block' : 'none'}"
+                ></live-insights-panel>
             </div>
         `;
     }

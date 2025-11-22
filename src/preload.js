@@ -194,6 +194,10 @@ contextBridge.exposeInMainWorld('api', {
     adjustWindowHeight: (winName, height) => ipcRenderer.invoke('adjust-window-height', { winName, height }),
     hideListenWindow: () => ipcRenderer.invoke('listen:hideWindow'),
 
+    // Phase 1 - Meeting Assistant
+    getRecentListenSession: () => ipcRenderer.invoke('listen:getRecentListenSession'),
+    openPostMeetingWindow: (sessionId) => ipcRenderer.invoke('listen:openPostMeetingWindow', sessionId),
+
     // Listeners
     onSessionStateChanged: (callback) => ipcRenderer.on('session-state-changed', callback),
     removeOnSessionStateChanged: (callback) => ipcRenderer.removeListener('session-state-changed', callback)
@@ -508,11 +512,309 @@ contextBridge.exposeInMainWorld('api', {
     hasNotes: (sessionId) => ipcRenderer.invoke('post-meeting:has-notes', sessionId),
 
     // Listeners
+    onSetSession: (callback) => ipcRenderer.on('post-meeting:set-session', (event, sessionId) => callback(sessionId)),
+    removeOnSetSession: (callback) => ipcRenderer.removeListener('post-meeting:set-session', callback),
     onNotesGenerated: (callback) => ipcRenderer.on('post-meeting:notes-generated', (event, data) => callback(data)),
     removeOnNotesGenerated: (callback) => ipcRenderer.removeListener('post-meeting:notes-generated', callback),
     onExportComplete: (callback) => ipcRenderer.on('post-meeting:export-complete', (event, data) => callback(data)),
     removeOnExportComplete: (callback) => ipcRenderer.removeListener('post-meeting:export-complete', callback),
     onError: (callback) => ipcRenderer.on('post-meeting:error', (event, data) => callback(data)),
     removeOnError: (callback) => ipcRenderer.removeListener('post-meeting:error', callback)
+  },
+
+  // Phase 2 - Participant Attribution
+  participants: {
+    // Detect speakers from session transcripts
+    detectSpeakers: (sessionId) => ipcRenderer.invoke('participants:detect-speakers', sessionId)
+      .then(result => result.success ? result.speakers : []),
+
+    // Get participants for a session
+    getSessionParticipants: (sessionId) => ipcRenderer.invoke('participants:get-session-participants', sessionId)
+      .then(result => result.success ? result.participants : []),
+
+    // Save participants for a session
+    saveParticipants: (sessionId, participantsData) => ipcRenderer.invoke('participants:save-participants', sessionId, participantsData)
+      .then(result => {
+        if (!result.success) throw new Error(result.error);
+        return result;
+      }),
+
+    // Get frequent participants for autocomplete
+    getFrequentParticipants: (limit = 10) => ipcRenderer.invoke('participants:get-frequent', limit)
+      .then(result => result.success ? result.participants : []),
+
+    // Check if participants are assigned
+    hasParticipantsAssigned: (sessionId) => ipcRenderer.invoke('participants:has-assigned', sessionId)
+      .then(result => result.success ? result.hasAssigned : false),
+
+    // Get participant mapping (speaker label -> participant info)
+    getParticipantMapping: (sessionId) => ipcRenderer.invoke('participants:get-mapping', sessionId)
+      .then(result => result.success ? result.mapping : {}),
+
+    // Delete participants for a session
+    deleteSessionParticipants: (sessionId) => ipcRenderer.invoke('participants:delete-session-participants', sessionId)
+      .then(result => {
+        if (!result.success) throw new Error(result.error);
+        return result;
+      }),
+
+    // Update meeting notes with participant names
+    updateNotesWithParticipants: (sessionId, meetingNoteId) => ipcRenderer.invoke('participants:update-notes', sessionId, meetingNoteId)
+      .then(result => {
+        if (!result.success) throw new Error(result.error);
+        return result;
+      }),
+
+    // Listeners
+    onParticipantsSaved: (callback) => ipcRenderer.on('participants:saved', (event, data) => callback(data)),
+    removeOnParticipantsSaved: (callback) => ipcRenderer.removeListener('participants:saved', callback),
+    onError: (callback) => ipcRenderer.on('participants:error', (event, data) => callback(data)),
+    removeOnError: (callback) => ipcRenderer.removeListener('participants:error', callback)
+  },
+
+  // Phase 2.2 - Email Generation
+  email: {
+    // Generate follow-up email using AI
+    generateFollowUp: (sessionId, options = {}) => ipcRenderer.invoke('email:generate-followup', sessionId, options)
+      .then(result => {
+        if (!result.success) throw new Error(result.error);
+        return result.emailData;
+      }),
+
+    // Generate quick email template (without AI)
+    generateTemplate: (sessionId, templateType = 'brief') => ipcRenderer.invoke('email:generate-template', sessionId, templateType)
+      .then(result => {
+        if (!result.success) throw new Error(result.error);
+        return result.emailData;
+      }),
+
+    // Copy email to clipboard
+    copyToClipboard: (content, format = 'text') => ipcRenderer.invoke('email:copy-to-clipboard', content, format)
+      .then(result => result.success),
+
+    // Open email in default mail client
+    openInMailClient: (emailData) => ipcRenderer.invoke('email:open-in-mail-client', emailData)
+      .then(result => result.success)
+  },
+
+  // Phase 2.3 - Advanced Task Management
+  tasks: {
+    // Auto-assign emails from participants
+    autoAssignEmails: (sessionId) => ipcRenderer.invoke('tasks:auto-assign-emails', sessionId)
+      .then(result => result),
+
+    // Update task
+    updateTask: (taskId, updates) => ipcRenderer.invoke('tasks:update', taskId, updates)
+      .then(result => {
+        if (!result.success) throw new Error(result.error);
+        return result;
+      }),
+
+    // Change task status
+    changeStatus: (taskId, newStatus, metadata = {}) => ipcRenderer.invoke('tasks:change-status', taskId, newStatus, metadata)
+      .then(result => {
+        if (!result.success) throw new Error(result.error);
+        return result;
+      }),
+
+    // Get tasks by status
+    getByStatus: (sessionId, status) => ipcRenderer.invoke('tasks:get-by-status', sessionId, status)
+      .then(result => result.success ? result.tasks : []),
+
+    // Get overdue tasks
+    getOverdue: (sessionId = null) => ipcRenderer.invoke('tasks:get-overdue', sessionId)
+      .then(result => result.success ? result.tasks : []),
+
+    // Get upcoming tasks
+    getUpcoming: (days = 7, sessionId = null) => ipcRenderer.invoke('tasks:get-upcoming', days, sessionId)
+      .then(result => result.success ? result.tasks : []),
+
+    // Set reminder
+    setReminder: (taskId, reminderDate) => ipcRenderer.invoke('tasks:set-reminder', taskId, reminderDate)
+      .then(result => {
+        if (!result.success) throw new Error(result.error);
+        return result;
+      }),
+
+    // Add tags
+    addTags: (taskId, tags) => ipcRenderer.invoke('tasks:add-tags', taskId, tags)
+      .then(result => {
+        if (!result.success) throw new Error(result.error);
+        return result;
+      }),
+
+    // Get statistics
+    getStatistics: (sessionId) => ipcRenderer.invoke('tasks:get-statistics', sessionId)
+      .then(result => result.success ? result.stats : null),
+
+    // Export to CSV
+    exportToCSV: (sessionId) => ipcRenderer.invoke('tasks:export-csv', sessionId)
+      .then(result => {
+        if (!result.success) throw new Error(result.error);
+        return result;
+      }),
+
+    // Phase 2.4 - Follow-up Suggestions
+    generateSuggestions: (sessionId, options = {}) => ipcRenderer.invoke('tasks:generate-suggestions', sessionId, options)
+      .then(result => result.success ? result.suggestions : []),
+
+    acceptSuggestion: (sessionId, suggestion) => ipcRenderer.invoke('tasks:accept-suggestion', sessionId, suggestion)
+      .then(result => result),
+
+    dismissSuggestion: (sessionId, suggestionType) => ipcRenderer.invoke('tasks:dismiss-suggestion', sessionId, suggestionType)
+      .then(result => result)
+  },
+
+  // Phase 3: Live Insights - Real-time Meeting Intelligence
+  insights: {
+    // Get all insights for current session
+    getAll: () => ipcRenderer.invoke('insights:get-all')
+      .then(result => result.success ? result.insights : []),
+
+    // Get active (non-dismissed) insights
+    getActive: () => ipcRenderer.invoke('insights:get-active')
+      .then(result => result.success ? result.insights : []),
+
+    // Get insights by type
+    getByType: (type) => ipcRenderer.invoke('insights:get-by-type', type)
+      .then(result => result.success ? result.insights : []),
+
+    // Get insights by priority
+    getByPriority: (priority) => ipcRenderer.invoke('insights:get-by-priority', priority)
+      .then(result => result.success ? result.insights : []),
+
+    // Get recent insights
+    getRecent: (count = 5) => ipcRenderer.invoke('insights:get-recent', count)
+      .then(result => result.success ? result.insights : []),
+
+    // Get high priority insights
+    getHighPriority: () => ipcRenderer.invoke('insights:get-high-priority')
+      .then(result => result.success ? result.insights : []),
+
+    // Get session statistics
+    getStatistics: () => ipcRenderer.invoke('insights:get-statistics')
+      .then(result => result.success ? result.stats : null),
+
+    // Dismiss an insight
+    dismiss: (insightId) => ipcRenderer.invoke('insights:dismiss', insightId)
+      .then(result => result),
+
+    // Save insight to database
+    save: (insightData) => ipcRenderer.invoke('insights:save', insightData)
+      .then(result => result),
+
+    // Get saved insights from database by session
+    getFromDb: (sessionId) => ipcRenderer.invoke('insights:get-from-db', sessionId)
+      .then(result => result.success ? result.insights : []),
+
+    // Get database statistics for a session
+    getDbStatistics: (sessionId) => ipcRenderer.invoke('insights:get-db-statistics', sessionId)
+      .then(result => result.success ? result.stats : null),
+
+    // Phase 3.4: AI-Powered Analysis
+    // Generate intelligent summary of conversation
+    generateSummary: () => ipcRenderer.invoke('insights:generate-summary')
+      .then(result => result.success ? result.summary : null),
+
+    // Get context summary from AI analysis
+    getContextSummary: () => ipcRenderer.invoke('insights:get-context-summary')
+      .then(result => result.success ? result.context : null),
+
+    // Event listeners
+    onInsightDetected: (callback) => ipcRenderer.on('insight-detected', (event, data) => callback(data)),
+    removeOnInsightDetected: (callback) => ipcRenderer.removeListener('insight-detected', callback),
+
+    onInsightDismissed: (callback) => ipcRenderer.on('insight-dismissed', (event, data) => callback(data)),
+    removeOnInsightDismissed: (callback) => ipcRenderer.removeListener('insight-dismissed', callback)
+  },
+
+  // Phase 3.3: Notifications
+  notifications: {
+    // Get all notifications
+    getAll: () => ipcRenderer.invoke('notifications:get-all')
+      .then(result => result.success ? result.notifications : []),
+
+    // Get unread notifications
+    getUnread: () => ipcRenderer.invoke('notifications:get-unread')
+      .then(result => result.success ? result.notifications : []),
+
+    // Get unread count
+    getUnreadCount: () => ipcRenderer.invoke('notifications:get-unread-count')
+      .then(result => result.success ? result.count : 0),
+
+    // Mark notification as read
+    markAsRead: (notificationId) => ipcRenderer.invoke('notifications:mark-as-read', notificationId)
+      .then(result => result.success),
+
+    // Mark all as read
+    markAllAsRead: () => ipcRenderer.invoke('notifications:mark-all-as-read')
+      .then(result => result.success),
+
+    // Clear notification
+    clear: (notificationId) => ipcRenderer.invoke('notifications:clear', notificationId)
+      .then(result => result.success),
+
+    // Clear all notifications
+    clearAll: () => ipcRenderer.invoke('notifications:clear-all')
+      .then(result => result.success),
+
+    // Get preferences
+    getPreferences: () => ipcRenderer.invoke('notifications:get-preferences')
+      .then(result => result.success ? result.preferences : null),
+
+    // Update preferences
+    updatePreferences: (preferences) => ipcRenderer.invoke('notifications:update-preferences', preferences)
+      .then(result => result.success),
+
+    // Enable/disable notifications
+    setEnabled: (enabled) => ipcRenderer.invoke('notifications:set-enabled', enabled)
+      .then(result => result.success),
+
+    // Get by type
+    getByType: (type) => ipcRenderer.invoke('notifications:get-by-type', type)
+      .then(result => result.success ? result.notifications : []),
+
+    // Get by priority
+    getByPriority: (priority) => ipcRenderer.invoke('notifications:get-by-priority', priority)
+      .then(result => result.success ? result.notifications : []),
+
+    // Event listeners
+    onNotification: (callback) => ipcRenderer.on('notification', (event, data) => callback(data)),
+    removeOnNotification: (callback) => ipcRenderer.removeListener('notification', callback),
+
+    onNotificationRead: (callback) => ipcRenderer.on('notification-read', (event, data) => callback(data)),
+    removeOnNotificationRead: (callback) => ipcRenderer.removeListener('notification-read', callback),
+
+    onAllRead: (callback) => ipcRenderer.on('all-notifications-read', (event) => callback()),
+    removeOnAllRead: (callback) => ipcRenderer.removeListener('all-notifications-read', callback),
+
+    onNotificationCleared: (callback) => ipcRenderer.on('notification-expired', (event, data) => callback(data)),
+    removeOnNotificationCleared: (callback) => ipcRenderer.removeListener('notification-expired', callback),
+
+    onAllCleared: (callback) => ipcRenderer.on('all-notifications-cleared', (event) => callback()),
+    removeOnAllCleared: (callback) => ipcRenderer.removeListener('all-notifications-cleared', callback)
+  },
+
+  // Phase 4: Analytics
+  analytics: {
+    // Get overview statistics
+    getOverview: (options = {}) => ipcRenderer.invoke('analytics:get-overview', options)
+      .then(result => result.success ? result.stats : null),
+
+    // Get session analytics
+    getSession: (sessionId) => ipcRenderer.invoke('analytics:get-session', sessionId)
+      .then(result => result.success ? result.analytics : null),
+
+    // Get trending topics
+    getTrendingTopics: (options = {}) => ipcRenderer.invoke('analytics:get-trending-topics', options)
+      .then(result => result.success ? result.topics : []),
+
+    // Get productivity trends
+    getProductivityTrends: (options = {}) => ipcRenderer.invoke('analytics:get-productivity-trends', options)
+      .then(result => result.success ? result.trends : []),
+
+    // Compare sessions
+    compareSessions: (sessionId1, sessionId2) => ipcRenderer.invoke('analytics:compare-sessions', sessionId1, sessionId2)
+      .then(result => result.success ? result.comparison : null)
   }
 });

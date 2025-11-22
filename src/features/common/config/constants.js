@@ -182,6 +182,10 @@ const WINDOW = {
     SETTINGS_WIDTH: 240,
     SETTINGS_MAX_HEIGHT: 400,
     SETTINGS_HIDE_DELAY: 200,
+
+    // Post-meeting window
+    POST_MEETING_WIDTH: 700,
+    POST_MEETING_MAX_HEIGHT: 800,
 };
 
 /**

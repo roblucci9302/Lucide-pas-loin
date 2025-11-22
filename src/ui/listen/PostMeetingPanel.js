@@ -1,4 +1,6 @@
 import { html, css, LitElement } from '../assets/lit-core-2.7.4.min.js';
+import './ParticipantModal.js';
+import './EmailPreviewModal.js';
 
 /**
  * Post-Meeting Panel Component
@@ -393,6 +395,12 @@ export class PostMeetingPanel extends LitElement {
         isLoading: { type: Boolean },
         isGenerating: { type: Boolean },
         message: { type: Object }, // { type: 'success' | 'error', text: string }
+        showParticipantModal: { type: Boolean },
+        showEmailModal: { type: Boolean },
+        currentEmailData: { type: Object },
+        isGeneratingEmail: { type: Boolean },
+        suggestions: { type: Array },
+        isLoadingSuggestions: { type: Boolean },
     };
 
     constructor() {
@@ -404,6 +412,12 @@ export class PostMeetingPanel extends LitElement {
         this.isLoading = false;
         this.isGenerating = false;
         this.message = null;
+        this.showParticipantModal = false;
+        this.showEmailModal = false;
+        this.currentEmailData = null;
+        this.isGeneratingEmail = false;
+        this.suggestions = [];
+        this.isLoadingSuggestions = false;
 
         // Setup IPC listeners
         this._setupListeners();
@@ -418,6 +432,14 @@ export class PostMeetingPanel extends LitElement {
     }
 
     _setupListeners() {
+        // Listen for session ID from main process (when window opens)
+        window.api?.postMeeting?.onSetSession?.((sessionId) => {
+            console.log('[PostMeetingPanel] Session ID received:', sessionId);
+            this.sessionId = sessionId;
+            // Automatically load meeting notes for this session
+            this.loadMeetingNotes();
+        });
+
         // Listen for meeting notes updates from main process
         window.api?.postMeeting?.onNotesGenerated?.(({ notes, tasks }) => {
             console.log('[PostMeetingPanel] Notes generated:', notes);
@@ -452,11 +474,82 @@ export class PostMeetingPanel extends LitElement {
             if (result) {
                 this.meetingNotes = result.notes;
                 this.tasks = result.tasks || [];
+
+                // Load suggestions if notes exist
+                if (this.meetingNotes) {
+                    this.loadSuggestions();
+                }
             }
         } catch (error) {
             console.error('[PostMeetingPanel] Error loading notes:', error);
         } finally {
             this.isLoading = false;
+        }
+    }
+
+    async loadSuggestions() {
+        if (!this.sessionId || !this.meetingNotes) return;
+
+        this.isLoadingSuggestions = true;
+        try {
+            const suggestions = await window.api.tasks.generateSuggestions(this.sessionId, {
+                useAI: true // Enable AI suggestions
+            });
+            this.suggestions = suggestions || [];
+            console.log(`[PostMeetingPanel] Loaded ${this.suggestions.length} suggestions`);
+        } catch (error) {
+            console.error('[PostMeetingPanel] Error loading suggestions:', error);
+            this.suggestions = [];
+        } finally {
+            this.isLoadingSuggestions = false;
+        }
+    }
+
+    async handleAcceptSuggestion(suggestion) {
+        if (!this.sessionId) return;
+
+        try {
+            const result = await window.api.tasks.acceptSuggestion(this.sessionId, suggestion);
+
+            if (result.success) {
+                // Remove from suggestions list
+                this.suggestions = this.suggestions.filter(s => s.type !== suggestion.type);
+
+                // Handle specific actions
+                if (result.action === 'open_task_assignment') {
+                    // Could open task modal here
+                    this.message = { type: 'success', text: '✅ Action appliquée' };
+                } else if (result.action === 'filter_upcoming_tasks') {
+                    this.activeTab = 'tasks';
+                    this.message = { type: 'success', text: '✅ Affichage des tâches à échéance' };
+                } else {
+                    this.message = { type: 'success', text: `✅ ${result.message}` };
+                }
+
+                // Reload if auto-assign was done
+                if (suggestion.action === 'auto_assign_emails') {
+                    await this.loadMeetingNotes();
+                }
+
+                setTimeout(() => { this.message = null; }, 3000);
+            }
+        } catch (error) {
+            console.error('[PostMeetingPanel] Error accepting suggestion:', error);
+            this.message = { type: 'error', text: `❌ Erreur: ${error.message}` };
+            setTimeout(() => { this.message = null; }, 3000);
+        }
+    }
+
+    async handleDismissSuggestion(suggestion) {
+        if (!this.sessionId) return;
+
+        try {
+            await window.api.tasks.dismissSuggestion(this.sessionId, suggestion.type);
+
+            // Remove from list
+            this.suggestions = this.suggestions.filter(s => s.type !== suggestion.type);
+        } catch (error) {
+            console.error('[PostMeetingPanel] Error dismissing suggestion:', error);
         }
     }
 
@@ -511,6 +604,74 @@ export class PostMeetingPanel extends LitElement {
         this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
     }
 
+    handleOpenParticipantModal() {
+        this.showParticipantModal = true;
+    }
+
+    handleCloseParticipantModal() {
+        this.showParticipantModal = false;
+    }
+
+    async handleParticipantsSaved(event) {
+        const { sessionId } = event.detail;
+
+        this.message = { type: 'success', text: '✅ Participants enregistrés avec succès' };
+        setTimeout(() => { this.message = null; }, 3000);
+
+        // Reload meeting notes if they exist to update with participant names
+        if (this.meetingNotes) {
+            try {
+                await window.api.participants.updateNotesWithParticipants(sessionId, this.meetingNotes.id);
+                await this.loadMeetingNotes();
+                this.message = { type: 'success', text: '✅ Notes mises à jour avec les participants' };
+                setTimeout(() => { this.message = null; }, 3000);
+            } catch (error) {
+                console.error('[PostMeetingPanel] Error updating notes with participants:', error);
+            }
+        }
+
+        this.showParticipantModal = false;
+    }
+
+    async handleGenerateEmail(templateType = 'brief') {
+        if (!this.sessionId || this.isGeneratingEmail) return;
+
+        this.isGeneratingEmail = true;
+        this.message = { type: 'success', text: '⏳ Génération de l\'email en cours...' };
+
+        try {
+            let emailData;
+
+            if (templateType === 'ai') {
+                // Use AI to generate email
+                emailData = await window.api.email.generateFollowUp(this.sessionId, {
+                    template: 'standard',
+                    tone: 'professional',
+                    includeActionItems: true,
+                    includeDecisions: true
+                });
+            } else {
+                // Use quick template
+                emailData = await window.api.email.generateTemplate(this.sessionId, templateType);
+            }
+
+            this.currentEmailData = emailData;
+            this.showEmailModal = true;
+            this.message = null;
+        } catch (error) {
+            console.error('[PostMeetingPanel] Error generating email:', error);
+            this.message = { type: 'error', text: `❌ Erreur: ${error.message}` };
+            setTimeout(() => { this.message = null; }, 5000);
+        } finally {
+            this.isGeneratingEmail = false;
+        }
+    }
+
+    handleCloseEmailModal() {
+        this.showEmailModal = false;
+        this.currentEmailData = null;
+    }
+
     renderSummaryTab() {
         if (!this.meetingNotes) {
             return html`
@@ -528,16 +689,75 @@ export class PostMeetingPanel extends LitElement {
 
         return html`
             <div class="summary-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h3 class="section-title" style="margin: 0;">👥 Attribution des participants</h3>
+                    <button
+                        class="export-button"
+                        style="padding: 6px 12px; font-size: 10px;"
+                        @click=${this.handleOpenParticipantModal}
+                    >
+                        ✏️ Assigner
+                    </button>
+                </div>
+                ${data.participants && data.participants.length > 0 ? html`
+                    <div class="summary-text">${data.participants.join(', ')}</div>
+                ` : html`
+                    <div class="summary-text" style="color: var(--color-white-60); font-style: italic;">
+                        Aucun participant assigné. Cliquez sur "Assigner" pour attribuer les speakers.
+                    </div>
+                `}
+            </div>
+
+            ${this.suggestions.length > 0 ? html`
+                <div class="summary-section">
+                    <h3 class="section-title">💡 Suggestions de suivi</h3>
+                    <ul class="item-list">
+                        ${this.suggestions.slice(0, 5).map(suggestion => html`
+                            <li class="list-item">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
+                                    <div style="flex: 1;">
+                                        <div class="item-title" style="display: flex; align-items: center; gap: 6px;">
+                                            ${suggestion.priority === 'high' ? '🔴' : suggestion.priority === 'low' ? '🟢' : '🟡'}
+                                            ${suggestion.title}
+                                        </div>
+                                        <div style="color: var(--color-white-70); font-size: 10px; margin-top: 4px;">
+                                            ${suggestion.description}
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 4px; flex-shrink: 0;">
+                                        <button
+                                            class="export-button"
+                                            style="padding: 4px 8px; font-size: 9px;"
+                                            @click=${() => this.handleAcceptSuggestion(suggestion)}
+                                        >
+                                            ✓ Appliquer
+                                        </button>
+                                        <button
+                                            class="export-button"
+                                            style="padding: 4px 8px; font-size: 9px; background: var(--color-white-5);"
+                                            @click=${() => this.handleDismissSuggestion(suggestion)}
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                </div>
+                            </li>
+                        `)}
+                    </ul>
+                </div>
+            ` : this.isLoadingSuggestions ? html`
+                <div class="summary-section">
+                    <h3 class="section-title">💡 Suggestions de suivi</h3>
+                    <div style="color: var(--color-white-60); font-size: 11px; font-style: italic; text-align: center; padding: 12px;">
+                        ⏳ Analyse en cours...
+                    </div>
+                </div>
+            ` : ''}
+
+            <div class="summary-section">
                 <h3 class="section-title">📝 Résumé exécutif</h3>
                 <div class="summary-text">${data.executiveSummary || 'Aucun résumé disponible'}</div>
             </div>
-
-            ${data.participants && data.participants.length > 0 ? html`
-                <div class="summary-section">
-                    <h3 class="section-title">👥 Participants</h3>
-                    <div class="summary-text">${data.participants.join(', ')}</div>
-                </div>
-            ` : ''}
 
             ${data.keyPoints && data.keyPoints.length > 0 ? html`
                 <div class="summary-section">
@@ -583,6 +803,44 @@ export class PostMeetingPanel extends LitElement {
         `;
     }
 
+    async handleAutoAssignEmails() {
+        if (!this.sessionId) return;
+
+        try {
+            this.message = { type: 'success', text: '⏳ Attribution des emails en cours...' };
+            const result = await window.api.tasks.autoAssignEmails(this.sessionId);
+
+            if (result.success) {
+                this.message = { type: 'success', text: `✅ ${result.assigned} emails attribués sur ${result.total} tâches` };
+                await this.loadMeetingNotes(); // Reload to get updated tasks
+            } else {
+                this.message = { type: 'error', text: `❌ ${result.message}` };
+            }
+
+            setTimeout(() => { this.message = null; }, 3000);
+        } catch (error) {
+            console.error('[PostMeetingPanel] Error auto-assigning emails:', error);
+            this.message = { type: 'error', text: `❌ Erreur: ${error.message}` };
+            setTimeout(() => { this.message = null; }, 3000);
+        }
+    }
+
+    async handleExportTasksCSV() {
+        if (!this.sessionId) return;
+
+        try {
+            this.message = { type: 'success', text: '⏳ Export des tâches en cours...' };
+            const result = await window.api.tasks.exportToCSV(this.sessionId);
+
+            this.message = { type: 'success', text: `✅ Export réussi: ${result.fileName}` };
+            setTimeout(() => { this.message = null; }, 5000);
+        } catch (error) {
+            console.error('[PostMeetingPanel] Error exporting tasks:', error);
+            this.message = { type: 'error', text: `❌ Erreur: ${error.message}` };
+            setTimeout(() => { this.message = null; }, 3000);
+        }
+    }
+
     renderTasksTab() {
         if (this.tasks.length === 0) {
             return html`
@@ -595,7 +853,25 @@ export class PostMeetingPanel extends LitElement {
 
         return html`
             <div class="summary-section">
-                <h3 class="section-title">✅ Actions à suivre (${this.tasks.length})</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h3 class="section-title" style="margin: 0;">✅ Actions à suivre (${this.tasks.length})</h3>
+                    <div style="display: flex; gap: 8px;">
+                        <button
+                            class="export-button"
+                            style="padding: 6px 12px; font-size: 10px;"
+                            @click=${this.handleAutoAssignEmails}
+                        >
+                            📧 Attribuer emails
+                        </button>
+                        <button
+                            class="export-button"
+                            style="padding: 6px 12px; font-size: 10px;"
+                            @click=${this.handleExportTasksCSV}
+                        >
+                            📊 Export CSV
+                        </button>
+                    </div>
+                </div>
                 <ul class="item-list">
                     ${this.tasks.map(task => html`
                         <li class="list-item task-item ${task.status === 'completed' ? 'task-completed' : ''}">
@@ -639,6 +915,28 @@ export class PostMeetingPanel extends LitElement {
         }
 
         return html`
+            <div class="summary-section">
+                <h3 class="section-title">📧 Générer email de suivi</h3>
+                <div class="export-grid">
+                    <button class="export-button" @click=${() => this.handleGenerateEmail('brief')} ?disabled=${this.isGeneratingEmail}>
+                        <div class="export-icon">📝</div>
+                        <div class="export-label">Email bref</div>
+                    </button>
+                    <button class="export-button" @click=${() => this.handleGenerateEmail('detailed')} ?disabled=${this.isGeneratingEmail}>
+                        <div class="export-icon">📋</div>
+                        <div class="export-label">Email détaillé</div>
+                    </button>
+                    <button class="export-button" @click=${() => this.handleGenerateEmail('action-only')} ?disabled=${this.isGeneratingEmail}>
+                        <div class="export-icon">✅</div>
+                        <div class="export-label">Actions seulement</div>
+                    </button>
+                    <button class="export-button" @click=${() => this.handleGenerateEmail('ai')} ?disabled=${this.isGeneratingEmail}>
+                        <div class="export-icon">🤖</div>
+                        <div class="export-label">Email IA (Claude)</div>
+                    </button>
+                </div>
+            </div>
+
             <div class="summary-section">
                 <h3 class="section-title">💾 Exporter le compte-rendu</h3>
                 <div class="export-grid">
@@ -744,6 +1042,23 @@ export class PostMeetingPanel extends LitElement {
                     `}
                 </div>
             </div>
+
+            ${this.showParticipantModal ? html`
+                <participant-modal
+                    .sessionId=${this.sessionId}
+                    @close=${this.handleCloseParticipantModal}
+                    @save=${this.handleParticipantsSaved}
+                ></participant-modal>
+            ` : ''}
+
+            ${this.showEmailModal ? html`
+                <email-preview-modal
+                    .sessionId=${this.sessionId}
+                    .emailData=${this.currentEmailData}
+                    .isLoading=${this.isGeneratingEmail}
+                    @close=${this.handleCloseEmailModal}
+                ></email-preview-modal>
+            ` : ''}
         `;
     }
 }

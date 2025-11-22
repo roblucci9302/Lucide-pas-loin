@@ -357,7 +357,7 @@ async function handleWindowVisibilityRequest(windowPool, layoutManager, movement
             // layoutManager.positionShortcutSettingsWindow();
             const newBounds = layoutManager.calculateShortcutSettingsWindowPosition();
             if (newBounds) win.setBounds(newBounds);
-            
+
             if (process.platform === 'darwin') {
                 win.setAlwaysOnTop(true, 'screen-saver');
             } else {
@@ -373,6 +373,35 @@ async function handleWindowVisibilityRequest(windowPool, layoutManager, movement
                 win.setAlwaysOnTop(false);
             }
             restoreClicks();
+            win.hide();
+        }
+        return;
+    }
+
+    // Phase 1 - Meeting Assistant: Post-meeting window
+    if (name === 'post-meeting') {
+        if (shouldBeVisible) {
+            // Position near header, similar to settings but larger
+            const header = windowPool.get('header');
+            if (header && !header.isDestroyed()) {
+                const headerBounds = header.getBounds();
+                const display = screen.getDisplayNearestPoint({ x: headerBounds.x, y: headerBounds.y });
+                const { workArea } = display;
+
+                // Center horizontally, position below header
+                const x = Math.max(
+                    workArea.x,
+                    Math.min(
+                        headerBounds.x + (headerBounds.width - WINDOW.POST_MEETING_WIDTH) / 2,
+                        workArea.x + workArea.width - WINDOW.POST_MEETING_WIDTH
+                    )
+                );
+                const y = headerBounds.y + headerBounds.height + 10;
+
+                win.setBounds({ x, y, width: WINDOW.POST_MEETING_WIDTH, height: WINDOW.POST_MEETING_MAX_HEIGHT });
+            }
+            win.show();
+        } else {
             win.hide();
         }
         return;
@@ -667,6 +696,43 @@ function createFeatureWindows(header, namesToCreate) {
                 }
                 break;
             }
+
+            // Phase 1 - Meeting Assistant
+            case 'post-meeting': {
+                const postMeeting = new BrowserWindow({
+                    ...commonChildOptions,
+                    width: WINDOW.POST_MEETING_WIDTH,
+                    maxHeight: WINDOW.POST_MEETING_MAX_HEIGHT,
+                    parent: undefined,
+                    alwaysOnTop: false,
+                });
+
+                postMeeting.setContentProtection(isContentProtectionOn);
+                postMeeting.setVisibleOnAllWorkspaces(true, {visibleOnFullScreen:true});
+                if (process.platform === 'darwin') {
+                    postMeeting.setWindowButtonVisibility(false);
+                }
+
+                const postMeetingLoadOptions = { query: { view: 'post-meeting' } };
+                if (!shouldUseLiquidGlass) {
+                    postMeeting.loadFile(path.join(__dirname, '../ui/app/content.html'), postMeetingLoadOptions);
+                } else {
+                    postMeetingLoadOptions.query.glass = 'true';
+                    postMeeting.loadFile(path.join(__dirname, '../ui/app/content.html'), postMeetingLoadOptions);
+                    postMeeting.webContents.once('did-finish-load', () => {
+                        const viewId = liquidGlass.addView(postMeeting.getNativeWindowHandle());
+                        if (viewId !== -1) {
+                            liquidGlass.unstable_setVariant(viewId, liquidGlass.GlassMaterialVariant.bubbles);
+                        }
+                    });
+                }
+
+                windowPool.set('post-meeting', postMeeting);
+                if (!app.isPackaged) {
+                    postMeeting.webContents.openDevTools({ mode: 'detach' });
+                }
+                break;
+            }
         }
     };
 
@@ -679,11 +745,12 @@ function createFeatureWindows(header, namesToCreate) {
         createFeatureWindow('ask');
         createFeatureWindow('settings');
         createFeatureWindow('shortcut-settings');
+        createFeatureWindow('post-meeting');
     }
 }
 
 function destroyFeatureWindows() {
-    const featureWindows = ['listen','ask','settings','shortcut-settings'];
+    const featureWindows = ['listen','ask','settings','shortcut-settings','post-meeting'];
     if (settingsHideTimer) {
         clearTimeout(settingsHideTimer);
         settingsHideTimer = null;
