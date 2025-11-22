@@ -663,5 +663,59 @@ contextBridge.exposeInMainWorld('api', {
 
     dismissSuggestion: (sessionId, suggestionType) => ipcRenderer.invoke('tasks:dismiss-suggestion', sessionId, suggestionType)
       .then(result => result)
+  },
+
+  // Phase 3: Live Insights - Real-time Meeting Intelligence
+  insights: {
+    // Get all insights for current session
+    getAll: () => ipcRenderer.invoke('insights:get-all')
+      .then(result => result.success ? result.insights : []),
+
+    // Get active (non-dismissed) insights
+    getActive: () => ipcRenderer.invoke('insights:get-active')
+      .then(result => result.success ? result.insights : []),
+
+    // Get insights by type
+    getByType: (type) => ipcRenderer.invoke('insights:get-by-type', type)
+      .then(result => result.success ? result.insights : []),
+
+    // Get insights by priority
+    getByPriority: (priority) => ipcRenderer.invoke('insights:get-by-priority', priority)
+      .then(result => result.success ? result.insights : []),
+
+    // Get recent insights
+    getRecent: (count = 5) => ipcRenderer.invoke('insights:get-recent', count)
+      .then(result => result.success ? result.insights : []),
+
+    // Get high priority insights
+    getHighPriority: () => ipcRenderer.invoke('insights:get-high-priority')
+      .then(result => result.success ? result.insights : []),
+
+    // Get session statistics
+    getStatistics: () => ipcRenderer.invoke('insights:get-statistics')
+      .then(result => result.success ? result.stats : null),
+
+    // Dismiss an insight
+    dismiss: (insightId) => ipcRenderer.invoke('insights:dismiss', insightId)
+      .then(result => result),
+
+    // Save insight to database
+    save: (insightData) => ipcRenderer.invoke('insights:save', insightData)
+      .then(result => result),
+
+    // Get saved insights from database by session
+    getFromDb: (sessionId) => ipcRenderer.invoke('insights:get-from-db', sessionId)
+      .then(result => result.success ? result.insights : []),
+
+    // Get database statistics for a session
+    getDbStatistics: (sessionId) => ipcRenderer.invoke('insights:get-db-statistics', sessionId)
+      .then(result => result.success ? result.stats : null),
+
+    // Event listeners
+    onInsightDetected: (callback) => ipcRenderer.on('insight-detected', (event, data) => callback(data)),
+    removeOnInsightDetected: (callback) => ipcRenderer.removeListener('insight-detected', callback),
+
+    onInsightDismissed: (callback) => ipcRenderer.on('insight-dismissed', (event, data) => callback(data)),
+    removeOnInsightDismissed: (callback) => ipcRenderer.removeListener('insight-dismissed', callback)
   }
 });

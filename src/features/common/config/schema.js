@@ -403,6 +403,28 @@ const LATEST_SCHEMA = {
             { name: 'updated_at', type: 'INTEGER' },
             { name: 'sync_state', type: 'TEXT DEFAULT \'clean\'' }
         ]
+    },
+    // Phase 3: Live Insights - Real-time Meeting Intelligence
+    live_insights: {
+        columns: [
+            { name: 'id', type: 'TEXT PRIMARY KEY' },
+            { name: 'session_id', type: 'TEXT NOT NULL' }, // Foreign key to sessions
+            { name: 'user_id', type: 'TEXT NOT NULL' }, // Owner
+            // Insight classification
+            { name: 'type', type: 'TEXT NOT NULL' }, // 'decision', 'action', 'deadline', 'question', 'key_point', 'blocker', 'topic_change', 'recurring'
+            { name: 'title', type: 'TEXT NOT NULL' }, // Short title/summary
+            { name: 'content', type: 'TEXT NOT NULL' }, // Full content/context
+            { name: 'speaker', type: 'TEXT' }, // Who triggered this insight
+            { name: 'priority', type: 'TEXT DEFAULT \'medium\'' }, // 'low', 'medium', 'high'
+            // Timing
+            { name: 'timestamp', type: 'INTEGER NOT NULL' }, // When detected (milliseconds)
+            // Metadata
+            { name: 'metadata', type: 'TEXT' }, // JSON: type-specific data (topic, count, etc.)
+            { name: 'dismissed', type: 'INTEGER DEFAULT 0' }, // Boolean: user dismissed this insight
+            // Timestamps
+            { name: 'created_at', type: 'INTEGER' },
+            { name: 'sync_state', type: 'TEXT DEFAULT \'clean\'' }
+        ]
     }
 };
 
