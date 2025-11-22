@@ -1,5 +1,6 @@
 import { html, css, LitElement } from '../assets/lit-core-2.7.4.min.js';
 import './ParticipantModal.js';
+import './EmailPreviewModal.js';
 
 /**
  * Post-Meeting Panel Component
@@ -395,6 +396,9 @@ export class PostMeetingPanel extends LitElement {
         isGenerating: { type: Boolean },
         message: { type: Object }, // { type: 'success' | 'error', text: string }
         showParticipantModal: { type: Boolean },
+        showEmailModal: { type: Boolean },
+        currentEmailData: { type: Object },
+        isGeneratingEmail: { type: Boolean },
     };
 
     constructor() {
@@ -407,6 +411,9 @@ export class PostMeetingPanel extends LitElement {
         this.isGenerating = false;
         this.message = null;
         this.showParticipantModal = false;
+        this.showEmailModal = false;
+        this.currentEmailData = null;
+        this.isGeneratingEmail = false;
 
         // Setup IPC listeners
         this._setupListeners();
@@ -551,6 +558,45 @@ export class PostMeetingPanel extends LitElement {
         this.showParticipantModal = false;
     }
 
+    async handleGenerateEmail(templateType = 'brief') {
+        if (!this.sessionId || this.isGeneratingEmail) return;
+
+        this.isGeneratingEmail = true;
+        this.message = { type: 'success', text: '⏳ Génération de l\'email en cours...' };
+
+        try {
+            let emailData;
+
+            if (templateType === 'ai') {
+                // Use AI to generate email
+                emailData = await window.api.email.generateFollowUp(this.sessionId, {
+                    template: 'standard',
+                    tone: 'professional',
+                    includeActionItems: true,
+                    includeDecisions: true
+                });
+            } else {
+                // Use quick template
+                emailData = await window.api.email.generateTemplate(this.sessionId, templateType);
+            }
+
+            this.currentEmailData = emailData;
+            this.showEmailModal = true;
+            this.message = null;
+        } catch (error) {
+            console.error('[PostMeetingPanel] Error generating email:', error);
+            this.message = { type: 'error', text: `❌ Erreur: ${error.message}` };
+            setTimeout(() => { this.message = null; }, 5000);
+        } finally {
+            this.isGeneratingEmail = false;
+        }
+    }
+
+    handleCloseEmailModal() {
+        this.showEmailModal = false;
+        this.currentEmailData = null;
+    }
+
     renderSummaryTab() {
         if (!this.meetingNotes) {
             return html`
@@ -693,6 +739,28 @@ export class PostMeetingPanel extends LitElement {
 
         return html`
             <div class="summary-section">
+                <h3 class="section-title">📧 Générer email de suivi</h3>
+                <div class="export-grid">
+                    <button class="export-button" @click=${() => this.handleGenerateEmail('brief')} ?disabled=${this.isGeneratingEmail}>
+                        <div class="export-icon">📝</div>
+                        <div class="export-label">Email bref</div>
+                    </button>
+                    <button class="export-button" @click=${() => this.handleGenerateEmail('detailed')} ?disabled=${this.isGeneratingEmail}>
+                        <div class="export-icon">📋</div>
+                        <div class="export-label">Email détaillé</div>
+                    </button>
+                    <button class="export-button" @click=${() => this.handleGenerateEmail('action-only')} ?disabled=${this.isGeneratingEmail}>
+                        <div class="export-icon">✅</div>
+                        <div class="export-label">Actions seulement</div>
+                    </button>
+                    <button class="export-button" @click=${() => this.handleGenerateEmail('ai')} ?disabled=${this.isGeneratingEmail}>
+                        <div class="export-icon">🤖</div>
+                        <div class="export-label">Email IA (Claude)</div>
+                    </button>
+                </div>
+            </div>
+
+            <div class="summary-section">
                 <h3 class="section-title">💾 Exporter le compte-rendu</h3>
                 <div class="export-grid">
                     <button class="export-button" @click=${() => this.handleExport('markdown')}>
@@ -804,6 +872,15 @@ export class PostMeetingPanel extends LitElement {
                     @close=${this.handleCloseParticipantModal}
                     @save=${this.handleParticipantsSaved}
                 ></participant-modal>
+            ` : ''}
+
+            ${this.showEmailModal ? html`
+                <email-preview-modal
+                    .sessionId=${this.sessionId}
+                    .emailData=${this.currentEmailData}
+                    .isLoading=${this.isGeneratingEmail}
+                    @close=${this.handleCloseEmailModal}
+                ></email-preview-modal>
             ` : ''}
         `;
     }

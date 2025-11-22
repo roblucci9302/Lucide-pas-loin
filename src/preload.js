@@ -570,5 +570,30 @@ contextBridge.exposeInMainWorld('api', {
     removeOnParticipantsSaved: (callback) => ipcRenderer.removeListener('participants:saved', callback),
     onError: (callback) => ipcRenderer.on('participants:error', (event, data) => callback(data)),
     removeOnError: (callback) => ipcRenderer.removeListener('participants:error', callback)
+  },
+
+  // Phase 2.2 - Email Generation
+  email: {
+    // Generate follow-up email using AI
+    generateFollowUp: (sessionId, options = {}) => ipcRenderer.invoke('email:generate-followup', sessionId, options)
+      .then(result => {
+        if (!result.success) throw new Error(result.error);
+        return result.emailData;
+      }),
+
+    // Generate quick email template (without AI)
+    generateTemplate: (sessionId, templateType = 'brief') => ipcRenderer.invoke('email:generate-template', sessionId, templateType)
+      .then(result => {
+        if (!result.success) throw new Error(result.error);
+        return result.emailData;
+      }),
+
+    // Copy email to clipboard
+    copyToClipboard: (content, format = 'text') => ipcRenderer.invoke('email:copy-to-clipboard', content, format)
+      .then(result => result.success),
+
+    // Open email in default mail client
+    openInMailClient: (emailData) => ipcRenderer.invoke('email:open-in-mail-client', emailData)
+      .then(result => result.success)
   }
 });
