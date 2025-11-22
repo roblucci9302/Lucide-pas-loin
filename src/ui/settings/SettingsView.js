@@ -514,6 +514,9 @@ export class SettingsView extends LitElement {
         knowledgeBaseName: { type: String, state: true },
         documentCount: { type: Number, state: true },
         knowledgeBaseLoading: { type: Boolean, state: true },
+        // Phase 1 - Meeting Assistant: Listen session state
+        currentSessionId: { type: String, state: true },
+        hasEndedSession: { type: Boolean, state: true },
     };
     //////// after_modelStateService ////////
 
@@ -555,6 +558,9 @@ export class SettingsView extends LitElement {
         this.knowledgeBaseName = '';
         this.documentCount = 0;
         this.knowledgeBaseLoading = false;
+        // Phase 1 - Meeting Assistant: Session state
+        this.currentSessionId = null;
+        this.hasEndedSession = false;
         this.loadInitialData();
         //////// after_modelStateService ////////
     }
@@ -942,6 +948,23 @@ export class SettingsView extends LitElement {
 
     openShortcutEditor() {
         window.api.settingsView.openShortcutSettingsWindow();
+    }
+
+    // Phase 1 - Meeting Assistant: Open post-meeting window
+    async handleOpenPostMeeting() {
+        try {
+            const result = await window.api.listenView.getRecentListenSession();
+
+            if (result.success) {
+                await window.api.listenView.openPostMeetingWindow(result.sessionId);
+            } else {
+                console.warn('[SettingsView] No listen session found for post-meeting');
+                alert('Aucune session d\'écoute trouvée. Veuillez d\'abord créer une session avec le mode écoute.');
+            }
+        } catch (error) {
+            console.error('[SettingsView] Error opening post-meeting window:', error);
+            alert(`Erreur lors de l'ouverture du compte-rendu: ${error.message}`);
+        }
     }
 
     connectedCallback() {
@@ -1684,6 +1707,11 @@ export class SettingsView extends LitElement {
                 </div>
 
                 <div class="buttons-section">
+                    <!-- Phase 1 - Meeting Assistant: Post-meeting button -->
+                    <button class="settings-button full-width" @click=${this.handleOpenPostMeeting}>
+                        <span>📋 Compte-rendu de réunion</span>
+                    </button>
+
                     <button class="settings-button full-width" @click=${this.handlePersonalize}>
                         <span>Personnaliser / Notes de réunion</span>
                     </button>

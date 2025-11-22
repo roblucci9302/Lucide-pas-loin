@@ -194,6 +194,10 @@ contextBridge.exposeInMainWorld('api', {
     adjustWindowHeight: (winName, height) => ipcRenderer.invoke('adjust-window-height', { winName, height }),
     hideListenWindow: () => ipcRenderer.invoke('listen:hideWindow'),
 
+    // Phase 1 - Meeting Assistant
+    getRecentListenSession: () => ipcRenderer.invoke('listen:getRecentListenSession'),
+    openPostMeetingWindow: (sessionId) => ipcRenderer.invoke('listen:openPostMeetingWindow', sessionId),
+
     // Listeners
     onSessionStateChanged: (callback) => ipcRenderer.on('session-state-changed', callback),
     removeOnSessionStateChanged: (callback) => ipcRenderer.removeListener('session-state-changed', callback)
@@ -508,6 +512,8 @@ contextBridge.exposeInMainWorld('api', {
     hasNotes: (sessionId) => ipcRenderer.invoke('post-meeting:has-notes', sessionId),
 
     // Listeners
+    onSetSession: (callback) => ipcRenderer.on('post-meeting:set-session', (event, sessionId) => callback(sessionId)),
+    removeOnSetSession: (callback) => ipcRenderer.removeListener('post-meeting:set-session', callback),
     onNotesGenerated: (callback) => ipcRenderer.on('post-meeting:notes-generated', (event, data) => callback(data)),
     removeOnNotesGenerated: (callback) => ipcRenderer.removeListener('post-meeting:notes-generated', callback),
     onExportComplete: (callback) => ipcRenderer.on('post-meeting:export-complete', (event, data) => callback(data)),

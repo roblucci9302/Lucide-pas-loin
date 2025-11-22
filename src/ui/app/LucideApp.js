@@ -4,6 +4,7 @@ import { ListenView } from '../listen/ListenView.js';
 import { AskView } from '../ask/AskView.js';
 import { BrowserView } from '../browser/BrowserView.js';
 import { ShortcutSettingsView } from '../settings/ShortCutSettingsView.js';
+import { PostMeetingPanel } from '../listen/PostMeetingPanel.js'; // Phase 1 - Meeting Assistant
 import { i18n } from '../i18n/index.js';
 
 import '../listen/audioCore/renderer.js';
@@ -25,7 +26,7 @@ export class LucideApp extends LitElement {
             height: 100%;
         }
 
-        ask-view, browser-view, settings-view, history-view, help-view, setup-view {
+        ask-view, browser-view, settings-view, history-view, help-view, setup-view, post-meeting-panel {
             display: block;
             width: 100%;
             height: 100%;
@@ -160,6 +161,8 @@ export class LucideApp extends LitElement {
                 ></settings-view>`;
             case 'shortcut-settings':
                 return html`<shortcut-settings-view></shortcut-settings-view>`;
+            case 'post-meeting':
+                return html`<post-meeting-panel></post-meeting-panel>`;
             case 'history':
                 return html`<history-view></history-view>`;
             case 'help':

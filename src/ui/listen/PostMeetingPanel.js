@@ -418,6 +418,14 @@ export class PostMeetingPanel extends LitElement {
     }
 
     _setupListeners() {
+        // Listen for session ID from main process (when window opens)
+        window.api?.postMeeting?.onSetSession?.((sessionId) => {
+            console.log('[PostMeetingPanel] Session ID received:', sessionId);
+            this.sessionId = sessionId;
+            // Automatically load meeting notes for this session
+            this.loadMeetingNotes();
+        });
+
         // Listen for meeting notes updates from main process
         window.api?.postMeeting?.onNotesGenerated?.(({ notes, tasks }) => {
             console.log('[PostMeetingPanel] Notes generated:', notes);

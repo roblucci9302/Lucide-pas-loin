@@ -250,6 +250,80 @@ module.exports = {
             }
         });
 
+        // Phase 1 - Meeting Assistant: Get most recent listen session
+        ipcMain.handle('listen:getRecentListenSession', async () => {
+            try {
+                // First check if there's an active session
+                if (listenService.currentSessionId) {
+                    const currentSession = await sessionRepository.getById(listenService.currentSessionId);
+                    if (currentSession && currentSession.session_type === 'listen') {
+                        return {
+                            success: true,
+                            sessionId: listenService.currentSessionId,
+                            hasEnded: currentSession.ended_at !== null
+                        };
+                    }
+                }
+
+                // Otherwise, find the most recent ended listen session
+                const authService = require('../../features/common/services/authService');
+                const userId = authService.getCurrentUserId();
+                const sessions = await sessionRepository.getAllByUserId(userId);
+
+                // Filter for listen sessions with ended_at, sort by ended_at desc
+                const endedListenSessions = sessions
+                    .filter(s => s.session_type === 'listen' && s.ended_at !== null)
+                    .sort((a, b) => b.ended_at - a.ended_at);
+
+                if (endedListenSessions.length > 0) {
+                    return {
+                        success: true,
+                        sessionId: endedListenSessions[0].id,
+                        hasEnded: true
+                    };
+                }
+
+                return {
+                    success: false,
+                    error: 'No listen session found'
+                };
+            } catch (error) {
+                console.error('[ConversationBridge] Error getting recent listen session:', error);
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        });
+
+        // Phase 1 - Meeting Assistant: Open post-meeting window
+        ipcMain.handle('listen:openPostMeetingWindow', async (event, sessionId) => {
+            try {
+                const internalBridge = require('../../bridge/internalBridge');
+
+                // Show the post-meeting window
+                internalBridge.emit('window:requestVisibility', { name: 'post-meeting', visible: true });
+
+                // Send session ID to the window after it's visible
+                const { windowPool } = require('../../window/windowManager');
+                const postMeetingWindow = windowPool?.get('post-meeting');
+                if (postMeetingWindow && !postMeetingWindow.isDestroyed()) {
+                    // Wait a bit for the window to be ready
+                    setTimeout(() => {
+                        postMeetingWindow.webContents.send('post-meeting:set-session', sessionId);
+                    }, 100);
+                }
+
+                return { success: true };
+            } catch (error) {
+                console.error('[ConversationBridge] Error opening post-meeting window:', error);
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        });
+
         console.log('[ConversationBridge] Initialized');
     },
 
