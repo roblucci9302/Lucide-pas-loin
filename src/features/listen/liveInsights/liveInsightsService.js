@@ -1,9 +1,11 @@
 /**
- * Live Insights Service - Phase 3.1
+ * Live Insights Service - Phase 3.1 + 3.4
  * Real-time analysis of conversation to detect patterns, decisions, actions, and key moments
+ * Enhanced with AI-powered contextual analysis
  */
 
 const EventEmitter = require('events');
+const contextualAnalysisService = require('./contextualAnalysisService');
 
 /**
  * Insight Types
@@ -36,6 +38,7 @@ class LiveInsightsService extends EventEmitter {
         this.conversationBuffer = [];
         this.topicHistory = new Map(); // Track topic frequency
         this.questionTracker = new Set(); // Track open questions
+        this.turnCounter = 0; // Track conversation turns for AI analysis
 
         // Pattern detection configuration
         this.patterns = this._initializePatterns();
@@ -113,6 +116,8 @@ class LiveInsightsService extends EventEmitter {
         this.conversationBuffer = [];
         this.topicHistory.clear();
         this.questionTracker.clear();
+        this.turnCounter = 0;
+        contextualAnalysisService.reset(); // Reset AI analysis context
         console.log('[LiveInsightsService] State reset');
     }
 
@@ -135,8 +140,17 @@ class LiveInsightsService extends EventEmitter {
             this.conversationBuffer.shift();
         }
 
+        // Add to contextual analysis service for AI-powered insights
+        contextualAnalysisService.addConversationTurn(speaker, text);
+        this.turnCounter++;
+
         // Analyze the turn
         this._analyzeConversationTurn(speaker, text);
+
+        // Generate proactive AI suggestions every 5 turns
+        if (this.turnCounter % 5 === 0) {
+            this._generateProactiveSuggestions();
+        }
     }
 
     /**
@@ -227,11 +241,26 @@ class LiveInsightsService extends EventEmitter {
             ));
         }
 
-        // Store and emit insights
-        insights.forEach(insight => {
-            this.insights.push(insight);
-            this.emit('insight-detected', insight);
-            console.log(`[LiveInsights] ${insight.type}: ${insight.title}`);
+        // Store and emit insights (with AI enrichment for high-priority ones)
+        insights.forEach(async (insight) => {
+            // Enrich high-priority insights with AI analysis
+            if (insight.priority === Priority.HIGH) {
+                try {
+                    const enrichedInsight = await contextualAnalysisService.enrichInsight(insight);
+                    this.insights.push(enrichedInsight);
+                    this.emit('insight-detected', enrichedInsight);
+                    console.log(`[LiveInsights] ${enrichedInsight.type}: ${enrichedInsight.title} [${enrichedInsight.sentiment}]`);
+                } catch (error) {
+                    console.error('[LiveInsights] Failed to enrich insight:', error);
+                    // Fallback: emit original insight
+                    this.insights.push(insight);
+                    this.emit('insight-detected', insight);
+                }
+            } else {
+                this.insights.push(insight);
+                this.emit('insight-detected', insight);
+                console.log(`[LiveInsights] ${insight.type}: ${insight.title}`);
+            }
         });
 
         // Check for recurring topics
@@ -368,6 +397,40 @@ class LiveInsightsService extends EventEmitter {
     }
 
     /**
+     * Generate proactive AI suggestions based on conversation context
+     * @private
+     */
+    async _generateProactiveSuggestions() {
+        try {
+            const activeInsights = this.getActiveInsights();
+            const suggestions = await contextualAnalysisService.generateProactiveSuggestions(activeInsights);
+
+            if (suggestions && suggestions.length > 0) {
+                suggestions.forEach(suggestion => {
+                    const insight = this._createInsight(
+                        'suggestion', // New type for AI suggestions
+                        suggestion.title,
+                        suggestion.description,
+                        'AI Assistant',
+                        suggestion.priority === 'high' ? Priority.HIGH : Priority.MEDIUM,
+                        {
+                            type: suggestion.type,
+                            reasoning: suggestion.reasoning,
+                            aiGenerated: true
+                        }
+                    );
+
+                    this.insights.push(insight);
+                    this.emit('insight-detected', insight);
+                    console.log(`[LiveInsights] AI Suggestion: ${insight.title}`);
+                });
+            }
+        } catch (error) {
+            console.error('[LiveInsights] Failed to generate proactive suggestions:', error);
+        }
+    }
+
+    /**
      * Create insight object
      * @private
      */
@@ -479,6 +542,28 @@ class LiveInsightsService extends EventEmitter {
         return this.insights.filter(
             i => i.priority === Priority.HIGH && !i.dismissed
         );
+    }
+
+    /**
+     * Generate intelligent summary of conversation (Phase 3.4)
+     * @returns {Promise<Object>} Summary with themes, mood, and progress
+     */
+    async generateIntelligentSummary() {
+        try {
+            const summary = await contextualAnalysisService.generateIntelligentSummary();
+            return summary;
+        } catch (error) {
+            console.error('[LiveInsights] Failed to generate intelligent summary:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Get context summary from AI analysis (Phase 3.4)
+     * @returns {Object} Context summary
+     */
+    getContextSummary() {
+        return contextualAnalysisService.getContextSummary();
     }
 }
 

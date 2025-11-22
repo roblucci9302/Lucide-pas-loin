@@ -711,6 +711,15 @@ contextBridge.exposeInMainWorld('api', {
     getDbStatistics: (sessionId) => ipcRenderer.invoke('insights:get-db-statistics', sessionId)
       .then(result => result.success ? result.stats : null),
 
+    // Phase 3.4: AI-Powered Analysis
+    // Generate intelligent summary of conversation
+    generateSummary: () => ipcRenderer.invoke('insights:generate-summary')
+      .then(result => result.success ? result.summary : null),
+
+    // Get context summary from AI analysis
+    getContextSummary: () => ipcRenderer.invoke('insights:get-context-summary')
+      .then(result => result.success ? result.context : null),
+
     // Event listeners
     onInsightDetected: (callback) => ipcRenderer.on('insight-detected', (event, data) => callback(data)),
     removeOnInsightDetected: (callback) => ipcRenderer.removeListener('insight-detected', callback),

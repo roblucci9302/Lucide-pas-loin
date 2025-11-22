@@ -244,6 +244,48 @@ module.exports = {
             }
         });
 
-        console.log('[LiveInsightsBridge] ✅ IPC handlers initialized');
+        /**
+         * Generate intelligent summary (Phase 3.4)
+         */
+        ipcMain.handle('insights:generate-summary', async (event) => {
+            try {
+                const summary = await liveInsightsService.generateIntelligentSummary();
+
+                return {
+                    success: true,
+                    summary
+                };
+            } catch (error) {
+                console.error('[LiveInsightsBridge] Error generating summary:', error);
+                return {
+                    success: false,
+                    error: error.message,
+                    summary: null
+                };
+            }
+        });
+
+        /**
+         * Get context summary from AI analysis (Phase 3.4)
+         */
+        ipcMain.handle('insights:get-context-summary', async (event) => {
+            try {
+                const context = liveInsightsService.getContextSummary();
+
+                return {
+                    success: true,
+                    context
+                };
+            } catch (error) {
+                console.error('[LiveInsightsBridge] Error getting context summary:', error);
+                return {
+                    success: false,
+                    error: error.message,
+                    context: null
+                };
+            }
+        });
+
+        console.log('[LiveInsightsBridge] ✅ IPC handlers initialized (Phase 3 + 3.4)');
     }
 };

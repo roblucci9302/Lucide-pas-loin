@@ -1,8 +1,9 @@
 import { html, css, LitElement } from '../assets/lit-core-2.7.4.min.js';
 
 /**
- * Live Insights Panel - Phase 3.2
+ * Live Insights Panel - Phase 3.2 + 3.4
  * Real-time display of meeting insights detected during conversation
+ * Enhanced with AI-powered sentiment analysis and contextual suggestions
  */
 export class LiveInsightsPanel extends LitElement {
     static properties = {
@@ -238,6 +239,43 @@ export class LiveInsightsPanel extends LitElement {
             gap: var(--space-1);
         }
 
+        /* Phase 3.4: Sentiment & AI Suggestions */
+        .sentiment-badge {
+            font-size: 14px;
+            padding: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ai-suggestions {
+            margin-top: var(--margin-sm);
+            padding: var(--padding-xs);
+            background: var(--color-black-70);
+            border-radius: var(--radius-sm);
+            border-left: 3px solid var(--color-primary);
+        }
+
+        .suggestions-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--color-white-80);
+            margin-bottom: var(--margin-xs);
+        }
+
+        .suggestions-list {
+            margin: 0;
+            padding-left: var(--padding-md);
+            list-style: disc;
+        }
+
+        .suggestions-list li {
+            font-size: 11px;
+            color: var(--color-white-70);
+            line-height: 1.4;
+            margin-bottom: 4px;
+        }
+
         .empty-state {
             text-align: center;
             padding: var(--padding-lg);
@@ -435,9 +473,21 @@ export class LiveInsightsPanel extends LitElement {
             key_point: '💡',
             blocker: '⛔',
             topic_change: '🔄',
-            recurring: '🔁'
+            recurring: '🔁',
+            suggestion: '🤖' // Phase 3.4: AI suggestions
         };
         return icons[type] || '📌';
+    }
+
+    getSentimentEmoji(sentiment) {
+        const emojis = {
+            positive: '😊',
+            neutral: '😐',
+            negative: '😟',
+            urgent: '🚨',
+            collaborative: '🤝'
+        };
+        return emojis[sentiment] || '';
     }
 
     getPriorityColor(priority) {
@@ -542,6 +592,11 @@ export class LiveInsightsPanel extends LitElement {
                         <div class="insight-title">${insight.title}</div>
                     </div>
                     <div class="insight-actions">
+                        ${insight.sentiment ? html`
+                            <span class="sentiment-badge" title="${insight.sentiment}">
+                                ${this.getSentimentEmoji(insight.sentiment)}
+                            </span>
+                        ` : ''}
                         <button
                             class="dismiss-btn"
                             @click="${() => this.handleDismiss(insight.id)}"
@@ -553,6 +608,17 @@ export class LiveInsightsPanel extends LitElement {
 
                 ${insight.content ? html`
                     <div class="insight-content">${insight.content}</div>
+                ` : ''}
+
+                ${insight.aiSuggestions && insight.aiSuggestions.length > 0 ? html`
+                    <div class="ai-suggestions">
+                        <div class="suggestions-label">💡 AI Suggestions:</div>
+                        <ul class="suggestions-list">
+                            ${insight.aiSuggestions.map(suggestion => html`
+                                <li>${suggestion}</li>
+                            `)}
+                        </ul>
+                    </div>
                 ` : ''}
 
                 <div class="insight-meta">
