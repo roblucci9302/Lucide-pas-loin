@@ -487,6 +487,394 @@ class ExportService {
     }
 
     /**
+     * Export to PDF format
+     * @param {Object} meetingNotes - Meeting notes object
+     * @param {Array<Object>} tasks - Array of tasks
+     * @param {string} customPath - Optional custom export path
+     * @returns {Promise<string>} Path to exported file
+     */
+    async exportToPDF(meetingNotes, tasks, customPath = null) {
+        console.log('[ExportService] Exporting to PDF...');
+
+        try {
+            const PDFDocument = require('pdfkit');
+            const data = this._parseNoteData(meetingNotes);
+
+            const fileName = this._generateFileName(meetingNotes, 'pdf');
+            const filePath = customPath || path.join(this.defaultExportPath, fileName);
+
+            return new Promise((resolve, reject) => {
+                const doc = new PDFDocument({ margin: 50 });
+                const stream = fs.createWriteStream(filePath);
+
+                stream.on('finish', () => {
+                    console.log(`[ExportService] ✅ PDF exported to: ${filePath}`);
+                    resolve(filePath);
+                });
+
+                stream.on('error', reject);
+                doc.pipe(stream);
+
+                // Title
+                doc.fontSize(20).font('Helvetica-Bold').text('📋 Compte-rendu de réunion', { align: 'center' });
+                doc.moveDown();
+
+                // Metadata
+                doc.fontSize(10).font('Helvetica')
+                    .text(`Date: ${new Date(meetingNotes.created_at * 1000).toLocaleString('fr-FR')}`, { align: 'center' });
+                if (data.meetingMetadata?.duration) {
+                    doc.text(`Durée: ${data.meetingMetadata.duration}`, { align: 'center' });
+                }
+                doc.moveDown(2);
+
+                // Executive Summary
+                if (data.executiveSummary) {
+                    doc.fontSize(14).font('Helvetica-Bold').text('Résumé exécutif');
+                    doc.moveDown(0.5);
+                    doc.fontSize(11).font('Helvetica').text(data.executiveSummary);
+                    doc.moveDown();
+                }
+
+                // Participants
+                if (data.participants && data.participants.length > 0) {
+                    doc.fontSize(14).font('Helvetica-Bold').text('Participants');
+                    doc.moveDown(0.5);
+                    doc.fontSize(11).font('Helvetica');
+                    data.participants.forEach(p => doc.text(`• ${p}`));
+                    doc.moveDown();
+                }
+
+                // Key Points
+                if (data.keyPoints && data.keyPoints.length > 0) {
+                    doc.fontSize(14).font('Helvetica-Bold').text('Points clés');
+                    doc.moveDown(0.5);
+                    doc.fontSize(11).font('Helvetica');
+                    data.keyPoints.forEach(point => doc.text(`• ${point}`, { indent: 10 }));
+                    doc.moveDown();
+                }
+
+                // Decisions
+                if (data.decisions && data.decisions.length > 0) {
+                    doc.fontSize(14).font('Helvetica-Bold').text('Décisions prises');
+                    doc.moveDown(0.5);
+                    doc.fontSize(11).font('Helvetica');
+                    data.decisions.forEach((decision, i) => {
+                        doc.font('Helvetica-Bold').text(`${i + 1}. ${decision.decision || decision.title || 'Décision'}`);
+                        doc.font('Helvetica').text(decision.description || decision.rationale || '', { indent: 15 });
+                        doc.moveDown(0.5);
+                    });
+                }
+
+                // Tasks
+                if (tasks && tasks.length > 0) {
+                    doc.fontSize(14).font('Helvetica-Bold').text('Actions à suivre');
+                    doc.moveDown(0.5);
+                    doc.fontSize(11).font('Helvetica');
+                    tasks.forEach((task, i) => {
+                        doc.font('Helvetica-Bold').text(`${i + 1}. ${task.task_description}`);
+                        doc.font('Helvetica')
+                            .text(`   Assigné à: ${task.assigned_to} | Deadline: ${task.deadline} | Priorité: ${task.priority}`);
+                        if (task.context) {
+                            doc.text(`   Contexte: ${task.context}`, { indent: 15 });
+                        }
+                        doc.moveDown(0.5);
+                    });
+                }
+
+                // Footer
+                doc.moveDown(2);
+                doc.fontSize(9).font('Helvetica-Oblique').text('Généré par Lucide Meeting Assistant', { align: 'center' });
+
+                doc.end();
+            });
+        } catch (error) {
+            console.error('[ExportService] Error exporting to PDF:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Export to Word (DOCX) format
+     * @param {Object} meetingNotes - Meeting notes object
+     * @param {Array<Object>} tasks - Array of tasks
+     * @param {string} customPath - Optional custom export path
+     * @returns {Promise<string>} Path to exported file
+     */
+    async exportToWord(meetingNotes, tasks, customPath = null) {
+        console.log('[ExportService] Exporting to Word...');
+
+        try {
+            const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = require('docx');
+            const data = this._parseNoteData(meetingNotes);
+
+            const fileName = this._generateFileName(meetingNotes, 'docx');
+            const filePath = customPath || path.join(this.defaultExportPath, fileName);
+
+            const children = [];
+
+            // Title
+            children.push(
+                new Paragraph({
+                    text: '📋 Compte-rendu de réunion',
+                    heading: HeadingLevel.TITLE,
+                    alignment: AlignmentType.CENTER,
+                    spacing: { after: 200 }
+                })
+            );
+
+            // Metadata
+            children.push(
+                new Paragraph({
+                    text: `Date: ${new Date(meetingNotes.created_at * 1000).toLocaleString('fr-FR')}`,
+                    alignment: AlignmentType.CENTER
+                })
+            );
+            if (data.meetingMetadata?.duration) {
+                children.push(
+                    new Paragraph({
+                        text: `Durée: ${data.meetingMetadata.duration}`,
+                        alignment: AlignmentType.CENTER,
+                        spacing: { after: 400 }
+                    })
+                );
+            }
+
+            // Executive Summary
+            if (data.executiveSummary) {
+                children.push(
+                    new Paragraph({ text: 'Résumé exécutif', heading: HeadingLevel.HEADING_1, spacing: { before: 200 } }),
+                    new Paragraph({ text: data.executiveSummary, spacing: { after: 200 } })
+                );
+            }
+
+            // Participants
+            if (data.participants && data.participants.length > 0) {
+                children.push(new Paragraph({ text: 'Participants', heading: HeadingLevel.HEADING_1, spacing: { before: 200 } }));
+                data.participants.forEach(p => {
+                    children.push(new Paragraph({ text: `• ${p}`, indent: { left: 300 } }));
+                });
+                children.push(new Paragraph({ text: '', spacing: { after: 200 } }));
+            }
+
+            // Key Points
+            if (data.keyPoints && data.keyPoints.length > 0) {
+                children.push(new Paragraph({ text: 'Points clés', heading: HeadingLevel.HEADING_1, spacing: { before: 200 } }));
+                data.keyPoints.forEach(point => {
+                    children.push(new Paragraph({ text: `• ${point}`, indent: { left: 300 } }));
+                });
+                children.push(new Paragraph({ text: '', spacing: { after: 200 } }));
+            }
+
+            // Decisions
+            if (data.decisions && data.decisions.length > 0) {
+                children.push(new Paragraph({ text: 'Décisions prises', heading: HeadingLevel.HEADING_1, spacing: { before: 200 } }));
+                data.decisions.forEach((decision, i) => {
+                    children.push(
+                        new Paragraph({
+                            children: [
+                                new TextRun({ text: `${i + 1}. ${decision.decision || decision.title}`, bold: true })
+                            ],
+                            indent: { left: 300 }
+                        }),
+                        new Paragraph({ text: decision.description || decision.rationale || '', indent: { left: 600 } })
+                    );
+                });
+                children.push(new Paragraph({ text: '', spacing: { after: 200 } }));
+            }
+
+            // Tasks
+            if (tasks && tasks.length > 0) {
+                children.push(new Paragraph({ text: 'Actions à suivre', heading: HeadingLevel.HEADING_1, spacing: { before: 200 } }));
+                tasks.forEach((task, i) => {
+                    children.push(
+                        new Paragraph({
+                            children: [
+                                new TextRun({ text: `${i + 1}. ${task.task_description}`, bold: true })
+                            ],
+                            indent: { left: 300 }
+                        }),
+                        new Paragraph({
+                            text: `Assigné à: ${task.assigned_to} | Deadline: ${task.deadline} | Priorité: ${task.priority}`,
+                            indent: { left: 600 }
+                        })
+                    );
+                    if (task.context) {
+                        children.push(new Paragraph({ text: `Contexte: ${task.context}`, indent: { left: 600 } }));
+                    }
+                });
+            }
+
+            // Footer
+            children.push(
+                new Paragraph({
+                    text: 'Généré par Lucide Meeting Assistant',
+                    alignment: AlignmentType.CENTER,
+                    spacing: { before: 400 },
+                    italics: true
+                })
+            );
+
+            const doc = new Document({
+                sections: [{
+                    properties: {},
+                    children: children
+                }]
+            });
+
+            const buffer = await Packer.toBuffer(doc);
+            await fs.promises.writeFile(filePath, buffer);
+
+            console.log(`[ExportService] ✅ Word exported to: ${filePath}`);
+            return filePath;
+        } catch (error) {
+            console.error('[ExportService] Error exporting to Word:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Export to Excel (XLSX) format
+     * @param {Object} meetingNotes - Meeting notes object
+     * @param {Array<Object>} tasks - Array of tasks
+     * @param {string} customPath - Optional custom export path
+     * @returns {Promise<string>} Path to exported file
+     */
+    async exportToExcel(meetingNotes, tasks, customPath = null) {
+        console.log('[ExportService] Exporting to Excel...');
+
+        try {
+            const ExcelJS = require('exceljs');
+            const data = this._parseNoteData(meetingNotes);
+
+            const fileName = this._generateFileName(meetingNotes, 'xlsx');
+            const filePath = customPath || path.join(this.defaultExportPath, fileName);
+
+            const workbook = new ExcelJS.Workbook();
+
+            // Summary Sheet
+            const summarySheet = workbook.addWorksheet('Résumé');
+
+            summarySheet.columns = [
+                { header: 'Champ', key: 'field', width: 30 },
+                { header: 'Valeur', key: 'value', width: 70 }
+            ];
+
+            // Add summary data
+            summarySheet.addRow({ field: 'Date', value: new Date(meetingNotes.created_at * 1000).toLocaleString('fr-FR') });
+            if (data.meetingMetadata?.duration) {
+                summarySheet.addRow({ field: 'Durée', value: data.meetingMetadata.duration });
+            }
+            summarySheet.addRow({ field: '', value: '' });
+            summarySheet.addRow({ field: 'Résumé exécutif', value: data.executiveSummary || '' });
+
+            // Style header row
+            summarySheet.getRow(1).font = { bold: true, size: 12 };
+            summarySheet.getRow(1).fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FF4472C4' }
+            };
+            summarySheet.getRow(1).font = { color: { argb: 'FFFFFFFF' }, bold: true };
+
+            // Tasks Sheet
+            if (tasks && tasks.length > 0) {
+                const tasksSheet = workbook.addWorksheet('Actions');
+
+                tasksSheet.columns = [
+                    { header: '#', key: 'index', width: 5 },
+                    { header: 'Tâche', key: 'task', width: 50 },
+                    { header: 'Assigné à', key: 'assigned', width: 20 },
+                    { header: 'Deadline', key: 'deadline', width: 15 },
+                    { header: 'Priorité', key: 'priority', width: 12 },
+                    { header: 'Statut', key: 'status', width: 12 },
+                    { header: 'Contexte', key: 'context', width: 40 }
+                ];
+
+                tasks.forEach((task, i) => {
+                    tasksSheet.addRow({
+                        index: i + 1,
+                        task: task.task_description,
+                        assigned: task.assigned_to,
+                        deadline: task.deadline,
+                        priority: task.priority,
+                        status: task.status || 'pending',
+                        context: task.context || ''
+                    });
+                });
+
+                // Style header
+                tasksSheet.getRow(1).font = { bold: true, size: 12 };
+                tasksSheet.getRow(1).fill = {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'FF70AD47' }
+                };
+                tasksSheet.getRow(1).font = { color: { argb: 'FFFFFFFF' }, bold: true };
+
+                // Add filters
+                tasksSheet.autoFilter = 'A1:G1';
+            }
+
+            // Key Points Sheet
+            if (data.keyPoints && data.keyPoints.length > 0) {
+                const pointsSheet = workbook.addWorksheet('Points clés');
+
+                pointsSheet.columns = [
+                    { header: '#', key: 'index', width: 5 },
+                    { header: 'Point', key: 'point', width: 80 }
+                ];
+
+                data.keyPoints.forEach((point, i) => {
+                    pointsSheet.addRow({ index: i + 1, point });
+                });
+
+                pointsSheet.getRow(1).font = { bold: true, size: 12 };
+                pointsSheet.getRow(1).fill = {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'FFFFC000' }
+                };
+                pointsSheet.getRow(1).font = { color: { argb: 'FFFFFFFF' }, bold: true };
+            }
+
+            // Decisions Sheet
+            if (data.decisions && data.decisions.length > 0) {
+                const decisionsSheet = workbook.addWorksheet('Décisions');
+
+                decisionsSheet.columns = [
+                    { header: '#', key: 'index', width: 5 },
+                    { header: 'Décision', key: 'decision', width: 40 },
+                    { header: 'Rationale', key: 'rationale', width: 60 }
+                ];
+
+                data.decisions.forEach((decision, i) => {
+                    decisionsSheet.addRow({
+                        index: i + 1,
+                        decision: decision.decision || decision.title || '',
+                        rationale: decision.description || decision.rationale || ''
+                    });
+                });
+
+                decisionsSheet.getRow(1).font = { bold: true, size: 12 };
+                decisionsSheet.getRow(1).fill = {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'FF5B9BD5' }
+                };
+                decisionsSheet.getRow(1).font = { color: { argb: 'FFFFFFFF' }, bold: true };
+            }
+
+            await workbook.xlsx.writeFile(filePath);
+
+            console.log(`[ExportService] ✅ Excel exported to: ${filePath}`);
+            return filePath;
+        } catch (error) {
+            console.error('[ExportService] Error exporting to Excel:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Get default export path
      */
     getDefaultExportPath() {
