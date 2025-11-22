@@ -480,5 +480,39 @@ contextBridge.exposeInMainWorld('api', {
 
     // Get context summary
     getSummary: (uid) => ipcRenderer.invoke('context:get-summary', uid)
+  },
+
+  // Phase 1: Meeting Assistant - Post-Meeting Features
+  postMeeting: {
+    // Generate meeting notes for a session
+    generateNotes: (sessionId) => ipcRenderer.invoke('post-meeting:generate-notes', sessionId),
+
+    // Get meeting notes for a session
+    getMeetingNotes: (sessionId) => ipcRenderer.invoke('post-meeting:get-notes', sessionId),
+
+    // Export meeting notes to a format
+    exportNotes: (sessionId, format) => ipcRenderer.invoke('post-meeting:export', sessionId, format),
+
+    // Get all meeting notes for current user
+    getAllNotes: () => ipcRenderer.invoke('post-meeting:get-all-notes'),
+
+    // Task management
+    updateTask: (taskId, updates) => ipcRenderer.invoke('post-meeting:update-task', taskId, updates),
+    completeTask: (taskId) => ipcRenderer.invoke('post-meeting:complete-task', taskId),
+    getTasks: (meetingNoteId) => ipcRenderer.invoke('post-meeting:get-tasks', meetingNoteId),
+
+    // Delete meeting notes
+    deleteNotes: (noteId) => ipcRenderer.invoke('post-meeting:delete-notes', noteId),
+
+    // Check if session has notes
+    hasNotes: (sessionId) => ipcRenderer.invoke('post-meeting:has-notes', sessionId),
+
+    // Listeners
+    onNotesGenerated: (callback) => ipcRenderer.on('post-meeting:notes-generated', (event, data) => callback(data)),
+    removeOnNotesGenerated: (callback) => ipcRenderer.removeListener('post-meeting:notes-generated', callback),
+    onExportComplete: (callback) => ipcRenderer.on('post-meeting:export-complete', (event, data) => callback(data)),
+    removeOnExportComplete: (callback) => ipcRenderer.removeListener('post-meeting:export-complete', callback),
+    onError: (callback) => ipcRenderer.on('post-meeting:error', (event, data) => callback(data)),
+    removeOnError: (callback) => ipcRenderer.removeListener('post-meeting:error', callback)
   }
 });
