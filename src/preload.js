@@ -726,5 +726,72 @@ contextBridge.exposeInMainWorld('api', {
 
     onInsightDismissed: (callback) => ipcRenderer.on('insight-dismissed', (event, data) => callback(data)),
     removeOnInsightDismissed: (callback) => ipcRenderer.removeListener('insight-dismissed', callback)
+  },
+
+  // Phase 3.3: Notifications
+  notifications: {
+    // Get all notifications
+    getAll: () => ipcRenderer.invoke('notifications:get-all')
+      .then(result => result.success ? result.notifications : []),
+
+    // Get unread notifications
+    getUnread: () => ipcRenderer.invoke('notifications:get-unread')
+      .then(result => result.success ? result.notifications : []),
+
+    // Get unread count
+    getUnreadCount: () => ipcRenderer.invoke('notifications:get-unread-count')
+      .then(result => result.success ? result.count : 0),
+
+    // Mark notification as read
+    markAsRead: (notificationId) => ipcRenderer.invoke('notifications:mark-as-read', notificationId)
+      .then(result => result.success),
+
+    // Mark all as read
+    markAllAsRead: () => ipcRenderer.invoke('notifications:mark-all-as-read')
+      .then(result => result.success),
+
+    // Clear notification
+    clear: (notificationId) => ipcRenderer.invoke('notifications:clear', notificationId)
+      .then(result => result.success),
+
+    // Clear all notifications
+    clearAll: () => ipcRenderer.invoke('notifications:clear-all')
+      .then(result => result.success),
+
+    // Get preferences
+    getPreferences: () => ipcRenderer.invoke('notifications:get-preferences')
+      .then(result => result.success ? result.preferences : null),
+
+    // Update preferences
+    updatePreferences: (preferences) => ipcRenderer.invoke('notifications:update-preferences', preferences)
+      .then(result => result.success),
+
+    // Enable/disable notifications
+    setEnabled: (enabled) => ipcRenderer.invoke('notifications:set-enabled', enabled)
+      .then(result => result.success),
+
+    // Get by type
+    getByType: (type) => ipcRenderer.invoke('notifications:get-by-type', type)
+      .then(result => result.success ? result.notifications : []),
+
+    // Get by priority
+    getByPriority: (priority) => ipcRenderer.invoke('notifications:get-by-priority', priority)
+      .then(result => result.success ? result.notifications : []),
+
+    // Event listeners
+    onNotification: (callback) => ipcRenderer.on('notification', (event, data) => callback(data)),
+    removeOnNotification: (callback) => ipcRenderer.removeListener('notification', callback),
+
+    onNotificationRead: (callback) => ipcRenderer.on('notification-read', (event, data) => callback(data)),
+    removeOnNotificationRead: (callback) => ipcRenderer.removeListener('notification-read', callback),
+
+    onAllRead: (callback) => ipcRenderer.on('all-notifications-read', (event) => callback()),
+    removeOnAllRead: (callback) => ipcRenderer.removeListener('all-notifications-read', callback),
+
+    onNotificationCleared: (callback) => ipcRenderer.on('notification-expired', (event, data) => callback(data)),
+    removeOnNotificationCleared: (callback) => ipcRenderer.removeListener('notification-expired', callback),
+
+    onAllCleared: (callback) => ipcRenderer.on('all-notifications-cleared', (event) => callback()),
+    removeOnAllCleared: (callback) => ipcRenderer.removeListener('all-notifications-cleared', callback)
   }
 });

@@ -4,6 +4,7 @@ const SummaryService = require('./summary/summaryService');
 const responseService = require('./response/responseService');
 const liveInsightsService = require('./liveInsights/liveInsightsService');
 const { liveInsightsRepository } = require('./liveInsights/repositories');
+const notificationService = require('./liveInsights/notificationService'); // Phase 3.3
 const authService = require('../common/services/authService');
 const sessionRepository = require('../common/repositories/session');
 const sttRepository = require('./stt/repositories');
@@ -68,6 +69,31 @@ class ListenService {
         liveInsightsService.on('insight-dismissed', (insight) => {
             console.log(`[LiveInsights] Dismissed: ${insight.title}`);
             this.sendToRenderer('insight-dismissed', { insightId: insight.id });
+        });
+
+        // Notification service callbacks (Phase 3.3)
+        notificationService.on('notification', (notification) => {
+            this.sendToRenderer('notification', notification);
+        });
+
+        notificationService.on('notification-read', (notification) => {
+            this.sendToRenderer('notification-read', notification);
+        });
+
+        notificationService.on('all-notifications-read', () => {
+            this.sendToRenderer('all-notifications-read', {});
+        });
+
+        notificationService.on('notification-expired', (notificationId) => {
+            this.sendToRenderer('notification-expired', notificationId);
+        });
+
+        notificationService.on('all-notifications-cleared', () => {
+            this.sendToRenderer('all-notifications-cleared', {});
+        });
+
+        notificationService.on('preferences-updated', (preferences) => {
+            this.sendToRenderer('notification-preferences-updated', { preferences });
         });
     }
 

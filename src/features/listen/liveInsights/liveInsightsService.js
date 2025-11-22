@@ -1,11 +1,12 @@
 /**
- * Live Insights Service - Phase 3.1 + 3.4
+ * Live Insights Service - Phase 3.1 + 3.4 + 3.3
  * Real-time analysis of conversation to detect patterns, decisions, actions, and key moments
- * Enhanced with AI-powered contextual analysis
+ * Enhanced with AI-powered contextual analysis and intelligent notifications
  */
 
 const EventEmitter = require('events');
 const contextualAnalysisService = require('./contextualAnalysisService');
+const notificationService = require('./notificationService');
 
 /**
  * Insight Types
@@ -118,6 +119,7 @@ class LiveInsightsService extends EventEmitter {
         this.questionTracker.clear();
         this.turnCounter = 0;
         contextualAnalysisService.reset(); // Reset AI analysis context
+        notificationService.reset(); // Reset notifications (Phase 3.3)
         console.log('[LiveInsightsService] State reset');
     }
 
@@ -249,16 +251,27 @@ class LiveInsightsService extends EventEmitter {
                     const enrichedInsight = await contextualAnalysisService.enrichInsight(insight);
                     this.insights.push(enrichedInsight);
                     this.emit('insight-detected', enrichedInsight);
+
+                    // Notify via notification service (Phase 3.3)
+                    notificationService.notifyInsight(enrichedInsight);
+
                     console.log(`[LiveInsights] ${enrichedInsight.type}: ${enrichedInsight.title} [${enrichedInsight.sentiment}]`);
                 } catch (error) {
                     console.error('[LiveInsights] Failed to enrich insight:', error);
                     // Fallback: emit original insight
                     this.insights.push(insight);
                     this.emit('insight-detected', insight);
+
+                    // Notify even if enrichment failed
+                    notificationService.notifyInsight(insight);
                 }
             } else {
                 this.insights.push(insight);
                 this.emit('insight-detected', insight);
+
+                // Notify via notification service (Phase 3.3)
+                notificationService.notifyInsight(insight);
+
                 console.log(`[LiveInsights] ${insight.type}: ${insight.title}`);
             }
         });
@@ -422,6 +435,10 @@ class LiveInsightsService extends EventEmitter {
 
                     this.insights.push(insight);
                     this.emit('insight-detected', insight);
+
+                    // Notify AI suggestion (Phase 3.3)
+                    notificationService.notifySuggestion(suggestion);
+
                     console.log(`[LiveInsights] AI Suggestion: ${insight.title}`);
                 });
             }
