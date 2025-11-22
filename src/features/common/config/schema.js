@@ -324,6 +324,60 @@ const LATEST_SCHEMA = {
             { name: 'created_at', type: 'INTEGER' },
             { name: 'sync_state', type: 'TEXT DEFAULT \'clean\'' }
         ]
+    },
+    // Phase 1: Meeting Assistant - Structured Meeting Notes
+    meeting_notes: {
+        columns: [
+            { name: 'id', type: 'TEXT PRIMARY KEY' },
+            { name: 'session_id', type: 'TEXT NOT NULL' }, // Foreign key to sessions
+            { name: 'uid', type: 'TEXT NOT NULL' }, // Owner
+            // Structured data (JSON)
+            { name: 'executive_summary', type: 'TEXT' }, // 2-3 sentence summary
+            { name: 'participants', type: 'TEXT' }, // JSON array of participant names
+            { name: 'meeting_metadata', type: 'TEXT' }, // JSON: duration, mainTopic, type
+            { name: 'key_points', type: 'TEXT' }, // JSON array of key discussion points
+            { name: 'decisions', type: 'TEXT' }, // JSON array of decision objects
+            { name: 'action_items', type: 'TEXT' }, // JSON array of action item objects
+            { name: 'timeline', type: 'TEXT' }, // JSON array of timeline segments
+            { name: 'unresolved_items', type: 'TEXT' }, // JSON array of unresolved questions
+            { name: 'next_steps', type: 'TEXT' }, // JSON array of suggested next steps
+            { name: 'important_quotes', type: 'TEXT' }, // JSON array of quote objects
+            // Full structured data (backup)
+            { name: 'full_structured_data', type: 'TEXT' }, // Complete JSON response from AI
+            // Email drafts
+            { name: 'email_draft', type: 'TEXT' }, // Generated follow-up email
+            // Generation metadata
+            { name: 'model_used', type: 'TEXT' }, // AI model used for generation
+            { name: 'tokens_used', type: 'INTEGER' }, // Token count
+            { name: 'generation_status', type: 'TEXT DEFAULT \'pending\'' }, // 'pending', 'completed', 'failed'
+            { name: 'generation_error', type: 'TEXT' }, // Error message if failed
+            // Timestamps
+            { name: 'created_at', type: 'INTEGER' },
+            { name: 'updated_at', type: 'INTEGER' },
+            { name: 'sync_state', type: 'TEXT DEFAULT \'clean\'' }
+        ]
+    },
+    // Phase 1: Meeting Assistant - Task Management
+    meeting_tasks: {
+        columns: [
+            { name: 'id', type: 'TEXT PRIMARY KEY' },
+            { name: 'meeting_note_id', type: 'TEXT NOT NULL' }, // Foreign key to meeting_notes
+            { name: 'session_id', type: 'TEXT NOT NULL' }, // Foreign key to sessions
+            { name: 'uid', type: 'TEXT NOT NULL' }, // Owner
+            // Task details
+            { name: 'task_description', type: 'TEXT NOT NULL' }, // What needs to be done
+            { name: 'assigned_to', type: 'TEXT' }, // Speaker name or 'Team' or 'TBD'
+            { name: 'deadline', type: 'TEXT' }, // ISO date or 'TBD' or timeframe
+            { name: 'priority', type: 'TEXT DEFAULT \'medium\'' }, // 'low', 'medium', 'high'
+            { name: 'context', type: 'TEXT' }, // Why this task matters
+            // Status tracking
+            { name: 'status', type: 'TEXT DEFAULT \'pending\'' }, // 'pending', 'in_progress', 'completed', 'cancelled'
+            { name: 'completed_at', type: 'INTEGER' }, // When marked complete
+            // Metadata
+            { name: 'created_at', type: 'INTEGER' },
+            { name: 'updated_at', type: 'INTEGER' },
+            { name: 'sync_state', type: 'TEXT DEFAULT \'clean\'' }
+        ]
     }
 };
 
