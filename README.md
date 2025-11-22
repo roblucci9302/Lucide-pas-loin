@@ -28,6 +28,7 @@ Avec les assistants IA classiques, vous devez :
 - ✅ **S'adapte à vous** : répond selon votre industrie, rôle et besoins
 - ✅ **9 experts spécialisés** : RH, CEO, Dev, Marketing, Finance, etc.
 - ✅ **Documents professionnels** : génère PDF, Word, Markdown prêts à l'emploi
+- ✅ **Assistant de réunion intelligent** : transcription temps réel, insights automatiques
 - ✅ **Fonctionne offline** : données en local, confidentialité totale
 
 ---
@@ -116,11 +117,42 @@ Plus vous l'alimentez, plus il devient pertinent pour VOTRE entreprise.
 
 ### 6. Assistant de réunion intelligent
 
-- 🎙️ **Transcription en temps réel** : convertit la parole en texte
-- 📝 **Résumés instantanés** : synthèse de ce qui est dit
-- ✅ **Extraction d'actions** : identifie automatiquement les tâches
-- 👥 **Suivi des participants** : qui a dit quoi
-- 📊 **Analyse post-réunion** : rapport complet après la réunion
+Un système complet d'analyse de réunions en 4 phases :
+
+#### 📝 Phase 1 : Transcription & Export
+- **Transcription temps réel** avec Speech-to-Text multi-provider
+- **Résumés IA** générés par Claude Sonnet 4
+- **Export multi-format** : Markdown, PDF, CSV
+- **Stockage persistant** : SQLite local ou Firebase cloud
+
+#### 👥 Phase 2 : Attribution & Suivi
+- **Attribution des intervenants** avec détection intelligente
+- **Génération d'emails** (4 types : Follow-up, Summary, Action Items, Thank You)
+- **Gestion de tâches avancée** avec priorités, tags et deadlines
+- **Suggestions IA** pour les prochaines étapes
+
+#### 💡 Phase 3 : Insights en Direct
+- **Détection d'insights temps réel** (8 types) :
+  - ✅ Décisions : "Nous avons décidé de..."
+  - 📋 Actions : "Jean va gérer l'intégration API"
+  - ⏰ Deadlines : "Nous devons livrer vendredi prochain"
+  - ❓ Questions : "Comment aborder le design de la BDD ?"
+  - 💡 Points clés : "L'aspect le plus important est la sécurité"
+  - ⛔ Blocages : "Nous sommes bloqués par l'API"
+  - 🔄 Changements de sujet
+  - 🔁 Sujets récurrents (mentionnés 3+ fois)
+
+- **Analyse de sentiment IA** (5 types : positif, neutre, négatif, urgent, collaboratif)
+- **Suggestions proactives** générées tous les 5 tours de conversation
+- **Notifications intelligentes** (desktop + in-app) avec niveaux de priorité
+- **30+ algorithmes de détection** pour insights contextuels
+
+#### 📊 Phase 4 : Analytics & Dashboard
+- **Statistiques complètes** sur toutes vos réunions
+- **Extraction de sujets tendance** avec analyse de fréquence
+- **Tendances de productivité** (jour/semaine/mois)
+- **Comparaisons de sessions** et score d'engagement
+- **Dashboard interactif** avec filtres période (7j, 30j, tout)
 
 ---
 
@@ -147,8 +179,15 @@ nvm use 20
 ### Démarrage rapide
 
 ```bash
+# Cloner le repository
+git clone https://github.com/roblucci9302/Lucide-pas-loin.git
+cd Lucide-pas-loin
+
 # Installation complète (dépendances + build + démarrage)
 npm run setup
+
+# Démarrer l'application
+npm start
 ```
 
 Cette commande :
@@ -156,13 +195,28 @@ Cette commande :
 2. Build l'interface web
 3. Démarre l'application
 
+### Dépendances optionnelles
+
+Lucide utilise un système de dégradation gracieuse. L'application fonctionne sans ces modules, mais certaines fonctionnalités avancées les requièrent :
+
+```bash
+# Toutes les dépendances optionnelles
+npm install uuid better-sqlite3 pg mysql2
+
+# Ou individuellement
+npm install uuid           # Pour l'indexation de documents
+npm install better-sqlite3 # Pour SQLite natif
+npm install pg             # Pour PostgreSQL
+npm install mysql2         # Pour MySQL
+```
+
 ### Configuration
 
 Au premier lancement, configurez votre clé API :
 
 - **OpenAI** : [Obtenir une clé](https://platform.openai.com/api-keys)
 - **Gemini** : [Obtenir une clé](https://aistudio.google.com/apikey)
-- **Claude** : Configurez dans les paramètres
+- **Claude** : [Obtenir une clé](https://console.anthropic.com/)
 - **Ollama** : Aucune clé requise (modèles locaux)
 
 ---
@@ -174,7 +228,7 @@ Au premier lancement, configurez votre clé API :
 - **Base de données** : SQLite (local) + Firebase (cloud optionnel)
 - **IA** : Multi-provider (OpenAI, Anthropic, Google, Ollama)
 - **Documents** : PDFKit, DOCX, Mammoth, PDF-Parse
-- **Speech** : Deepgram (cloud), Whisper (local)
+- **Speech** : Deepgram (cloud), Whisper (local), OpenAI
 - **OCR** : Tesseract.js
 
 ---
@@ -211,12 +265,76 @@ npm run test:integration:sqlite
 npm run docker:stop
 ```
 
+### Tests manuels
+
+Suivez le guide de tests complet :
+```bash
+cat TESTING_GUIDE.md
+```
+
+**31 cas de tests manuels** couvrant toutes les phases :
+- Phase 1 : 4 tests
+- Phase 2 : 5 tests
+- Phase 3 : 11 tests
+- Phase 4 : 8 tests
+- Intégration : 3 tests
+
 ### Intégration Continue
 
 GitHub Actions exécute automatiquement :
 - ✅ Tests d'intégration (30 tests)
 - ✅ Tests unitaires + linting
 - ✅ Build multi-plateforme
+
+---
+
+## 🏗️ Architecture
+
+### Stack Technique
+
+- **Frontend** : Lit Elements (Web Components)
+- **Backend** : Electron + Node.js
+- **Database** : SQLite (local) + Firebase (cloud sync optionnel)
+- **IA** : Claude Sonnet 4 (Anthropic), OpenAI, Google, Ollama
+- **STT** : Multi-provider (OpenAI, Google, modèles locaux)
+
+### Structure du Projet
+
+```
+src/
+├── features/
+│   ├── listen/              # Réunions & transcription
+│   │   ├── stt/            # Speech-to-Text
+│   │   ├── summary/        # Génération résumés IA
+│   │   ├── export/         # Export MD/PDF/CSV
+│   │   ├── participants/   # Attribution intervenants
+│   │   ├── email/          # Génération emails
+│   │   ├── tasks/          # Gestion de tâches
+│   │   ├── followUp/       # Suggestions IA
+│   │   └── liveInsights/   # Insights temps réel
+│   ├── analytics/          # Analytics & Dashboard
+│   ├── ask/                # Questions & réponses
+│   ├── knowledge/          # Base de connaissances (RAG)
+│   └── common/             # Services partagés
+├── ui/
+│   ├── listen/             # Composants UI réunions
+│   ├── analytics/          # Dashboard analytics
+│   ├── ask/                # Interface Q&A
+│   └── components/         # Composants réutilisables
+├── bridge/                 # Communication IPC
+└── preload.js             # APIs exposées
+```
+
+### API Overview
+
+Lucide expose **50+ méthodes** via `window.api` :
+
+- **Insights** : 14 méthodes + 4 event listeners
+- **Notifications** : 14 méthodes + 6 event listeners
+- **Analytics** : 5 méthodes
+- **Tasks** : Gestion avancée de tâches
+- **Participants** : 7 méthodes
+- **Email** : 5 méthodes
 
 ---
 
@@ -229,14 +347,22 @@ GitHub Actions exécute automatiquement :
 - ✅ Phase 2 : Mémoire augmentée (RAG, knowledge graph)
 - ✅ Phase 3 : Tests & CI/CD (Docker, 30 tests)
 - ✅ Phase 4 : Documents & export (PDF, Word, Markdown)
+- ✅ Meeting Assistant : 4 phases complètes (transcription, analytics, insights)
 - 🚧 Phase WOW : Profils utilisateur & onboarding (en cours)
+
+**Statistiques** :
+- ~6500+ lignes de code production
+- 50+ méthodes API
+- 30+ templates de workflows
+- 8 types d'insights détectés
+- 30+ regex patterns pour détection
 
 ---
 
 ## 🔒 Sécurité & confidentialité
 
 - **Offline-first** : fonctionne sans connexion Internet
-- **Stockage local** : vos données restent sur votre machine
+- **Stockage local** : vos données restent sur votre machine (SQLite)
 - **Chiffrement** : données sensibles chiffrées
 - **Aucune collecte** : vous contrôlez vos providers IA
 - **RGPD compliant** : conformité native
@@ -246,11 +372,13 @@ GitHub Actions exécute automatiquement :
 ## 📚 Documentation
 
 Documentation technique complète :
-- [Architecture du système](./ARCHITECTURE_DOCUMENTS.md)
-- [Guide de développement](./PHASE_3_PLAN_AND_ROADMAP.md)
-- [Gestion des dépendances](./DEPENDENCY_MANAGEMENT.md)
-- [Guide des tests](./tests/README.md)
-- [Présentation investisseurs](./PRESENTATION_INVESTISSEURS.md)
+- [TESTING_GUIDE.md](./TESTING_GUIDE.md) - Guide de tests manuels (31 tests)
+- [IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md) - Documentation complète des features
+- [ARCHITECTURE_DOCUMENTS.md](./ARCHITECTURE_DOCUMENTS.md) - Architecture du système
+- [PHASE_3_PLAN_AND_ROADMAP.md](./PHASE_3_PLAN_AND_ROADMAP.md) - Plan de développement
+- [DEPENDENCY_MANAGEMENT.md](./DEPENDENCY_MANAGEMENT.md) - Gestion des dépendances
+- [PRESENTATION_INVESTISSEURS.md](./PRESENTATION_INVESTISSEURS.md) - Présentation investisseurs
+- [CONTRIBUTING.md](./CONTRIBUTING.md) - Guide de contribution
 
 ---
 
@@ -258,7 +386,18 @@ Documentation technique complète :
 
 Les contributions sont les bienvenues !
 
-Consultez notre [guide de contribution](./CONTRIBUTING.md) pour commencer.
+1. Forkez le repository
+2. Créez une branche feature (`git checkout -b feature/amazing-feature`)
+3. Committez vos changements (`git commit -m 'Add amazing feature'`)
+4. Pushez vers la branche (`git push origin feature/amazing-feature`)
+5. Ouvrez une Pull Request
+
+### Guidelines de développement
+
+- Suivez le style de code existant
+- Ajoutez des tests pour les nouvelles features
+- Mettez à jour la documentation
+- Assurez-vous que tous les tests passent
 
 ---
 
@@ -278,7 +417,16 @@ GPL-3.0
 | Zéro mémoire | **Mémoire complète** |
 | Génère du texte | **Documents professionnels** |
 | Cloud uniquement | **Fonctionne offline** |
+| Pas d'insights réunions | **Analytics complètes + insights temps réel** |
+
+---
+
+## 🙏 Remerciements
+
+Ce projet est un fork de [CheatingDaddy](https://github.com/sohzm/cheating-daddy) avec des modifications extensives. Merci à [Soham](https://x.com/soham_btw) et tous les contributeurs open-source.
 
 ---
 
 **Lucide - L'IA qui devient VOTRE assistant personnel** 🚀
+
+*Dernière mise à jour : 2025-11-22*
