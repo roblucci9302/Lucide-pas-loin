@@ -652,6 +652,16 @@ contextBridge.exposeInMainWorld('api', {
       .then(result => {
         if (!result.success) throw new Error(result.error);
         return result;
-      })
+      }),
+
+    // Phase 2.4 - Follow-up Suggestions
+    generateSuggestions: (sessionId, options = {}) => ipcRenderer.invoke('tasks:generate-suggestions', sessionId, options)
+      .then(result => result.success ? result.suggestions : []),
+
+    acceptSuggestion: (sessionId, suggestion) => ipcRenderer.invoke('tasks:accept-suggestion', sessionId, suggestion)
+      .then(result => result),
+
+    dismissSuggestion: (sessionId, suggestionType) => ipcRenderer.invoke('tasks:dismiss-suggestion', sessionId, suggestionType)
+      .then(result => result)
   }
 });

@@ -399,6 +399,8 @@ export class PostMeetingPanel extends LitElement {
         showEmailModal: { type: Boolean },
         currentEmailData: { type: Object },
         isGeneratingEmail: { type: Boolean },
+        suggestions: { type: Array },
+        isLoadingSuggestions: { type: Boolean },
     };
 
     constructor() {
@@ -414,6 +416,8 @@ export class PostMeetingPanel extends LitElement {
         this.showEmailModal = false;
         this.currentEmailData = null;
         this.isGeneratingEmail = false;
+        this.suggestions = [];
+        this.isLoadingSuggestions = false;
 
         // Setup IPC listeners
         this._setupListeners();
@@ -470,11 +474,82 @@ export class PostMeetingPanel extends LitElement {
             if (result) {
                 this.meetingNotes = result.notes;
                 this.tasks = result.tasks || [];
+
+                // Load suggestions if notes exist
+                if (this.meetingNotes) {
+                    this.loadSuggestions();
+                }
             }
         } catch (error) {
             console.error('[PostMeetingPanel] Error loading notes:', error);
         } finally {
             this.isLoading = false;
+        }
+    }
+
+    async loadSuggestions() {
+        if (!this.sessionId || !this.meetingNotes) return;
+
+        this.isLoadingSuggestions = true;
+        try {
+            const suggestions = await window.api.tasks.generateSuggestions(this.sessionId, {
+                useAI: true // Enable AI suggestions
+            });
+            this.suggestions = suggestions || [];
+            console.log(`[PostMeetingPanel] Loaded ${this.suggestions.length} suggestions`);
+        } catch (error) {
+            console.error('[PostMeetingPanel] Error loading suggestions:', error);
+            this.suggestions = [];
+        } finally {
+            this.isLoadingSuggestions = false;
+        }
+    }
+
+    async handleAcceptSuggestion(suggestion) {
+        if (!this.sessionId) return;
+
+        try {
+            const result = await window.api.tasks.acceptSuggestion(this.sessionId, suggestion);
+
+            if (result.success) {
+                // Remove from suggestions list
+                this.suggestions = this.suggestions.filter(s => s.type !== suggestion.type);
+
+                // Handle specific actions
+                if (result.action === 'open_task_assignment') {
+                    // Could open task modal here
+                    this.message = { type: 'success', text: '✅ Action appliquée' };
+                } else if (result.action === 'filter_upcoming_tasks') {
+                    this.activeTab = 'tasks';
+                    this.message = { type: 'success', text: '✅ Affichage des tâches à échéance' };
+                } else {
+                    this.message = { type: 'success', text: `✅ ${result.message}` };
+                }
+
+                // Reload if auto-assign was done
+                if (suggestion.action === 'auto_assign_emails') {
+                    await this.loadMeetingNotes();
+                }
+
+                setTimeout(() => { this.message = null; }, 3000);
+            }
+        } catch (error) {
+            console.error('[PostMeetingPanel] Error accepting suggestion:', error);
+            this.message = { type: 'error', text: `❌ Erreur: ${error.message}` };
+            setTimeout(() => { this.message = null; }, 3000);
+        }
+    }
+
+    async handleDismissSuggestion(suggestion) {
+        if (!this.sessionId) return;
+
+        try {
+            await window.api.tasks.dismissSuggestion(this.sessionId, suggestion.type);
+
+            // Remove from list
+            this.suggestions = this.suggestions.filter(s => s.type !== suggestion.type);
+        } catch (error) {
+            console.error('[PostMeetingPanel] Error dismissing suggestion:', error);
         }
     }
 
@@ -632,6 +707,52 @@ export class PostMeetingPanel extends LitElement {
                     </div>
                 `}
             </div>
+
+            ${this.suggestions.length > 0 ? html`
+                <div class="summary-section">
+                    <h3 class="section-title">💡 Suggestions de suivi</h3>
+                    <ul class="item-list">
+                        ${this.suggestions.slice(0, 5).map(suggestion => html`
+                            <li class="list-item">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
+                                    <div style="flex: 1;">
+                                        <div class="item-title" style="display: flex; align-items: center; gap: 6px;">
+                                            ${suggestion.priority === 'high' ? '🔴' : suggestion.priority === 'low' ? '🟢' : '🟡'}
+                                            ${suggestion.title}
+                                        </div>
+                                        <div style="color: var(--color-white-70); font-size: 10px; margin-top: 4px;">
+                                            ${suggestion.description}
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 4px; flex-shrink: 0;">
+                                        <button
+                                            class="export-button"
+                                            style="padding: 4px 8px; font-size: 9px;"
+                                            @click=${() => this.handleAcceptSuggestion(suggestion)}
+                                        >
+                                            ✓ Appliquer
+                                        </button>
+                                        <button
+                                            class="export-button"
+                                            style="padding: 4px 8px; font-size: 9px; background: var(--color-white-5);"
+                                            @click=${() => this.handleDismissSuggestion(suggestion)}
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                </div>
+                            </li>
+                        `)}
+                    </ul>
+                </div>
+            ` : this.isLoadingSuggestions ? html`
+                <div class="summary-section">
+                    <h3 class="section-title">💡 Suggestions de suivi</h3>
+                    <div style="color: var(--color-white-60); font-size: 11px; font-style: italic; text-align: center; padding: 12px;">
+                        ⏳ Analyse en cours...
+                    </div>
+                </div>
+            ` : ''}
 
             <div class="summary-section">
                 <h3 class="section-title">📝 Résumé exécutif</h3>

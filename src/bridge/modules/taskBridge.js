@@ -3,6 +3,7 @@
  */
 const { ipcMain } = require('electron');
 const taskManagementService = require('../../features/listen/postCall/taskManagementService');
+const followUpSuggestionsService = require('../../features/listen/postCall/followUpSuggestionsService');
 const { meetingTasksRepository } = require('../../features/listen/postCall/repositories');
 
 module.exports = {
@@ -266,6 +267,76 @@ module.exports = {
                 };
             } catch (error) {
                 console.error('[TaskBridge] Error exporting to CSV:', error);
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        });
+
+        /**
+         * Generate follow-up suggestions (Phase 2.4)
+         * @param {string} sessionId - Session ID
+         * @param {Object} options - Generation options
+         * @returns {Promise<Object>} Suggestions
+         */
+        ipcMain.handle('tasks:generate-suggestions', async (event, sessionId, options = {}) => {
+            try {
+                console.log(`[TaskBridge] Generating follow-up suggestions for session ${sessionId}`);
+
+                const suggestions = await followUpSuggestionsService.generateSuggestions(sessionId, options);
+
+                return {
+                    success: true,
+                    suggestions
+                };
+            } catch (error) {
+                console.error('[TaskBridge] Error generating suggestions:', error);
+                return {
+                    success: false,
+                    error: error.message,
+                    suggestions: []
+                };
+            }
+        });
+
+        /**
+         * Accept a suggestion
+         * @param {string} sessionId - Session ID
+         * @param {Object} suggestion - Suggestion to accept
+         * @returns {Promise<Object>} Action result
+         */
+        ipcMain.handle('tasks:accept-suggestion', async (event, sessionId, suggestion) => {
+            try {
+                console.log(`[TaskBridge] Accepting suggestion: ${suggestion.type}`);
+
+                const result = await followUpSuggestionsService.acceptSuggestion(sessionId, suggestion);
+
+                return result;
+            } catch (error) {
+                console.error('[TaskBridge] Error accepting suggestion:', error);
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        });
+
+        /**
+         * Dismiss a suggestion
+         * @param {string} sessionId - Session ID
+         * @param {string} suggestionType - Type of suggestion
+         * @returns {Promise<Object>} Dismiss result
+         */
+        ipcMain.handle('tasks:dismiss-suggestion', async (event, sessionId, suggestionType) => {
+            try {
+                console.log(`[TaskBridge] Dismissing suggestion: ${suggestionType}`);
+
+                const result = followUpSuggestionsService.dismissSuggestion(sessionId, suggestionType);
+
+                return result;
+            } catch (error) {
+                console.error('[TaskBridge] Error dismissing suggestion:', error);
                 return {
                     success: false,
                     error: error.message
