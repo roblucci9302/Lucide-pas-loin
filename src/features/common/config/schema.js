@@ -372,8 +372,15 @@ const LATEST_SCHEMA = {
             { name: 'priority', type: 'TEXT DEFAULT \'medium\'' }, // 'low', 'medium', 'high'
             { name: 'context', type: 'TEXT' }, // Why this task matters
             // Status tracking
-            { name: 'status', type: 'TEXT DEFAULT \'pending\'' }, // 'pending', 'in_progress', 'completed', 'cancelled'
+            { name: 'status', type: 'TEXT DEFAULT \'pending\'' }, // 'pending', 'in_progress', 'completed', 'cancelled', 'blocked'
             { name: 'completed_at', type: 'INTEGER' }, // When marked complete
+            // Phase 2.3: Advanced task management
+            { name: 'notes', type: 'TEXT' }, // Additional notes on the task
+            { name: 'blocked_reason', type: 'TEXT' }, // Why task is blocked (if status='blocked')
+            { name: 'reminder_date', type: 'TEXT' }, // ISO date for reminder
+            { name: 'reminder_sent', type: 'INTEGER DEFAULT 0' }, // Boolean: has reminder been sent
+            { name: 'estimated_hours', type: 'REAL' }, // Estimated time to complete (in hours)
+            { name: 'tags', type: 'TEXT' }, // JSON array of tags ['frontend', 'urgent']
             // Metadata
             { name: 'created_at', type: 'INTEGER' },
             { name: 'updated_at', type: 'INTEGER' },

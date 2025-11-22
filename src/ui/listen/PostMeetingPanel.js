@@ -682,6 +682,44 @@ export class PostMeetingPanel extends LitElement {
         `;
     }
 
+    async handleAutoAssignEmails() {
+        if (!this.sessionId) return;
+
+        try {
+            this.message = { type: 'success', text: '⏳ Attribution des emails en cours...' };
+            const result = await window.api.tasks.autoAssignEmails(this.sessionId);
+
+            if (result.success) {
+                this.message = { type: 'success', text: `✅ ${result.assigned} emails attribués sur ${result.total} tâches` };
+                await this.loadMeetingNotes(); // Reload to get updated tasks
+            } else {
+                this.message = { type: 'error', text: `❌ ${result.message}` };
+            }
+
+            setTimeout(() => { this.message = null; }, 3000);
+        } catch (error) {
+            console.error('[PostMeetingPanel] Error auto-assigning emails:', error);
+            this.message = { type: 'error', text: `❌ Erreur: ${error.message}` };
+            setTimeout(() => { this.message = null; }, 3000);
+        }
+    }
+
+    async handleExportTasksCSV() {
+        if (!this.sessionId) return;
+
+        try {
+            this.message = { type: 'success', text: '⏳ Export des tâches en cours...' };
+            const result = await window.api.tasks.exportToCSV(this.sessionId);
+
+            this.message = { type: 'success', text: `✅ Export réussi: ${result.fileName}` };
+            setTimeout(() => { this.message = null; }, 5000);
+        } catch (error) {
+            console.error('[PostMeetingPanel] Error exporting tasks:', error);
+            this.message = { type: 'error', text: `❌ Erreur: ${error.message}` };
+            setTimeout(() => { this.message = null; }, 3000);
+        }
+    }
+
     renderTasksTab() {
         if (this.tasks.length === 0) {
             return html`
@@ -694,7 +732,25 @@ export class PostMeetingPanel extends LitElement {
 
         return html`
             <div class="summary-section">
-                <h3 class="section-title">✅ Actions à suivre (${this.tasks.length})</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h3 class="section-title" style="margin: 0;">✅ Actions à suivre (${this.tasks.length})</h3>
+                    <div style="display: flex; gap: 8px;">
+                        <button
+                            class="export-button"
+                            style="padding: 6px 12px; font-size: 10px;"
+                            @click=${this.handleAutoAssignEmails}
+                        >
+                            📧 Attribuer emails
+                        </button>
+                        <button
+                            class="export-button"
+                            style="padding: 6px 12px; font-size: 10px;"
+                            @click=${this.handleExportTasksCSV}
+                        >
+                            📊 Export CSV
+                        </button>
+                    </div>
+                </div>
                 <ul class="item-list">
                     ${this.tasks.map(task => html`
                         <li class="list-item task-item ${task.status === 'completed' ? 'task-completed' : ''}">

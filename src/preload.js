@@ -595,5 +595,63 @@ contextBridge.exposeInMainWorld('api', {
     // Open email in default mail client
     openInMailClient: (emailData) => ipcRenderer.invoke('email:open-in-mail-client', emailData)
       .then(result => result.success)
+  },
+
+  // Phase 2.3 - Advanced Task Management
+  tasks: {
+    // Auto-assign emails from participants
+    autoAssignEmails: (sessionId) => ipcRenderer.invoke('tasks:auto-assign-emails', sessionId)
+      .then(result => result),
+
+    // Update task
+    updateTask: (taskId, updates) => ipcRenderer.invoke('tasks:update', taskId, updates)
+      .then(result => {
+        if (!result.success) throw new Error(result.error);
+        return result;
+      }),
+
+    // Change task status
+    changeStatus: (taskId, newStatus, metadata = {}) => ipcRenderer.invoke('tasks:change-status', taskId, newStatus, metadata)
+      .then(result => {
+        if (!result.success) throw new Error(result.error);
+        return result;
+      }),
+
+    // Get tasks by status
+    getByStatus: (sessionId, status) => ipcRenderer.invoke('tasks:get-by-status', sessionId, status)
+      .then(result => result.success ? result.tasks : []),
+
+    // Get overdue tasks
+    getOverdue: (sessionId = null) => ipcRenderer.invoke('tasks:get-overdue', sessionId)
+      .then(result => result.success ? result.tasks : []),
+
+    // Get upcoming tasks
+    getUpcoming: (days = 7, sessionId = null) => ipcRenderer.invoke('tasks:get-upcoming', days, sessionId)
+      .then(result => result.success ? result.tasks : []),
+
+    // Set reminder
+    setReminder: (taskId, reminderDate) => ipcRenderer.invoke('tasks:set-reminder', taskId, reminderDate)
+      .then(result => {
+        if (!result.success) throw new Error(result.error);
+        return result;
+      }),
+
+    // Add tags
+    addTags: (taskId, tags) => ipcRenderer.invoke('tasks:add-tags', taskId, tags)
+      .then(result => {
+        if (!result.success) throw new Error(result.error);
+        return result;
+      }),
+
+    // Get statistics
+    getStatistics: (sessionId) => ipcRenderer.invoke('tasks:get-statistics', sessionId)
+      .then(result => result.success ? result.stats : null),
+
+    // Export to CSV
+    exportToCSV: (sessionId) => ipcRenderer.invoke('tasks:export-csv', sessionId)
+      .then(result => {
+        if (!result.success) throw new Error(result.error);
+        return result;
+      })
   }
 });
