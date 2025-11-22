@@ -1,48 +1,134 @@
-# Lucide - AI-Powered Meeting Assistant 🎙️
+# Lucide - Assistant de Réunion Intelligent Propulsé par l'IA 🎙️
 
-**Lucide** is a comprehensive, intelligent meeting assistant built with Electron that transforms your meetings into actionable insights through real-time transcription, AI analysis, and automated follow-up.
+**Lucide** est un assistant de réunion intelligent et complet, développé avec Electron, qui transforme vos réunions en insights actionnables grâce à la transcription en temps réel, l'analyse IA et le suivi automatisé.
 
-## ✨ Key Features
+## 📋 Table des matières
 
-### 🎯 Phase 1: Meeting Notes & Export
-- **Real-time transcription** with Speech-to-Text
-- **AI-powered summaries** using Claude Sonnet 4
-- **Multi-format export** (Markdown, PDF, CSV)
-- **Persistent storage** (SQLite/Firebase)
+- [Qu'est-ce que Lucide ?](#quest-ce-que-lucide-)
+- [Fonctionnalités principales](#-fonctionnalités-principales)
+- [Installation rapide](#-installation-rapide)
+- [Modes d'utilisation](#-modes-dutilisation)
+- [Architecture technique](#-architecture-technique)
+- [Configuration](#-configuration)
+- [Tests](#-tests)
+- [Contribution](#-contribution)
+- [Licence](#-licence)
 
-### 👥 Phase 2: Smart Attribution & Follow-up
-- **Speaker attribution** with intelligent participant detection
-- **Email generation** (4 types: Follow-up, Summary, Action Items, Thank You)
-- **Advanced task management** with priorities, tags, and deadlines
-- **AI-powered suggestions** for next steps and action items
+## Qu'est-ce que Lucide ?
 
-### 💡 Phase 3: Live Insights & Intelligence
-- **Real-time insight detection** (8 types: decisions, actions, deadlines, questions, key points, blockers, topic changes, recurring topics)
-- **AI sentiment analysis** (5 types: positive, neutral, negative, urgent, collaborative)
-- **Proactive AI suggestions** generated every 5 conversation turns
-- **Smart notifications** (desktop + in-app) with priority-based alerting
-- **30+ pattern detection** algorithms for context-aware insights
+Lucide est une **application desktop multi-plateforme** (Windows, macOS, Linux) qui révolutionne la façon dont vous gérez vos réunions et vos conversations professionnelles. Propulsée par l'intelligence artificielle, Lucide capture, analyse et transforme vos discussions en données actionnables.
 
-### 📊 Phase 4: Analytics & Dashboard
-- **Comprehensive analytics** across all your meetings
-- **Trending topics** extraction with frequency analysis
-- **Productivity trends** tracking (daily/weekly/monthly)
-- **Session comparisons** and engagement scoring
-- **Interactive dashboard** with period filtering (7 days, 30 days, all time)
+### À quoi sert Lucide ?
 
-## 🚀 Quick Start
+- **📝 Prendre des notes automatiquement** pendant vos réunions
+- **🎯 Identifier les décisions**, actions et deadlines en temps réel
+- **👥 Attribuer automatiquement** les interventions aux bons participants
+- **📊 Analyser vos réunions** pour détecter des tendances et améliorer la productivité
+- **💼 Générer des emails de suivi** professionnels automatiquement
+- **📚 Créer une base de connaissances** avec vos documents et conversations
+- **🤖 Bénéficier d'un assistant IA personnalisé** avec 9 profils spécialisés
 
-### Prerequisites
+### Cas d'usage principaux
 
-- **Node.js** v20.x.x ([Download](https://nodejs.org/en/download))
-- **Python** ([Download](https://www.python.org/downloads/))
-- **Windows only**: [Build Tools for Visual Studio](https://visualstudio.microsoft.com/downloads/)
+- **Réunions d'équipe** : Capture automatique, distribution des tâches
+- **Entretiens** : Transcription, analyse de sentiment, résumés RH
+- **Formations** : Prise de notes automatique, génération de résumés
+- **Brainstorming** : Capture d'idées, détection de patterns
+- **Gestion de projets** : Extraction d'actions, deadlines, blocages
+- **Recherche** : Base de connaissances avec citations automatiques
+
+## ✨ Fonctionnalités principales
+
+### 🎯 Phase 1 : Prise de Notes & Export
+
+- **Transcription en temps réel** avec plusieurs moteurs Speech-to-Text (Whisper, Deepgram, OpenAI)
+- **Résumés intelligents** générés par Claude Sonnet 4
+- **Export multi-format** : Markdown, PDF professionnel, CSV
+- **Stockage persistant** : SQLite local + synchronisation cloud Firebase optionnelle
+
+### 👥 Phase 2 : Attribution Intelligente & Suivi
+
+- **Attribution automatique des speakers** avec détection intelligente des participants
+- **Génération d'emails professionnels** en 4 types :
+  - Email de suivi (Follow-up)
+  - Résumé de réunion (Summary)
+  - Liste des actions (Action Items)
+  - Remerciements (Thank You)
+- **Gestion avancée des tâches** avec :
+  - 5 états : À faire, En cours, Terminé, Annulé, En pause
+  - Niveaux de priorité : Faible, Moyen, Élevé, Urgent
+  - Tags personnalisés et deadlines
+  - Export CSV pour intégration externe
+- **Suggestions IA** pour les prochaines étapes et actions à entreprendre
+
+### 💡 Phase 3 : Insights en Temps Réel & Intelligence
+
+- **Détection automatique de 8 types d'insights** :
+  - ✅ **Décisions** : "Nous avons décidé de choisir l'option A"
+  - 📋 **Actions** : "Jean va s'occuper de l'intégration API"
+  - ⏰ **Deadlines** : "Il nous faut ça pour vendredi prochain"
+  - ❓ **Questions** : "Comment devons-nous aborder la conception?"
+  - 💡 **Points clés** : "L'aspect le plus important est la sécurité"
+  - ⛔ **Blocages** : "Nous sommes bloqués par le problème d'API"
+  - 🔄 **Changements de sujet** : "Parlons maintenant du frontend"
+  - 🔁 **Sujets récurrents** : Sujets mentionnés 3 fois ou plus
+
+- **Analyse de sentiment IA** en 5 types : Positif, Neutre, Négatif, Urgent, Collaboratif
+- **Suggestions proactives** générées toutes les 5 interventions
+- **Notifications intelligentes** avec :
+  - 4 niveaux de priorité (Faible, Moyen, Élevé, Critique)
+  - Notifications desktop pour insights prioritaires
+  - Centre de notifications in-app avec compteur
+  - Configuration personnalisable (types, son, desktop/in-app)
+- **Plus de 30 algorithmes de détection** de patterns pour une analyse contextuelle
+
+### 📊 Phase 4 : Analytics & Dashboard
+
+- **Statistiques complètes** : Nombre de réunions, durée totale, insights générés
+- **Répartition des insights** par type avec visualisations
+- **Identification du jour le plus productif**
+- **Sujets tendances** avec analyse de fréquence
+- **Timeline de productivité** avec tendances visuelles
+- **Filtres de période** : 7 jours, 30 jours, historique complet
+- **Comparaison de sessions** et scoring d'engagement
+
+### 🚀 Phase WOW : Base de Connaissances & Assistant IA
+
+- **Base de connaissances avec RAG** (Retrieval Augmented Generation)
+- **Upload et analyse de documents** :
+  - PDF, DOCX, TXT, Markdown
+  - Images avec OCR (reconnaissance de texte)
+  - Tableaux Excel
+- **Recherche sémantique** avec embeddings vectoriels
+- **Citations automatiques** des sources dans les réponses
+- **9 profils d'agents IA spécialisés** :
+  - 🎓 Assistant général
+  - 📚 Étudiant
+  - 🔬 Chercheur
+  - 👔 Ressources Humaines
+  - 💻 IT/Tech
+  - 📈 Marketing
+  - 👨‍💼 CEO/Direction
+  - 💰 Sales/Commercial
+  - 📊 Manager/Chef de projet
+- **Génération de documents professionnels** : CV, lettres de motivation, rapports
+- **Export de documents** : PDF, DOCX, Markdown
+- **Système de workflows** pour tâches complexes
+- **Support multi-langues** (internationalisation i18n)
+
+## 🚀 Installation rapide
+
+### Prérequis
+
+- **Node.js** v20.x.x ([Télécharger](https://nodejs.org/fr/download))
+- **Python** ([Télécharger](https://www.python.org/downloads/))
+- **Windows uniquement** : [Build Tools for Visual Studio](https://visualstudio.microsoft.com/fr/downloads/)
 
 ```bash
-# Check your Node.js version
+# Vérifier votre version de Node.js
 node --version
 
-# If needed, use nvm to switch to Node.js 20
+# Si nécessaire, utiliser nvm pour passer à Node.js 20
 # nvm install 20
 # nvm use 20
 ```
@@ -50,253 +136,352 @@ node --version
 ### Installation
 
 ```bash
-# Clone the repository
+# Cloner le dépôt
 git clone https://github.com/roblucci9302/Lucide-pas-loin.git
 cd Lucide-pas-loin
 
-# Install dependencies
+# Installer les dépendances
 npm run setup
 
-# Start the application
+# Démarrer l'application
 npm start
 ```
 
-### Optional Dependencies
+### Dépendances optionnelles
 
-Lucide uses a graceful degradation system. Core features work without these, but for full functionality:
+Lucide utilise un système de dégradation gracieuse. Les fonctionnalités de base fonctionnent sans ces dépendances, mais pour une fonctionnalité complète :
 
 ```bash
-# All optional dependencies
+# Toutes les dépendances optionnelles
 npm install uuid better-sqlite3 pg mysql2
 
-# Or individually
-npm install uuid          # For document indexing
-npm install better-sqlite3 # For local SQLite database
-npm install pg            # For PostgreSQL support
-npm install mysql2        # For MySQL support
+# Ou individuellement
+npm install uuid              # Pour l'indexation de documents
+npm install better-sqlite3    # Pour la base de données SQLite locale
+npm install pg                # Pour le support PostgreSQL
+npm install mysql2            # Pour le support MySQL
 ```
 
-## 🎨 Features Deep Dive
+## 🎨 Modes d'utilisation
 
-### Live Insights Detection
+### 1. Mode Réunion (Listen)
 
-Lucide automatically detects and categorizes insights during your meetings:
+**Activation** : Bouton "Écouter" dans le header
 
-- **✅ Decisions**: "We decided to go with option A"
-- **📋 Actions**: "John will handle the API integration"
-- **⏰ Deadlines**: "We need this by next Friday"
-- **❓ Questions**: "How should we approach the database design?"
-- **💡 Key Points**: "The most important aspect is security"
-- **⛔ Blockers**: "We're blocked by the API issue"
-- **🔄 Topic Changes**: "Let's talk about the frontend now"
-- **🔁 Recurring Topics**: Topics mentioned 3+ times
+**Fonctionnalités** :
+- Capture audio du microphone ou loopback (Windows)
+- Transcription en temps réel
+- Détection d'insights automatique
+- Notifications proactives pendant la réunion
+- Attribution des speakers
 
-### Intelligent Notifications
+**Workflow** :
+1. Cliquez sur "Écouter" pour démarrer
+2. Parlez naturellement pendant votre réunion
+3. Consultez les insights en temps réel dans le panneau latéral
+4. Arrêtez l'enregistrement
+5. Accédez au panneau post-réunion pour :
+   - Gérer les participants
+   - Voir les tâches générées
+   - Générer des emails de suivi
+   - Exporter les notes
 
-- **4 priority levels**: Low, Medium, High, Critical
-- **Desktop notifications** for high-priority insights
-- **In-app notification center** with badge counter
-- **Configurable preferences** (types, sound, desktop/in-app)
-- **Auto-expiration** for non-critical notifications (30s)
+### 2. Mode Chat (Ask)
 
-### Analytics Dashboard
+**Activation** : Fenêtre principale
 
-- **Overview statistics**: Total meetings, duration, insights, transcriptions
-- **Insights breakdown** by type with visual cards
-- **Most productive day** identification
-- **Trending topics** with frequency bars
-- **Productivity timeline** with visual trends
+**Fonctionnalités** :
+- Conversation avec l'IA (Claude, GPT-4, Gemini, Ollama)
+- Upload de documents pour analyse
+- Recherche dans la base de connaissances
+- Génération de documents professionnels
+- Citations automatiques des sources
 
-### Task Management
+**Profils disponibles** :
+Choisissez parmi 9 profils spécialisés selon votre besoin (étudiant, chercheur, RH, IT, marketing, CEO, sales, manager)
 
-- **5 task states**: Todo, In Progress, Completed, Cancelled, On Hold
-- **Priority levels**: Low, Medium, High, Urgent
-- **Custom tags** and categorization
-- **Deadline tracking** with reminders
-- **CSV export** for external tools
-- **Advanced filtering** by status, priority, tags
+### 3. Mode Base de Connaissances (Knowledge)
 
-## 🏗️ Architecture
+**Activation** : Menu Knowledge
 
-### Tech Stack
+**Fonctionnalités** :
+- Gestion de vos documents
+- Recherche sémantique avancée
+- Indexation automatique
+- Organisation par tags et catégories
+- Visualisation des documents liés
 
-- **Frontend**: Lit Elements (Web Components)
-- **Backend**: Electron + Node.js
-- **Database**: SQLite (local) + Firebase (optional cloud sync)
-- **AI**: Claude Sonnet 4 (Anthropic)
-- **STT**: Multiple providers (OpenAI, Google, Local)
+### 4. Mode Analytics
 
-### Project Structure
+**Activation** : Menu Analytics
+
+**Fonctionnalités** :
+- Vue d'ensemble de toutes vos réunions
+- Tendances de productivité
+- Identification des sujets récurrents
+- Comparaison de sessions
+- Statistiques détaillées
+
+### 5. Mode Historique (History)
+
+**Fonctionnalités** :
+- Consultation des sessions passées
+- Recherche dans l'historique
+- Ré-analyse de conversations
+- Export de données historiques
+
+## 🏗️ Architecture technique
+
+### Technologies utilisées
+
+#### Frontend
+- **Lit Elements** - Web Components modernes
+- **HTML/CSS** - Interface utilisateur responsive
+- **JavaScript ES6+** - Logique applicative
+
+#### Backend
+- **Electron** v30.5.1 - Framework desktop multi-plateforme
+- **Node.js** v20.x.x - Environnement d'exécution
+- **Better-SQLite3** - Base de données locale SQLite
+- **Firebase** - Synchronisation cloud optionnelle (Firestore + Auth)
+- **Express** - Serveur HTTP intégré
+
+#### Intelligence Artificielle
+- **Claude Sonnet 4** (Anthropic) - Moteur IA principal
+- **OpenAI GPT-4.1** - Alternative LLM
+- **Google Gemini 2.5 Flash** - Alternative LLM
+- **Ollama** - Modèles IA locaux
+- **Whisper** - Speech-to-Text local (tiny, base, small, medium)
+- **Deepgram Nova-3** - Speech-to-Text cloud
+- **Portkey AI** - Gateway IA pour la gestion multi-providers
+
+#### Traitement de documents
+- **Tesseract.js** - OCR pour reconnaissance de texte dans images
+- **pdf-parse** - Extraction de texte PDF
+- **mammoth** - Extraction DOCX
+- **PDFKit** - Génération de PDF professionnels
+- **docx** - Génération de documents Word
+- **marked** - Parsing Markdown
+- **sharp** - Traitement d'images
+- **xlsx** - Gestion de fichiers Excel
+
+### Structure du projet
 
 ```
 src/
-├── features/
-│   ├── listen/              # Meeting recording & transcription
-│   │   ├── stt/            # Speech-to-Text service
-│   │   ├── summary/        # AI summary generation
-│   │   ├── export/         # Export to MD/PDF/CSV
-│   │   ├── participants/   # Speaker attribution (Phase 2.1)
-│   │   ├── email/          # Email generation (Phase 2.2)
-│   │   ├── tasks/          # Task management (Phase 2.3)
-│   │   ├── followUp/       # AI suggestions (Phase 2.4)
-│   │   └── liveInsights/   # Real-time insights (Phase 3)
+├── index.js                      # Point d'entrée principal (Electron main process)
+├── preload.js                    # Exposition des APIs (50+ méthodes)
+│
+├── features/                     # Services backend
+│   ├── listen/                   # Fonctionnalités de réunion
+│   │   ├── listenService.js
+│   │   ├── stt/                 # Speech-to-Text
+│   │   ├── summary/             # Résumés IA
+│   │   ├── participants/        # Attribution de speakers (Phase 2.1)
+│   │   ├── email/               # Génération d'emails (Phase 2.2)
+│   │   ├── tasks/               # Gestion de tâches (Phase 2.3)
+│   │   ├── followUp/            # Suggestions IA (Phase 2.4)
+│   │   └── liveInsights/        # Insights en temps réel (Phase 3)
 │   │       ├── liveInsightsService.js
 │   │       ├── notificationService.js
 │   │       └── contextualAnalysisService.js
-│   └── analytics/          # Analytics & Dashboard (Phase 4)
-├── ui/
-│   ├── listen/             # Meeting UI components
+│   │
+│   ├── analytics/               # Analytics & Dashboard (Phase 4)
+│   ├── knowledge/               # Base de connaissances (Phase WOW)
+│   ├── ask/                     # Chat IA
+│   ├── browser/                 # Navigateur intégré
+│   ├── settings/                # Configuration
+│   │
+│   └── common/                  # Services partagés
+│       ├── ai/providers/        # OpenAI, Gemini, Anthropic, Ollama, Whisper, Deepgram
+│       ├── services/            # 40+ services (RAG, OCR, indexation, documents...)
+│       ├── repositories/        # Accès base de données
+│       ├── config/              # Configuration et schémas DB
+│       └── utils/               # Utilitaires
+│
+├── ui/                          # Interface utilisateur (Lit Elements)
+│   ├── app/                     # Application principale
+│   ├── listen/                  # Interface réunion
+│   │   ├── ListenView.js
 │   │   ├── LiveInsightsPanel.js
-│   │   └── NotificationCenter.js
-│   └── analytics/          # Analytics dashboard
-│       └── AnalyticsDashboard.js
-├── bridge/                 # IPC communication
-│   └── modules/            # Feature-specific bridges
-└── preload.js             # Exposed APIs
+│   │   ├── NotificationCenter.js
+│   │   ├── PostMeetingPanel.js
+│   │   ├── ParticipantModal.js
+│   │   └── EmailPreviewModal.js
+│   ├── analytics/               # Dashboard analytics
+│   ├── ask/                     # Interface chat
+│   ├── documents/               # Gestion documents
+│   ├── knowledge/               # Base de connaissances
+│   ├── settings/                # Paramètres
+│   ├── onboarding/              # Onboarding utilisateur
+│   └── i18n/                    # Internationalisation
+│
+├── bridge/                      # Communication IPC (Electron)
+│   └── modules/                 # 10+ bridges spécialisés
+│
+└── window/                      # Gestion des fenêtres Electron
 ```
 
-### API Overview
+### Statistiques du projet
 
-Lucide exposes 50+ methods via `window.api`:
+- **~70,000 lignes** de code JavaScript
+- **50+ méthodes API** exposées via window.api
+- **40+ services backend** spécialisés
+- **20+ composants UI** en Lit Elements
+- **6 fournisseurs IA** supportés
+- **8 types d'insights** détectés automatiquement
+- **9 profils d'agents** IA spécialisés
+- **4 formats d'export** (Markdown, PDF, DOCX, CSV)
+- **30+ algorithmes** de détection de patterns
 
-- **Insights**: 14 methods + 4 event listeners
-- **Notifications**: 14 methods + 6 event listeners
-- **Analytics**: 5 methods
-- **Tasks**: Extended task management
-- **Participants**: 7 methods
-- **Email**: 5 methods
+## ⌨️ Raccourcis clavier
 
-## ⌨️ Keyboard Shortcuts
+- `Ctrl/Cmd + \` : Afficher/masquer la fenêtre principale
+- `Ctrl/Cmd + Enter` : Poser une question à l'IA avec le contexte
+- `Ctrl/Cmd + Flèches` : Déplacer la position de la fenêtre
 
-- `Ctrl/Cmd + \` : Show/hide main window
-- `Ctrl/Cmd + Enter` : Ask AI using context
-- `Ctrl/Cmd + Arrows` : Move window position
+## 🔧 Configuration
 
-## 🧪 Testing
+### Clés API
 
-### Integration Tests
+Lucide supporte plusieurs fournisseurs d'IA. Configurez vos clés API dans Paramètres → Clés API :
+
+- **OpenAI API** : [Obtenir une clé](https://platform.openai.com/api-keys)
+- **Gemini API** : [Obtenir une clé](https://aistudio.google.com/apikey)
+- **Claude API** : [Obtenir une clé](https://console.anthropic.com/)
+- **LLM Local** : Ollama & Whisper (aucune clé nécessaire)
+
+### Préférences de notifications
+
+Personnalisez le comportement des notifications dans Paramètres :
+- Notifications desktop (activées/désactivées)
+- Notifications in-app (activées/désactivées)
+- Alertes sonores
+- Filtres de priorité (élevée uniquement, toutes, etc.)
+- Filtres de type (blocages, deadlines, décisions, etc.)
+
+### Modes de déploiement
+
+1. **Local (Standalone)** :
+   - SQLite uniquement
+   - Pas de synchronisation cloud
+   - Modèles IA locaux (Whisper, Ollama)
+
+2. **Cloud (Connecté)** :
+   - Synchronisation Firebase
+   - APIs IA cloud (OpenAI, Anthropic, Gemini)
+   - Collaboration possible
+
+3. **Hybride** :
+   - SQLite + Firebase
+   - Mix de modèles locaux et cloud
+   - Basculement automatique (fallback)
+
+4. **Entreprise** :
+   - Gateway entreprise
+   - Base de données externe (PostgreSQL/MySQL)
+   - Gestion des licences et permissions
+
+## 🧪 Tests
+
+### Tests d'intégration
 
 ```bash
-# Start test databases (Docker required)
+# Démarrer les bases de données de test (Docker requis)
 npm run docker:start
 
-# Run all integration tests
+# Exécuter tous les tests d'intégration
 npm run test:integration
 
-# Run specific database tests
+# Exécuter des tests spécifiques par base de données
 npm run test:integration:postgres
 npm run test:integration:mysql
 npm run test:integration:sqlite
 
-# Stop test databases
+# Arrêter les bases de données de test
 npm run docker:stop
 ```
 
-### Manual Testing
+### Tests manuels
 
-Follow the comprehensive testing guide:
+Consultez le guide de tests complet :
 
 ```bash
-# View testing guide
+# Voir le guide de tests
 cat TESTING_GUIDE.md
 ```
 
-**31 manual test cases** covering all phases:
-- Phase 1: 4 tests
-- Phase 2: 5 tests
-- Phase 3: 11 tests
-- Phase 4: 8 tests
-- Integration: 3 tests
+**31 cas de test manuels** couvrant toutes les phases :
+- Phase 1 : 4 tests
+- Phase 2 : 5 tests
+- Phase 3 : 11 tests
+- Phase 4 : 8 tests
+- Intégration : 3 tests
 
-## 📊 Implementation Stats
+## 🤝 Contribution
 
-- **~6500+ lines** of production code
-- **18 new files** created
-- **8 files** modified
-- **50+ API methods** exposed
-- **10+ AI prompts** implemented
-- **8 insight types** detected
-- **30+ regex patterns** for detection
+Les contributions sont les bienvenues ! N'hésitez pas à :
 
-## 🤝 Contributing
+1. Forker le dépôt
+2. Créer une branche de fonctionnalité (`git checkout -b feature/super-fonctionnalite`)
+3. Committer vos changements (`git commit -m 'Ajout d'une super fonctionnalité'`)
+4. Pousser vers la branche (`git push origin feature/super-fonctionnalite`)
+5. Ouvrir une Pull Request
 
-We welcome contributions! Feel free to:
+### Directives de développement
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Development Guidelines
-
-- Follow existing code style
-- Add tests for new features
-- Update documentation
-- Ensure all tests pass before submitting
+- Suivre le style de code existant
+- Ajouter des tests pour les nouvelles fonctionnalités
+- Mettre à jour la documentation
+- S'assurer que tous les tests passent avant de soumettre
 
 ## 📝 Documentation
 
-- **[TESTING_GUIDE.md](./TESTING_GUIDE.md)**: Manual testing guide (31 tests)
-- **[IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md)**: Complete feature documentation
-- **[DEPENDENCY_MANAGEMENT.md](./DEPENDENCY_MANAGEMENT.md)**: Dependency guide
-- **[CONTRIBUTING.md](./CONTRIBUTING.md)**: Contribution guidelines
+Documentation complète disponible dans le dépôt :
 
-## 🔧 Configuration
-
-### API Keys
-
-Lucide supports multiple AI providers:
-
-- **OpenAI API**: [Get API Key](https://platform.openai.com/api-keys)
-- **Gemini API**: [Get API Key](https://aistudio.google.com/apikey)
-- **Claude API**: [Get API Key](https://console.anthropic.com/)
-- **Local LLM**: Ollama & Whisper (no API key needed)
-
-Configure in Settings → API Keys
-
-### Notification Preferences
-
-Customize notification behavior in Settings:
-- Desktop notifications (on/off)
-- In-app notifications (on/off)
-- Sound alerts
-- Priority filters (high only, all, etc.)
-- Type filters (blockers, deadlines, decisions, etc.)
+- **[TESTING_GUIDE.md](./TESTING_GUIDE.md)** : Guide de tests manuels (31 tests)
+- **[IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md)** : Documentation complète des fonctionnalités
+- **[DEPENDENCY_MANAGEMENT.md](./DEPENDENCY_MANAGEMENT.md)** : Guide de gestion des dépendances
+- **[CONTRIBUTING.md](./CONTRIBUTING.md)** : Guide de contribution
+- **[docs/](./docs/)** : Documentation technique détaillée (60+ fichiers)
 
 ## 🗺️ Roadmap
 
-### Completed ✅
-- [x] Phase 1: Meeting Notes & Export
-- [x] Phase 2: Attribution, Emails, Tasks, Suggestions
-- [x] Phase 3: Live Insights, AI Analysis, Notifications
-- [x] Phase 4: Analytics & Dashboard
+### Complété ✅
 
-### Future Enhancements 🚀
-- [ ] Multi-language support
-- [ ] Integration with Slack, Teams, Calendar
-- [ ] Collaborative note-taking
-- [ ] Voice commands during meetings
-- [ ] Mobile app (iOS/Android)
-- [ ] Cloud synchronization improvements
-- [ ] Custom AI model training
-- [ ] Meeting templates
+- [x] Phase 1 : Prise de notes et export
+- [x] Phase 2 : Attribution, emails, tâches, suggestions
+- [x] Phase 3 : Insights en temps réel, analyse IA, notifications
+- [x] Phase 4 : Analytics et dashboard
+- [x] Phase WOW : Base de connaissances avec RAG et agents spécialisés
 
-## 📄 License
+### Améliorations futures 🚀
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- [ ] Support multi-langues complet (i18n)
+- [ ] Intégrations avec Slack, Teams, Calendar
+- [ ] Prise de notes collaborative
+- [ ] Commandes vocales pendant les réunions
+- [ ] Application mobile (iOS/Android)
+- [ ] Amélioration de la synchronisation cloud
+- [ ] Entraînement de modèles IA personnalisés
+- [ ] Templates de réunion prédéfinis
+- [ ] Marketplace de plugins
 
-## 🙏 Acknowledgments
+## 📄 Licence
 
-This project is a fork of [CheatingDaddy](https://github.com/sohzm/cheating-daddy) with extensive modifications. Thanks to [Soham](https://x.com/soham_btw) and all open-source contributors.
+Ce projet est sous licence GPL-3.0 - voir le fichier [LICENSE](LICENSE) pour plus de détails.
+
+## 🙏 Remerciements
+
+Ce projet est un fork de [CheatingDaddy](https://github.com/sohzm/cheating-daddy) avec des modifications extensives. Merci à [Soham](https://x.com/soham_btw) et à tous les contributeurs open-source.
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/roblucci9302/Lucide-pas-loin/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/roblucci9302/Lucide-pas-loin/discussions)
+- **Issues** : [GitHub Issues](https://github.com/roblucci9302/Lucide-pas-loin/issues)
+- **Discussions** : [GitHub Discussions](https://github.com/roblucci9302/Lucide-pas-loin/discussions)
 
 ---
 
-**Built with ❤️ using Electron, Lit Elements**
+**Développé avec ❤️ en utilisant Electron et Lit Elements**
 
-*Last updated: 2025-11-22*
+*Dernière mise à jour : 2025-11-22*
