@@ -297,6 +297,6 @@ This project is a fork of [CheatingDaddy](https://github.com/sohzm/cheating-dadd
 
 ---
 
-**Built with ❤️ using Electron, Lit Elements, and Claude AI**
+**Built with ❤️ using Electron, Lit Elements**
 
 *Last updated: 2025-11-22*
