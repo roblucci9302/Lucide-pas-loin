@@ -793,5 +793,28 @@ contextBridge.exposeInMainWorld('api', {
 
     onAllCleared: (callback) => ipcRenderer.on('all-notifications-cleared', (event) => callback()),
     removeOnAllCleared: (callback) => ipcRenderer.removeListener('all-notifications-cleared', callback)
+  },
+
+  // Phase 4: Analytics
+  analytics: {
+    // Get overview statistics
+    getOverview: (options = {}) => ipcRenderer.invoke('analytics:get-overview', options)
+      .then(result => result.success ? result.stats : null),
+
+    // Get session analytics
+    getSession: (sessionId) => ipcRenderer.invoke('analytics:get-session', sessionId)
+      .then(result => result.success ? result.analytics : null),
+
+    // Get trending topics
+    getTrendingTopics: (options = {}) => ipcRenderer.invoke('analytics:get-trending-topics', options)
+      .then(result => result.success ? result.topics : []),
+
+    // Get productivity trends
+    getProductivityTrends: (options = {}) => ipcRenderer.invoke('analytics:get-productivity-trends', options)
+      .then(result => result.success ? result.trends : []),
+
+    // Compare sessions
+    compareSessions: (sessionId1, sessionId2) => ipcRenderer.invoke('analytics:compare-sessions', sessionId1, sessionId2)
+      .then(result => result.success ? result.comparison : null)
   }
 });

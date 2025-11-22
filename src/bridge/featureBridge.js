@@ -18,6 +18,7 @@ const emailBridge = require('./modules/emailBridge'); // Phase 2 - Email Generat
 const taskBridge = require('./modules/taskBridge'); // Phase 2.3 - Task Management
 const liveInsightsBridge = require('./modules/liveInsightsBridge'); // Phase 3 - Live Insights
 const notificationBridge = require('./modules/notificationBridge'); // Phase 3.3 - Notifications
+const analyticsBridge = require('./modules/analyticsBridge'); // Phase 4 - Analytics
 
 module.exports = {
     /**
@@ -42,6 +43,7 @@ module.exports = {
         taskBridge.initialize(); // Phase 2.3 - Task Management
         liveInsightsBridge.initialize(); // Phase 3 - Live Insights
         notificationBridge.initialize(); // Phase 3.3 - Notifications
+        analyticsBridge.initialize(); // Phase 4 - Analytics
 
         console.log('[FeatureBridge] All bridges initialized successfully');
     },
