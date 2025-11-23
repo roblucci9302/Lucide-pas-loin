@@ -1,7 +1,7 @@
 {
     "name": "lucide",
     "productName": "Lucide",
-    "version": "0.2.4",
+    "version": "0.3.0",
     "description": "Lucide - Assistant IA",
     "main": "src/index.js",
     "scripts": {
@@ -39,9 +39,10 @@
         "assistant ia"
     ],
     "author": {
-        "name": "Pickle Team"
+        "name": "Robespierre Ganro (roblucci9302)",
+        "email": "robganray@gmail.com"
     },
-    "license": "GPL-3.0",
+    "license": "PROPRIETARY",
     "dependencies": {
         "@anthropic-ai/sdk": "^0.56.0",
         "@deepgram/sdk": "^4.9.1",

@@ -521,26 +521,42 @@ Un avenir où :
 
 ## 📄 Licence
 
-GPL-3.0 - Voir [LICENSE](LICENSE) pour plus de détails.
+**Licence Propriétaire** - Voir [LICENSE](LICENSE) pour plus de détails.
+
+**Copyright © 2025 Robespierre Ganro (roblucci9302). Tous droits réservés.**
+
+### Utilisation Gratuite (Non-Commerciale)
+
+Vous pouvez utiliser Lucide gratuitement pour :
+- ✅ Usage personnel non commercial
+- ✅ Évaluation et tests
+- ✅ Démonstrations
+
+### Utilisation Commerciale
+
+Pour toute utilisation commerciale, contactez : **robganray@gmail.com**
 
 ---
 
 ## 🙏 Remerciements
 
-Projet inspiré de [CheatingDaddy](https://github.com/sohzm/cheating-daddy) par [Soham](https://x.com/soham_btw).
+Projet conceptuellement inspiré de l'idée d'assistants IA pour réunions.
 
-Merci à la communauté open-source et à tous les contributeurs.
+Merci aux technologies open-source utilisées : Electron, SQLite, Firebase, et les APIs IA (OpenAI, Anthropic, Google).
+
+**Auteur** : Robespierre Ganro (roblucci9302)
 
 ---
 
 <div align="center">
 
-**Construit avec ❤️ par des humains, pour des humains, avec l'aide de l'IA**
+**Construit avec ❤️ par Robespierre Ganro, avec l'aide de l'IA**
 
 **Lucide - L'assistant qui vous connaît vraiment**
 
 [⭐ Star ce projet](https://github.com/roblucci9302/Lucide-pas-loin) • [🚀 Commencer maintenant](#-installation-rapide) • [📖 Documentation](#-documentation-complète)
 
 *Dernière mise à jour : 2025-11-23*
+*Version : 0.3.0 - Licence Propriétaire*
 
 </div>
