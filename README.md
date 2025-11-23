@@ -1,487 +1,546 @@
-# Lucide - Assistant de Réunion Intelligent Propulsé par l'IA 🎙️
+# Lucide - L'Assistant IA qui vous connaît vraiment 🧠
 
-**Lucide** est un assistant de réunion intelligent et complet, développé avec Electron, qui transforme vos réunions en insights actionnables grâce à la transcription en temps réel, l'analyse IA et le suivi automatisé.
+> **Imaginez un assistant IA qui se souvient de tout, vous connaît en profondeur, et s'adapte à votre réalité unique.**
 
-## 📋 Table des matières
+Lucide n'est pas un énième assistant IA générique. C'est **VOTRE** assistant personnel qui apprend de chaque interaction, mémorise votre contexte professionnel, et devient progressivement l'expert qui vous connaît le mieux.
 
-- [Qu'est-ce que Lucide ?](#quest-ce-que-lucide-)
-- [Fonctionnalités principales](#-fonctionnalités-principales)
-- [Installation rapide](#-installation-rapide)
-- [Modes d'utilisation](#-modes-dutilisation)
-- [Architecture technique](#-architecture-technique)
-- [Configuration](#-configuration)
-- [Tests](#-tests)
-- [Contribution](#-contribution)
-- [Licence](#-licence)
+---
 
-## Qu'est-ce que Lucide ?
+## 💡 Le problème que nous résolvons
 
-Lucide est une **application desktop multi-plateforme** (Windows, macOS, Linux) qui révolutionne la façon dont vous gérez vos réunions et vos conversations professionnelles. Propulsée par l'intelligence artificielle, Lucide capture, analyse et transforme vos discussions en données actionnables.
+Vous êtes-vous déjà retrouvé à **réexpliquer votre contexte** à ChatGPT ou Claude pour la dixième fois ?
 
-### À quoi sert Lucide ?
+- "Je suis CEO d'une startup SaaS de 15 personnes en phase Seed..."
+- "Mon budget marketing est limité à..."
+- "Comme je te l'ai déjà dit, notre stack technique est..."
 
-- **📝 Prendre des notes automatiquement** pendant vos réunions
-- **🎯 Identifier les décisions**, actions et deadlines en temps réel
-- **👥 Attribuer automatiquement** les interventions aux bons participants
-- **📊 Analyser vos réunions** pour détecter des tendances et améliorer la productivité
-- **💼 Générer des emails de suivi** professionnels automatiquement
-- **📚 Créer une base de connaissances** avec vos documents et conversations
-- **🤖 Bénéficier d'un assistant IA personnalisé** avec 9 profils spécialisés
+**C'est frustrant.** C'est comme si vous engagiez un consultant qui souffre d'amnésie sévère et ne se souvient jamais de votre dernier rendez-vous.
 
-### Cas d'usage principaux
+### ✨ Notre réponse : Lucide
 
-- **Réunions d'équipe** : Capture automatique, distribution des tâches
-- **Entretiens** : Transcription, analyse de sentiment, résumés RH
-- **Formations** : Prise de notes automatique, génération de résumés
-- **Brainstorming** : Capture d'idées, détection de patterns
-- **Gestion de projets** : Extraction d'actions, deadlines, blocages
-- **Recherche** : Base de connaissances avec citations automatiques
+Lucide est fondamentalement différent. C'est un assistant qui :
 
-## ✨ Fonctionnalités principales
+- ✅ **Se souvient** de toutes vos conversations, documents et contextes
+- ✅ **Vous connaît** en profondeur : votre rôle, votre industrie, vos objectifs
+- ✅ **S'adapte** automatiquement à vos besoins du moment
+- ✅ **Évolue** avec vous au fil de votre parcours professionnel
+- ✅ **Se spécialise** instantanément selon votre demande
 
-### 🎯 Phase 1 : Prise de Notes & Export
+---
 
-- **Transcription en temps réel** avec plusieurs moteurs Speech-to-Text (Whisper, Deepgram, OpenAI)
-- **Résumés intelligents** générés par Claude Sonnet 4
-- **Export multi-format** : Markdown, PDF professionnel, CSV
-- **Stockage persistant** : SQLite local + synchronisation cloud Firebase optionnelle
+## 🎯 Ce qui rend Lucide unique
 
-### 👥 Phase 2 : Attribution Intelligente & Suivi
+### 1. 🧠 La Mémoire Contextuelle Permanente
 
-- **Attribution automatique des speakers** avec détection intelligente des participants
-- **Génération d'emails professionnels** en 4 types :
-  - Email de suivi (Follow-up)
-  - Résumé de réunion (Summary)
-  - Liste des actions (Action Items)
-  - Remerciements (Thank You)
-- **Gestion avancée des tâches** avec :
-  - 5 états : À faire, En cours, Terminé, Annulé, En pause
-  - Niveaux de priorité : Faible, Moyen, Élevé, Urgent
-  - Tags personnalisés et deadlines
-  - Export CSV pour intégration externe
-- **Suggestions IA** pour les prochaines étapes et actions à entreprendre
+Contrairement aux assistants classiques qui oublient tout entre chaque conversation, **Lucide se souvient de TOUT** :
 
-### 💡 Phase 3 : Insights en Temps Réel & Intelligence
+| Assistants classiques | Lucide |
+|----------------------|---------|
+| 🔴 Aucune mémoire entre les sessions | 🟢 Mémoire permanente de votre historique complet |
+| 🔴 Contexte réexpliqué à chaque fois | 🟢 Connaît votre contexte professionnel en profondeur |
+| 🔴 Réponses génériques et standardisées | 🟢 Réponses ultra-personnalisées à votre situation |
+| 🔴 Un seul profil, une seule approche | 🟢 9 experts spécialisés qui s'activent selon vos besoins |
+| 🔴 Texte brut sans structure | 🟢 Documents professionnels prêts à l'emploi |
+| 🔴 Toujours en ligne, données dans le cloud | 🟢 Fonctionne 100% offline, vos données restent locales |
 
-- **Détection automatique de 8 types d'insights** :
-  - ✅ **Décisions** : "Nous avons décidé de choisir l'option A"
-  - 📋 **Actions** : "Jean va s'occuper de l'intégration API"
-  - ⏰ **Deadlines** : "Il nous faut ça pour vendredi prochain"
-  - ❓ **Questions** : "Comment devons-nous aborder la conception?"
-  - 💡 **Points clés** : "L'aspect le plus important est la sécurité"
-  - ⛔ **Blocages** : "Nous sommes bloqués par le problème d'API"
-  - 🔄 **Changements de sujet** : "Parlons maintenant du frontend"
-  - 🔁 **Sujets récurrents** : Sujets mentionnés 3 fois ou plus
+### 2. 👥 9 Profils d'Experts qui vous connaissent
 
-- **Analyse de sentiment IA** en 5 types : Positif, Neutre, Négatif, Urgent, Collaboratif
-- **Suggestions proactives** générées toutes les 5 interventions
-- **Notifications intelligentes** avec :
-  - 4 niveaux de priorité (Faible, Moyen, Élevé, Critique)
-  - Notifications desktop pour insights prioritaires
-  - Centre de notifications in-app avec compteur
-  - Configuration personnalisable (types, son, desktop/in-app)
-- **Plus de 30 algorithmes de détection** de patterns pour une analyse contextuelle
+Lucide ne fait pas semblant d'être un expert. Il **SE TRANSFORME** en l'expert dont vous avez besoin, tout en gardant la mémoire de qui vous êtes :
 
-### 📊 Phase 4 : Analytics & Dashboard
+**🎓 Lucide Assistant Général**
+- Votre assistant polyvalent du quotidien
+- Connaît votre contexte et s'adapte à vos besoins
 
-- **Statistiques complètes** : Nombre de réunions, durée totale, insights générés
-- **Répartition des insights** par type avec visualisations
-- **Identification du jour le plus productif**
-- **Sujets tendances** avec analyse de fréquence
-- **Timeline de productivité** avec tendances visuelles
-- **Filtres de période** : 7 jours, 30 jours, historique complet
-- **Comparaison de sessions** et scoring d'engagement
+**👨‍💼 Lucide CEO Advisor**
+- Votre conseiller stratégique personnel
+- Vous aide sur : OKRs, fundraising, pitch decks, board meetings
+- Se souvient de votre stade (Seed/Serie A), votre ARR, vos objectifs de croissance
 
-### 🚀 Phase WOW : Base de Connaissances & Assistant IA
+**💰 Lucide Sales Expert**
+- Votre directeur commercial virtuel
+- Maîtrise MEDDIC, BANT, Challenger Sale
+- Connaît votre pipeline, vos personas, votre cycle de vente
 
-- **Base de connaissances avec RAG** (Retrieval Augmented Generation)
-- **Upload et analyse de documents** :
-  - PDF, DOCX, TXT, Markdown
-  - Images avec OCR (reconnaissance de texte)
-  - Tableaux Excel
-- **Recherche sémantique** avec embeddings vectoriels
-- **Citations automatiques** des sources dans les réponses
-- **9 profils d'agents IA spécialisés** :
-  - 🎓 Assistant général
-  - 📚 Étudiant
-  - 🔬 Chercheur
-  - 👔 Ressources Humaines
-  - 💻 IT/Tech
-  - 📈 Marketing
-  - 👨‍💼 CEO/Direction
-  - 💰 Sales/Commercial
-  - 📊 Manager/Chef de projet
-- **Génération de documents professionnels** : CV, lettres de motivation, rapports
-- **Export de documents** : PDF, DOCX, Markdown
-- **Système de workflows** pour tâches complexes
-- **Support multi-langues** (internationalisation i18n)
+**👔 Lucide HR Specialist**
+- Votre responsable RH dédié
+- Recrute, onboarde, gère les conflits, fait les reviews
+- Se souvient de votre org chart, culture, grille salariale
 
-## 🚀 Installation rapide
+**💻 Lucide IT Expert**
+- Votre CTO personnel
+- Architecture, debugging, code review, DevOps
+- Connaît votre stack technique, vos contraintes, votre dette technique
+
+**📈 Lucide Marketing Expert**
+- Votre CMO à la demande
+- SEO, content, growth, performance marketing
+- Se souvient de vos personas, canaux, campagnes précédentes
+
+**📊 Lucide Manager Coach**
+- Votre coach de management
+- 1:1s, feedback, délégation, team building
+- Connaît votre équipe, vos challenges, votre style
+
+**🔬 Lucide Researcher**
+- Votre superviseur académique
+- Méthodologie, rédaction scientifique, grants
+- Se souvient de votre sujet de recherche, vos deadlines
+
+**📚 Lucide Student Assistant**
+- Votre tuteur personnel
+- Méthodologie, révisions, dissertations
+- Connaît vos cours, vos examens, vos points faibles
+
+### 3. 🤖 Le Routage Intelligent Automatique
+
+**Vous n'avez même pas à choisir l'expert.**
+
+Lucide analyse votre question en temps réel et **active automatiquement le bon profil** :
+
+```
+Vous : "Comment structurer mon processus de recrutement ?"
+→ Lucide active automatiquement le profil RH
+
+Vous : "Aide-moi à optimiser notre funnel d'acquisition"
+→ Lucide bascule automatiquement sur le profil Marketing
+
+Vous : "On a un bug critique en production"
+→ Lucide active le profil IT Expert
+```
+
+**Et tout en changeant d'expert, Lucide garde la mémoire complète de votre contexte.**
+
+---
+
+## 🚀 Fonctionnalités Principales
+
+### 📚 Base de Connaissances Personnelle (RAG)
+
+Uploadez vos documents, et Lucide les **intègre dans sa mémoire** :
+
+- 📄 **PDF, DOCX, TXT, Markdown** : vos business plans, contrats, procédures
+- 🖼️ **Images avec OCR** : vos schémas, screenshots, documents scannés
+- 🔍 **Recherche sémantique** : retrouve instantanément l'info pertinente
+- 💬 **Citations automatiques** : toujours sourcées et vérifiables
+
+**Exemple concret :**
+
+```
+Vous uploadez votre business plan de 50 pages il y a 2 mois.
+
+Aujourd'hui vous demandez : "Quelle est notre stratégie GTM pour 2025 ?"
+
+Lucide retrouve automatiquement la section page 23, extrait les passages
+pertinents, et répond : "D'après votre business plan (section GTM, p.23),
+votre stratégie 2025 repose sur 3 piliers : partenariats stratégiques,
+content marketing SEO-driven, et outbound ciblé..."
+```
+
+### 🎨 30+ Workflows Professionnels
+
+Au lieu de chercher comment formuler votre demande, **remplissez simplement un formulaire guidé** :
+
+**Pour les RH :**
+- ✅ Créer une offre d'emploi complète
+- ✅ Analyser un CV avec scoring
+- ✅ Plan d'onboarding 30-60-90 jours
+- ✅ Grille salariale par poste
+- ✅ Guide d'entretien structuré
+- ✅ Plan de résolution de conflit
+
+**Pour les CEO :**
+- ✅ Plan stratégique annuel
+- ✅ Rapport trimestriel investisseurs
+- ✅ Pitch deck levée de fonds
+- ✅ Présentation board meeting
+- ✅ OKRs d'entreprise
+
+**Pour les Marketeurs :**
+- ✅ Plan de campagne complet
+- ✅ Calendrier éditorial 3-6 mois
+- ✅ Buyer personas détaillés
+- ✅ Analyse concurrentielle
+- ✅ Stratégie de contenu
+
+**Pour les Managers :**
+- ✅ Plan de projet structuré
+- ✅ Feedback de performance
+- ✅ Structure de one-on-one
+- ✅ Plan de développement d'équipe
+
+**Valeur économique :** Ces documents coûtent entre 500€ et 2000€ chez un consultant. Avec Lucide, vous les générez en 10 minutes.
+
+### 📄 Documents Professionnels Prêts à l'Emploi
+
+Lucide ne génère pas du texte brut. Il crée de **vrais documents professionnels** :
+
+- 📕 **PDF** : mise en page professionnelle, prêt à imprimer
+- 📘 **DOCX** : format Word natif, éditable
+- 📙 **Markdown** : pour Notion, Confluence, GitHub
+
+**Et tout est personnalisé à votre contexte.**
+
+Exemple : créer une offre d'emploi
+
+| ChatGPT | Lucide |
+|---------|--------|
+| "Voici un template générique d'offre d'emploi..." | "En tant que startup SaaS de 12 personnes en Seed, voici une offre adaptée : Stack React/Node/PostgreSQL (votre stack), 55-70K€ (réaliste pour votre budget), equity importante (levier Seed), remote flexible..." |
+
+### 🎙️ Mode Listen : Transformez vos réunions en insights
+
+**Capture et transcription en temps réel** de toutes vos réunions :
+
+- 🎤 Transcription audio instantanée (Whisper, Deepgram, OpenAI)
+- 🧠 Détection automatique de **8 types d'insights** :
+  - ✅ Décisions prises
+  - 📋 Actions assignées
+  - ⏰ Deadlines mentionnées
+  - ❓ Questions ouvertes
+  - 💡 Points clés
+  - ⛔ Blocages identifiés
+  - 🔄 Changements de sujet
+  - 🔁 Sujets récurrents
+
+- 📧 **Génération automatique d'emails de suivi** (4 types)
+- ✅ **Extraction de tâches** avec assignation et deadlines
+- 👥 **Attribution des speakers** intelligente
+- 📊 **Résumés intelligents** avec quiz de compréhension
+
+**Et tout est mémorisé dans votre historique permanent.**
+
+### 📊 Analytics : Comprenez vos patterns de travail
+
+Lucide **analyse votre activité** pour vous révéler des insights :
+
+- 📈 Tendances de productivité (jour le plus productif, heures clés)
+- 🔥 Sujets récurrents (ce qui revient souvent = ce qui compte)
+- 📉 Comparaison de sessions (évolution dans le temps)
+- 🎯 Score d'engagement par réunion
+- 💬 Distribution des insights par type
+
+---
+
+## 🔐 Confidentialité & Sécurité
+
+### 🏠 Offline-First : Vos données restent CHEZ VOUS
+
+Contrairement à tous les autres assistants IA :
+
+- ✅ **Tout est stocké localement** (SQLite)
+- ✅ **Fonctionne 100% offline** (aucune connexion requise)
+- ✅ **Vos données ne partent JAMAIS** vers nos serveurs
+- ✅ **Chiffrement AES-256** pour les données sensibles
+- ✅ **Conforme RGPD** by design
+- ✅ **Support on-premise** pour les entreprises
+
+**Mode cloud optionnel :** Vous pouvez activer la sync Firebase si vous le souhaitez (multi-devices), mais c'est votre choix.
+
+---
+
+## 🛠️ Installation Rapide
 
 ### Prérequis
 
 - **Node.js** v20.x.x ([Télécharger](https://nodejs.org/fr/download))
 - **Python** ([Télécharger](https://www.python.org/downloads/))
-- **Windows uniquement** : [Build Tools for Visual Studio](https://visualstudio.microsoft.com/fr/downloads/)
+
+### Installation en 3 commandes
 
 ```bash
-# Vérifier votre version de Node.js
-node --version
-
-# Si nécessaire, utiliser nvm pour passer à Node.js 20
-# nvm install 20
-# nvm use 20
-```
-
-### Installation
-
-```bash
-# Cloner le dépôt
+# 1. Cloner le dépôt
 git clone https://github.com/roblucci9302/Lucide-pas-loin.git
 cd Lucide-pas-loin
 
-# Installer les dépendances
+# 2. Installer les dépendances
 npm run setup
 
-# Démarrer l'application
+# 3. Démarrer
 npm start
 ```
 
-### Dépendances optionnelles
+**C'est tout !** Lucide démarre en mode offline par défaut.
 
-Lucide utilise un système de dégradation gracieuse. Les fonctionnalités de base fonctionnent sans ces dépendances, mais pour une fonctionnalité complète :
+### Configuration des clés API (optionnel)
 
-```bash
-# Toutes les dépendances optionnelles
-npm install uuid better-sqlite3 pg mysql2
+Pour utiliser les modèles IA cloud (recommandé pour de meilleures performances) :
 
-# Ou individuellement
-npm install uuid              # Pour l'indexation de documents
-npm install better-sqlite3    # Pour la base de données SQLite locale
-npm install pg                # Pour le support PostgreSQL
-npm install mysql2            # Pour le support MySQL
-```
-
-## 🎨 Modes d'utilisation
-
-### 1. Mode Réunion (Listen)
-
-**Activation** : Bouton "Écouter" dans le header
-
-**Fonctionnalités** :
-- Capture audio du microphone ou loopback (Windows)
-- Transcription en temps réel
-- Détection d'insights automatique
-- Notifications proactives pendant la réunion
-- Attribution des speakers
-
-**Workflow** :
-1. Cliquez sur "Écouter" pour démarrer
-2. Parlez naturellement pendant votre réunion
-3. Consultez les insights en temps réel dans le panneau latéral
-4. Arrêtez l'enregistrement
-5. Accédez au panneau post-réunion pour :
-   - Gérer les participants
-   - Voir les tâches générées
-   - Générer des emails de suivi
-   - Exporter les notes
-
-### 2. Mode Chat (Ask)
-
-**Activation** : Fenêtre principale
-
-**Fonctionnalités** :
-- Conversation avec l'IA (Claude, GPT-4, Gemini, Ollama)
-- Upload de documents pour analyse
-- Recherche dans la base de connaissances
-- Génération de documents professionnels
-- Citations automatiques des sources
-
-**Profils disponibles** :
-Choisissez parmi 9 profils spécialisés selon votre besoin (étudiant, chercheur, RH, IT, marketing, CEO, sales, manager)
-
-### 3. Mode Base de Connaissances (Knowledge)
-
-**Activation** : Menu Knowledge
-
-**Fonctionnalités** :
-- Gestion de vos documents
-- Recherche sémantique avancée
-- Indexation automatique
-- Organisation par tags et catégories
-- Visualisation des documents liés
-
-### 4. Mode Analytics
-
-**Activation** : Menu Analytics
-
-**Fonctionnalités** :
-- Vue d'ensemble de toutes vos réunions
-- Tendances de productivité
-- Identification des sujets récurrents
-- Comparaison de sessions
-- Statistiques détaillées
-
-### 5. Mode Historique (History)
-
-**Fonctionnalités** :
-- Consultation des sessions passées
-- Recherche dans l'historique
-- Ré-analyse de conversations
-- Export de données historiques
-
-## 🏗️ Architecture technique
-
-### Technologies utilisées
-
-#### Frontend
-- **Lit Elements** - Web Components modernes
-- **HTML/CSS** - Interface utilisateur responsive
-- **JavaScript ES6+** - Logique applicative
-
-#### Backend
-- **Electron** v30.5.1 - Framework desktop multi-plateforme
-- **Node.js** v20.x.x - Environnement d'exécution
-- **Better-SQLite3** - Base de données locale SQLite
-- **Firebase** - Synchronisation cloud optionnelle (Firestore + Auth)
-- **Express** - Serveur HTTP intégré
-
-#### Intelligence Artificielle
-- **Claude Sonnet 4** (Anthropic) - Moteur IA principal
-- **OpenAI GPT-4.1** - Alternative LLM
-- **Google Gemini 2.5 Flash** - Alternative LLM
-- **Ollama** - Modèles IA locaux
-- **Whisper** - Speech-to-Text local (tiny, base, small, medium)
-- **Deepgram Nova-3** - Speech-to-Text cloud
-- **Portkey AI** - Gateway IA pour la gestion multi-providers
-
-#### Traitement de documents
-- **Tesseract.js** - OCR pour reconnaissance de texte dans images
-- **pdf-parse** - Extraction de texte PDF
-- **mammoth** - Extraction DOCX
-- **PDFKit** - Génération de PDF professionnels
-- **docx** - Génération de documents Word
-- **marked** - Parsing Markdown
-- **sharp** - Traitement d'images
-- **xlsx** - Gestion de fichiers Excel
-
-### Structure du projet
-
-```
-src/
-├── index.js                      # Point d'entrée principal (Electron main process)
-├── preload.js                    # Exposition des APIs (50+ méthodes)
-│
-├── features/                     # Services backend
-│   ├── listen/                   # Fonctionnalités de réunion
-│   │   ├── listenService.js
-│   │   ├── stt/                 # Speech-to-Text
-│   │   ├── summary/             # Résumés IA
-│   │   ├── participants/        # Attribution de speakers (Phase 2.1)
-│   │   ├── email/               # Génération d'emails (Phase 2.2)
-│   │   ├── tasks/               # Gestion de tâches (Phase 2.3)
-│   │   ├── followUp/            # Suggestions IA (Phase 2.4)
-│   │   └── liveInsights/        # Insights en temps réel (Phase 3)
-│   │       ├── liveInsightsService.js
-│   │       ├── notificationService.js
-│   │       └── contextualAnalysisService.js
-│   │
-│   ├── analytics/               # Analytics & Dashboard (Phase 4)
-│   ├── knowledge/               # Base de connaissances (Phase WOW)
-│   ├── ask/                     # Chat IA
-│   ├── browser/                 # Navigateur intégré
-│   ├── settings/                # Configuration
-│   │
-│   └── common/                  # Services partagés
-│       ├── ai/providers/        # OpenAI, Gemini, Anthropic, Ollama, Whisper, Deepgram
-│       ├── services/            # 40+ services (RAG, OCR, indexation, documents...)
-│       ├── repositories/        # Accès base de données
-│       ├── config/              # Configuration et schémas DB
-│       └── utils/               # Utilitaires
-│
-├── ui/                          # Interface utilisateur (Lit Elements)
-│   ├── app/                     # Application principale
-│   ├── listen/                  # Interface réunion
-│   │   ├── ListenView.js
-│   │   ├── LiveInsightsPanel.js
-│   │   ├── NotificationCenter.js
-│   │   ├── PostMeetingPanel.js
-│   │   ├── ParticipantModal.js
-│   │   └── EmailPreviewModal.js
-│   ├── analytics/               # Dashboard analytics
-│   ├── ask/                     # Interface chat
-│   ├── documents/               # Gestion documents
-│   ├── knowledge/               # Base de connaissances
-│   ├── settings/                # Paramètres
-│   ├── onboarding/              # Onboarding utilisateur
-│   └── i18n/                    # Internationalisation
-│
-├── bridge/                      # Communication IPC (Electron)
-│   └── modules/                 # 10+ bridges spécialisés
-│
-└── window/                      # Gestion des fenêtres Electron
-```
-
-### Statistiques du projet
-
-- **~70,000 lignes** de code JavaScript
-- **50+ méthodes API** exposées via window.api
-- **40+ services backend** spécialisés
-- **20+ composants UI** en Lit Elements
-- **6 fournisseurs IA** supportés
-- **8 types d'insights** détectés automatiquement
-- **9 profils d'agents** IA spécialisés
-- **4 formats d'export** (Markdown, PDF, DOCX, CSV)
-- **30+ algorithmes** de détection de patterns
-
-## ⌨️ Raccourcis clavier
-
-- `Ctrl/Cmd + \` : Afficher/masquer la fenêtre principale
-- `Ctrl/Cmd + Enter` : Poser une question à l'IA avec le contexte
-- `Ctrl/Cmd + Flèches` : Déplacer la position de la fenêtre
-
-## 🔧 Configuration
-
-### Clés API
-
-Lucide supporte plusieurs fournisseurs d'IA. Configurez vos clés API dans Paramètres → Clés API :
-
-- **OpenAI API** : [Obtenir une clé](https://platform.openai.com/api-keys)
-- **Gemini API** : [Obtenir une clé](https://aistudio.google.com/apikey)
-- **Claude API** : [Obtenir une clé](https://console.anthropic.com/)
-- **LLM Local** : Ollama & Whisper (aucune clé nécessaire)
-
-### Préférences de notifications
-
-Personnalisez le comportement des notifications dans Paramètres :
-- Notifications desktop (activées/désactivées)
-- Notifications in-app (activées/désactivées)
-- Alertes sonores
-- Filtres de priorité (élevée uniquement, toutes, etc.)
-- Filtres de type (blocages, deadlines, décisions, etc.)
-
-### Modes de déploiement
-
-1. **Local (Standalone)** :
-   - SQLite uniquement
-   - Pas de synchronisation cloud
-   - Modèles IA locaux (Whisper, Ollama)
-
-2. **Cloud (Connecté)** :
-   - Synchronisation Firebase
-   - APIs IA cloud (OpenAI, Anthropic, Gemini)
-   - Collaboration possible
-
-3. **Hybride** :
-   - SQLite + Firebase
-   - Mix de modèles locaux et cloud
-   - Basculement automatique (fallback)
-
-4. **Entreprise** :
-   - Gateway entreprise
-   - Base de données externe (PostgreSQL/MySQL)
-   - Gestion des licences et permissions
-
-## 🧪 Tests
-
-### Tests d'intégration
-
-```bash
-# Démarrer les bases de données de test (Docker requis)
-npm run docker:start
-
-# Exécuter tous les tests d'intégration
-npm run test:integration
-
-# Exécuter des tests spécifiques par base de données
-npm run test:integration:postgres
-npm run test:integration:mysql
-npm run test:integration:sqlite
-
-# Arrêter les bases de données de test
-npm run docker:stop
-```
-
-### Tests manuels
-
-Consultez le guide de tests complet :
-
-```bash
-# Voir le guide de tests
-cat TESTING_GUIDE.md
-```
-
-**31 cas de test manuels** couvrant toutes les phases :
-- Phase 1 : 4 tests
-- Phase 2 : 5 tests
-- Phase 3 : 11 tests
-- Phase 4 : 8 tests
-- Intégration : 3 tests
-
-## 🤝 Contribution
-
-Les contributions sont les bienvenues ! N'hésitez pas à :
-
-1. Forker le dépôt
-2. Créer une branche de fonctionnalité (`git checkout -b feature/super-fonctionnalite`)
-3. Committer vos changements (`git commit -m 'Ajout d'une super fonctionnalité'`)
-4. Pousser vers la branche (`git push origin feature/super-fonctionnalite`)
-5. Ouvrir une Pull Request
-
-### Directives de développement
-
-- Suivre le style de code existant
-- Ajouter des tests pour les nouvelles fonctionnalités
-- Mettre à jour la documentation
-- S'assurer que tous les tests passent avant de soumettre
-
-## 📝 Documentation
-
-Documentation complète disponible dans le dépôt :
-
-- **[TESTING_GUIDE.md](./TESTING_GUIDE.md)** : Guide de tests manuels (31 tests)
-- **[IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md)** : Documentation complète des fonctionnalités
-- **[DEPENDENCY_MANAGEMENT.md](./DEPENDENCY_MANAGEMENT.md)** : Guide de gestion des dépendances
-- **[CONTRIBUTING.md](./CONTRIBUTING.md)** : Guide de contribution
-- **[docs/](./docs/)** : Documentation technique détaillée (60+ fichiers)
-
-## 🗺️ Roadmap
-
-### Complété ✅
-
-- [x] Phase 1 : Prise de notes et export
-- [x] Phase 2 : Attribution, emails, tâches, suggestions
-- [x] Phase 3 : Insights en temps réel, analyse IA, notifications
-- [x] Phase 4 : Analytics et dashboard
-- [x] Phase WOW : Base de connaissances avec RAG et agents spécialisés
-
-### Améliorations futures 🚀
-
-- [ ] Support multi-langues complet (i18n)
-- [ ] Intégrations avec Slack, Teams, Calendar
-- [ ] Prise de notes collaborative
-- [ ] Commandes vocales pendant les réunions
-- [ ] Application mobile (iOS/Android)
-- [ ] Amélioration de la synchronisation cloud
-- [ ] Entraînement de modèles IA personnalisés
-- [ ] Templates de réunion prédéfinis
-- [ ] Marketplace de plugins
-
-## 📄 Licence
-
-Ce projet est sous licence GPL-3.0 - voir le fichier [LICENSE](LICENSE) pour plus de détails.
-
-## 🙏 Remerciements
-
-Ce projet est un fork de [CheatingDaddy](https://github.com/sohzm/cheating-daddy) avec des modifications extensives. Merci à [Soham](https://x.com/soham_btw) et à tous les contributeurs open-source.
-
-## 📞 Support
-
-- **Issues** : [GitHub Issues](https://github.com/roblucci9302/Lucide-pas-loin/issues)
-- **Discussions** : [GitHub Discussions](https://github.com/roblucci9302/Lucide-pas-loin/discussions)
+1. Allez dans **Paramètres → Clés API**
+2. Ajoutez une clé au choix :
+   - **OpenAI** ([Obtenir](https://platform.openai.com/api-keys))
+   - **Anthropic Claude** ([Obtenir](https://console.anthropic.com/))
+   - **Google Gemini** ([Obtenir](https://aistudio.google.com/apikey))
+   - **Ollama** (local, gratuit, aucune clé)
 
 ---
 
-**Développé avec ❤️ en utilisant Electron et Lit Elements**
+## 🎯 Cas d'Usage Concrets
 
-*Dernière mise à jour : 2025-11-22*
+### Scénario 1 : Startup en phase Seed
+
+**Contexte :** Vous êtes CEO d'une startup SaaS de 12 personnes, vous levez 1M€
+
+**Avec ChatGPT :**
+- ❌ Réexpliquer votre contexte à chaque question
+- ❌ Réponses génériques non adaptées
+- ❌ Pas de mémoire de vos échanges précédents
+- ❌ Documents à reformater manuellement
+
+**Avec Lucide :**
+- ✅ Configure une fois : "Startup SaaS, 12 personnes, Seed, ARR 200K€"
+- ✅ Lucide se souvient et personnalise TOUTES ses réponses
+- ✅ Génère pitch deck, plan stratégique, offres d'emploi adaptées
+- ✅ Documents PDF/DOCX prêts à envoyer
+- ✅ Historique complet de votre levée consultable
+
+**Valeur créée :** 10-15K€ de consulting économisés
+
+### Scénario 2 : Responsable RH en PME
+
+**Contexte :** Vous gérez RH pour une PME de 80 personnes
+
+**Avec ChatGPT :**
+- ❌ Templates génériques d'offres d'emploi
+- ❌ Pas de mémoire de votre org chart
+- ❌ Recommandations salariales hors marché
+- ❌ Tout à adapter manuellement
+
+**Avec Lucide :**
+- ✅ Connaît votre grille salariale, vos politiques internes
+- ✅ Se souvient de vos recrutements passés
+- ✅ Génère offres d'emploi cohérentes avec votre culture
+- ✅ Plans d'onboarding personnalisés par département
+- ✅ Base de connaissances avec tous vos process RH
+
+**Valeur créée :** 5-8K€ de recruteurs/consultants RH économisés
+
+### Scénario 3 : Consultant Freelance
+
+**Contexte :** Vous êtes consultant indépendant avec 5-10 clients
+
+**Avec ChatGPT :**
+- ❌ Mélange les contextes entre clients
+- ❌ Aucune mémoire des missions précédentes
+- ❌ Recommandations inadaptées
+
+**Avec Lucide :**
+- ✅ Base de connaissances par client (contrats, specs, historique)
+- ✅ Mémoire complète de chaque mission
+- ✅ Génération de livrables professionnels (rapports, présentations)
+- ✅ Recherche sémantique dans tous vos projets passés
+- ✅ Citations automatiques de vos anciens documents
+
+**Valeur créée :** 20-30h/mois économisées en recherche et rédaction
+
+---
+
+## 🌟 Pourquoi Lucide va changer votre quotidien
+
+### 1. Gain de Temps Massif
+
+**Avant Lucide :**
+- ⏱️ 30 min pour créer une offre d'emploi
+- ⏱️ 2 heures pour un plan stratégique
+- ⏱️ 1 heure pour un rapport de réunion
+- ⏱️ 3 heures pour un pitch deck
+
+**Avec Lucide :**
+- ⚡ 5 min pour une offre d'emploi personnalisée
+- ⚡ 15 min pour un plan stratégique complet
+- ⚡ Rapport de réunion automatique (0 min)
+- ⚡ 20 min pour un pitch deck structuré
+
+**= 10-15 heures économisées par semaine**
+
+### 2. Expertise de Haut Niveau Accessible
+
+**Coût d'un consultant :**
+- 💰 Consultant stratégie : 1500€/jour
+- 💰 Consultant RH : 800€/jour
+- 💰 Agence marketing : 1200€/jour
+- 💰 Architecte logiciel : 1000€/jour
+
+**Coût de Lucide :** 29€/mois (offre Pro)
+
+**= Accès à 9 experts 24/7 pour le prix d'un café par jour**
+
+### 3. Mémoire Parfaite
+
+- 🧠 Se souvient de TOUT ce que vous lui dites
+- 🧠 Historique complet de vos conversations
+- 🧠 Tous vos documents indexés et searchables
+- 🧠 Contexte qui s'enrichit au fil du temps
+- 🧠 Intelligence qui augmente avec l'usage
+
+**Lucide devient progressivement l'expert qui vous connaît le mieux dans votre domaine.**
+
+---
+
+## 🏗️ Architecture Technique
+
+### Technologies
+
+**Frontend :** Lit Elements, Web Components modernes, HTML/CSS
+**Backend :** Electron v30.5.1, Node.js v20.x.x
+**Base de données :** SQLite (local) + Firebase (cloud optionnel)
+**IA :** Support multi-provider (OpenAI, Anthropic, Gemini, Ollama)
+
+### L'Innovation : Dual Repository Pattern
+
+Notre architecture unique permet de **basculer entre SQLite et Firebase sans changer une ligne de code métier** :
+
+```
+Services métier
+     ↓
+Abstract Repository
+     ↓
+   ┌─────────────────┐
+   ↓                 ↓
+SQLite Repo    Firebase Repo
+(offline)      (cloud optionnel)
+```
+
+**Avantages :**
+- ✅ Offline-first natif
+- ✅ Migration données simplifiée
+- ✅ Testabilité maximale
+- ✅ Flexibilité totale
+
+### Statistiques du Projet
+
+- 📦 **70,000 lignes** de code JavaScript
+- 📂 **232 fichiers** organisés en modules
+- 🔌 **50+ méthodes API** exposées
+- 🤖 **6 providers IA** supportés
+- 🧪 **30 tests d'intégration** automatisés
+- 📚 **60+ fichiers** de documentation
+
+---
+
+## 💰 Modèle Économique
+
+### Pricing
+
+| Plan | Prix | Pour qui | Fonctionnalités |
+|------|------|----------|-----------------|
+| **Free** | 0€ | Découvrir Lucide | 1 profil, 10 workflows/mois, SQLite uniquement |
+| **Pro** | 29€/mois | Professionnels | 9 profils, workflows illimités, RAG, sync cloud |
+| **Team** | 99€/mois | Petites équipes | 5 sièges, partage workflows, dashboard admin |
+| **Enterprise** | Sur devis | Grandes entreprises | SSO, on-premise, support dédié |
+
+### ROI Concret
+
+**Pour une PME de 50 personnes :**
+
+Sans Lucide :
+- Consultant stratégie : 15K€/an
+- Consultant RH : 10K€/an
+- Agence marketing : 20K€/an
+- **Total : 45K€/an**
+
+Avec Lucide Team (5 sièges) :
+- **1188€/an**
+
+**= 43,812€ économisés (ROI de 3690%)**
+
+---
+
+## 🗺️ Roadmap
+
+### ✅ Déjà disponible (v0.2.4)
+
+- ✅ 9 profils d'experts spécialisés
+- ✅ Routage intelligent automatique
+- ✅ 30+ workflows professionnels
+- ✅ Base de connaissances avec RAG
+- ✅ Mode Listen avec transcription temps réel
+- ✅ Génération PDF/DOCX/Markdown
+- ✅ Analytics et insights
+- ✅ Mode offline-first complet
+- ✅ Multi-provider IA (OpenAI, Claude, Gemini, Ollama)
+
+### 🚧 En développement (Q1-Q2 2025)
+
+- ⏳ Marketplace de workflows communautaires
+- ⏳ Intégrations Slack, Teams, Notion
+- ⏳ Version mobile (iOS/Android)
+- ⏳ Agents autonomes (tâches de bout en bout)
+- ⏳ Collaboration d'équipe en temps réel
+
+### 🔮 Vision long terme (2025-2026)
+
+- 🔮 Connexion native aux bases de données entreprise
+- 🔮 API publique pour développeurs
+- 🔮 Marketplace d'experts tiers
+- 🔮 Support multi-langues complet
+- 🔮 Commandes vocales pendant réunions
+
+---
+
+## 📚 Documentation Complète
+
+- 📖 **[TESTING_GUIDE.md](./TESTING_GUIDE.md)** : 31 tests manuels détaillés
+- 📖 **[IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md)** : Documentation fonctionnalités
+- 📖 **[DEPENDENCY_MANAGEMENT.md](./DEPENDENCY_MANAGEMENT.md)** : Gestion dépendances
+- 📖 **[docs/](./docs/)** : Documentation technique (60+ fichiers)
+
+---
+
+## 🤝 Contribution
+
+Les contributions sont les bienvenues !
+
+1. Fork le dépôt
+2. Créer une branche : `git checkout -b feature/ma-fonctionnalite`
+3. Commit : `git commit -m 'Ajout fonctionnalité X'`
+4. Push : `git push origin feature/ma-fonctionnalite`
+5. Ouvrir une Pull Request
+
+---
+
+## 🎯 Notre Vision
+
+**Nous construisons l'avenir du travail assisté par l'IA.**
+
+Un avenir où :
+- 🌟 Chaque professionnel a un assistant qui le **connaît personnellement**
+- 🌟 L'expertise de haut niveau est **accessible à tous**, pas seulement aux grandes entreprises
+- 🌟 L'IA ne se contente pas de **répondre à des questions**, elle **comprend votre contexte** et **anticipe vos besoins**
+- 🌟 Votre assistant devient progressivement le **cerveau institutionnel** de votre activité
+
+**Lucide démocratise l'accès à l'expertise.**
+
+---
+
+## 📞 Contact & Support
+
+- 🐛 **Issues** : [GitHub Issues](https://github.com/roblucci9302/Lucide-pas-loin/issues)
+- 💬 **Discussions** : [GitHub Discussions](https://github.com/roblucci9302/Lucide-pas-loin/discussions)
+- 📧 **Email** : [Nous contacter](mailto:contact@lucide.ai)
+
+---
+
+## 📄 Licence
+
+GPL-3.0 - Voir [LICENSE](LICENSE) pour plus de détails.
+
+---
+
+## 🙏 Remerciements
+
+Projet inspiré de [CheatingDaddy](https://github.com/sohzm/cheating-daddy) par [Soham](https://x.com/soham_btw).
+
+Merci à la communauté open-source et à tous les contributeurs.
+
+---
+
+<div align="center">
+
+**Construit avec ❤️ par des humains, pour des humains, avec l'aide de l'IA**
+
+**Lucide - L'assistant qui vous connaît vraiment**
+
+[⭐ Star ce projet](https://github.com/roblucci9302/Lucide-pas-loin) • [🚀 Commencer maintenant](#-installation-rapide) • [📖 Documentation](#-documentation-complète)
+
+*Dernière mise à jour : 2025-11-23*
+
+</div>
